@@ -1,6 +1,7 @@
-﻿using System;
+﻿using StaticSite.Documents;
+using System;
 
-namespace StaticSite.Documents
+namespace StaticSite.Modules
 {
     public static class ModuleResult
     {

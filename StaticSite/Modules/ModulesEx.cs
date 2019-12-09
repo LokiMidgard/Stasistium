@@ -1,15 +1,16 @@
-﻿using System;
+﻿using StaticSite.Documents;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace StaticSite.Documents
+namespace StaticSite.Modules
 {
     public delegate Task<ModuleResult<TResult, TCache>> ModulePerformHandler<TResult, TCache>([AllowNull] BaseCache cache, OptionToken options);
 
-    public static class Modules
+    public static class ModulesEx
     {
         public static GitModule<T> GitModul<T>(this ModuleBase<string, T> input)
             where T : class

@@ -1,8 +1,9 @@
-﻿using System;
+﻿using StaticSite.Documents;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
-namespace StaticSite.Documents
+namespace StaticSite.Modules
 {
     public abstract class ModuleBase<TResult, TCache>
         where TCache : class

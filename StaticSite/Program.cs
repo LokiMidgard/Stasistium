@@ -1,4 +1,5 @@
 ﻿using StaticSite.Documents;
+using StaticSite.Modules;
 using System;
 using System.Threading.Tasks;
 
@@ -9,7 +10,7 @@ namespace StaticSite
         static async Task Main(string[] args)
         {
             var context = new GeneratorContext();
-            var startModule = Modules.FromResult("https://github.com/LokiMidgard/NDProperty.git", context);
+            var startModule = ModulesEx.FromResult("https://github.com/LokiMidgard/NDProperty.git", context);
             var generatorOptions = new GenerationOptions();
             var g = startModule
                 .GitModul()
