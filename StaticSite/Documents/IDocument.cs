@@ -8,7 +8,7 @@ namespace StaticSite.Documents
 {
     public interface IDocument
     {
-        ReadOnlyMemory<byte> Hash { get; }
+        string Hash { get; }
         string Id { get; }
         MetadataContainer Metadata { get; }
 
@@ -18,11 +18,15 @@ namespace StaticSite.Documents
     {
 
         T Value { get; }
+
+        IDocument<TNew> With<TNew>(TNew newItem, string newHash);
+        IDocument<TNew> With<TNew>(Func<TNew> newItem, string newHash);
+        IDocument<T> With(MetadataContainer metadata);
     }
 
     public interface IHashable
     {
-        ReadOnlyMemory<byte> GenerateHash();
+        string GenerateHash();
 
     }
 

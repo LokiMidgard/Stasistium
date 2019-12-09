@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace StaticSite.Modules
 {
-    public class GitRefToFiles<TPreviousCache> : ModuleBase<ImmutableList<IDocument>, string>
+    public class GitRefToFiles<TPreviousCache> : ModuleBase<ImmutableList<IDocument<System.IO.Stream>>, string>
     {
         private readonly ModulePerformHandler<GitRef, TPreviousCache> input;
 
@@ -20,7 +20,7 @@ namespace StaticSite.Modules
 
 
 
-        protected override async Task<ModuleResult<ImmutableList<IDocument>, string>> Do([AllowNull]BaseCache<string> cache, OptionToken options)
+        protected override async Task<ModuleResult<ImmutableList<IDocument<System.IO.Stream>>, string>> Do([AllowNull]BaseCache<string> cache, OptionToken options)
         {
             if (cache != null && cache.PreviousCache.Length != 1)
                 throw new ArgumentException($"This cache should have exactly one predecessor but had {cache.PreviousCache}");
@@ -35,7 +35,7 @@ namespace StaticSite.Modules
                 var queue = new Queue<Tree>();
                 queue.Enqueue(source.Tip.Tree);
 
-                var blobs = ImmutableList<IDocument>.Empty.ToBuilder();
+                var blobs = ImmutableList<IDocument<System.IO.Stream>>.Empty.ToBuilder();
 
                 while (queue.TryDequeue(out var tree))
                 {
@@ -45,7 +45,7 @@ namespace StaticSite.Modules
                         {
                             case Blob blob:
                                 var hash = HexHelper.FromHexString(blob.Sha).AsMemory();
-                                var document = new FileDocument(entry.Path, hash, () => blob.GetContentStream());
+                                var document = new GitFileDocument(entry.Path, blob);
                                 blobs.Add(document);
                                 break;
 

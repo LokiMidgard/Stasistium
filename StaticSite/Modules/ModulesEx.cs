@@ -39,6 +39,17 @@ namespace StaticSite.Modules
                 throw new ArgumentNullException(nameof(hashFunction));
             return new WhereModule<TCheck, TPreviousCache>(input.DoIt, predicate, hashFunction, input.Context);
         }
+        public static WhereModule<TCheck, TPreviousCache> Where<TCheck, TPreviousCache>(this ModuleBase<ImmutableList<TCheck>, TPreviousCache> input, Func<TCheck,bool> predicate, Func<TCheck, string> hashFunction)
+            where TPreviousCache : class
+        {
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            if (predicate is null)
+                throw new ArgumentNullException(nameof(predicate));
+            if (hashFunction is null)
+                throw new ArgumentNullException(nameof(hashFunction));
+            return new WhereModule<TCheck, TPreviousCache>(input.DoIt, x => Task.FromResult(predicate(x)), hashFunction, input.Context);
+        }
         public static SingleModule<TCheck, TPreviousCache> Single<TCheck, TPreviousCache>(this ModuleBase<ImmutableList<TCheck>, TPreviousCache> input, Func<TCheck, Task<string>> hashFunction)
             where TPreviousCache : class
         {
