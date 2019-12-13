@@ -71,7 +71,7 @@ if(single == 0 && list == 0)
         
         OptionToken options);
 
-        protected sealed override async Task<ModuleResult<TResult, CacheId<TCache>>> Do([AllowNull] BaseCache<CacheId<TCache>> cache, OptionToken options)
+        protected sealed override async Task<ModuleResult<TResult, CacheId<TCache>>> DoInternal([AllowNull] BaseCache<CacheId<TCache>>? cache, OptionToken options)
         {
             if (cache != null && cache.PreviousCache.Length != <#= list + single #>)
                 throw new ArgumentException($"This cache should have exactly <#= list + single #> predecessor but had {cache.PreviousCache}");
@@ -84,7 +84,7 @@ if(single == 0 && list == 0)
             var inputList<#= j #>Result = await this.inputList<#= j #>(cache?.PreviousCache.Span[<#= j + single #>], options).ConfigureAwait(false);
 <#}#>
 
-            var currentCache = cache as CacheId<TCache>;
+            var currentCache = cache?.Item;
 
 
             var task = LazyTask.Create(async () =>
@@ -186,7 +186,7 @@ if(single == 0 && list == 0)
         [AllowNull] ImmutableDictionary<string, BaseCache<TResultCache>> childCaches,
         OptionToken options);
 
-        protected sealed override async Task<ModuleResultList<TResult, TResultCache, CacheIds<TCache>>> Do([AllowNull] BaseCache<CacheIds<TCache>> cache, OptionToken options)
+        protected sealed override async Task<ModuleResultList<TResult, TResultCache, CacheIds<TCache>>> DoInternal([AllowNull] BaseCache<CacheIds<TCache>>? cache, OptionToken options)
         {
             if (cache != null && cache.PreviousCache.Length != <#= list + single #>)
                 throw new ArgumentException($"This cache should have exactly <#= list + single #> predecessor but had {cache.PreviousCache}");

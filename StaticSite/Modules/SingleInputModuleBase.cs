@@ -22,7 +22,7 @@ namespace StaticSite.Modules
 
         protected abstract Task<(IDocument<TResult> result, BaseCache<TCache> cache)> Work((IDocument<TInput> result, BaseCache<TPreviousCache> cache) input, bool previousHadChanges, OptionToken options);
 
-        protected sealed override async Task<ModuleResult<TResult, CacheId<TCache>>> Do([AllowNull] BaseCache<CacheId<TCache>> cache, OptionToken options)
+        protected sealed override async Task<ModuleResult<TResult, CacheId<TCache>>> DoInternal([AllowNull] BaseCache<CacheId<TCache>> cache, OptionToken options)
         {
             if (cache != null && cache.PreviousCache.Length != 1)
                 throw new ArgumentException($"This cache should have exactly one predecessor but had {cache.PreviousCache}");
@@ -79,7 +79,7 @@ namespace StaticSite.Modules
 
         protected abstract Task<(ImmutableList<ModuleResult<TResult, TResultCache>> result, BaseCache<TCache> cache)> Work((IDocument<TInput> result, BaseCache<TPreviousCache> cache) input, bool previousHadChanges, [AllowNull] TCache cache, [AllowNull] ImmutableDictionary<string, BaseCache<TResultCache>> childCaches, OptionToken options);
 
-        protected sealed override async Task<ModuleResultList<TResult, TResultCache, CacheIds<TCache>>> Do([AllowNull] BaseCache<CacheIds<TCache>> cache, OptionToken options)
+        protected sealed override async Task<ModuleResultList<TResult, TResultCache, CacheIds<TCache>>> DoInternal([AllowNull] BaseCache<CacheIds<TCache>> cache, OptionToken options)
         {
             if (cache != null && cache.PreviousCache.Length != 1)
                 throw new ArgumentException($"This cache should have exactly one predecessor but had {cache.PreviousCache}");

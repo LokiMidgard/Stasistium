@@ -95,7 +95,7 @@ namespace StaticSite.Modules
             this.hashFunction = hashFunction ?? throw new ArgumentNullException(nameof(hashFunction));
         }
 
-        protected override Task<ModuleResult<TResult, string>> Do([AllowNull] BaseCache<string>? cache, OptionToken options)
+        protected override Task<ModuleResult<TResult, string>> DoInternal([AllowNull] BaseCache<string>? cache, OptionToken options)
         {
             var contentHash = this.hashFunction(this.Value);
             return Task.FromResult(ModuleResult.Create(

@@ -17,7 +17,7 @@ namespace StaticSite.Modules
             this.Context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        protected abstract Task<ModuleResult<TResult, TCache>> Do([AllowNull]BaseCache<TCache>? cache, OptionToken options);
+        protected abstract Task<ModuleResult<TResult, TCache>> DoInternal([AllowNull]BaseCache<TCache>? cache, OptionToken options);
 
         public Task<ModuleResult<TResult, TCache>> DoIt([AllowNull]BaseCache? cache, OptionToken options)
         {
@@ -32,7 +32,7 @@ namespace StaticSite.Modules
             if (lastRun.lastId == options.GenerationId)
                 return lastRun.result;
 
-            var result = this.Do(cast, options);
+            var result = this.DoInternal(cast, options);
             this.lastRun = (options.GenerationId, result);
             return result;
         }
@@ -51,7 +51,7 @@ namespace StaticSite.Modules
             this.Context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        protected abstract Task<ModuleResultList<TResult, TCacheResult, TCache>> Do([AllowNull]BaseCache<TCache>? cache, OptionToken options);
+        protected abstract Task<ModuleResultList<TResult, TCacheResult, TCache>> DoInternal([AllowNull]BaseCache<TCache>? cache, OptionToken options);
 
         public Task<ModuleResultList<TResult, TCacheResult, TCache>> DoIt([AllowNull]BaseCache cache, OptionToken options)
         {
@@ -66,7 +66,7 @@ namespace StaticSite.Modules
             if (lastRun.lastId == options.GenerationId)
                 return lastRun.result;
 
-            var result = this.Do(cast, options);
+            var result = this.DoInternal(cast, options);
             this.lastRun = (options.GenerationId, result);
             return result;
         }
