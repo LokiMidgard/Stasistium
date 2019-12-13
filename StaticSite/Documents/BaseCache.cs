@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Threading.Tasks;
 
 namespace StaticSite.Documents
 {
@@ -18,7 +19,16 @@ namespace StaticSite.Documents
         public abstract JToken Serelize();
 
 
-        public static JArray Write(BaseCache baseCache)
+        public static async Task Write(BaseCache baseCache, System.IO.Stream stream)
+        {
+            var array = Write(baseCache);
+
+            using var textWriter = new System.IO.StreamWriter(stream);
+            using var jsonWriter = new Newtonsoft.Json.JsonTextWriter(textWriter);
+            await array.WriteToAsync(jsonWriter);
+        }
+
+        private static JArray Write(BaseCache baseCache)
         {
             var result = new JArray();
 
@@ -84,6 +94,14 @@ namespace StaticSite.Documents
             return result;
         }
 
+        internal static async Task<BaseCache<T>> Load<T>(System.IO.Stream stream)
+        {
+            using var textReader = new System.IO.StreamReader(stream);
+            using var jsonReadr = new Newtonsoft.Json.JsonTextReader(textReader);
+
+            var array = await JArray.LoadAsync(jsonReadr).ConfigureAwait(false);
+            return (BaseCache<T>)Load(array);
+        }
         internal static BaseCache Load(JArray json)
         {
             if (json.Count == 0)

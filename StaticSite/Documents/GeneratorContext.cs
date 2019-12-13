@@ -7,8 +7,17 @@ namespace StaticSite.Documents
 {
     public class GeneratorContext : IDisposable
     {
-        private const string TempFolder = "Temp";
         private readonly HashAlgorithm algorithm = SHA256.Create();
+
+        public DirectoryInfo CacheFolder { get; }
+        public DirectoryInfo TempFolder { get; }
+
+
+        public GeneratorContext(DirectoryInfo? cacheFolder = null, DirectoryInfo? tempFolder = null)
+        {
+            this.CacheFolder = cacheFolder ?? new DirectoryInfo("Cache");
+            this.TempFolder = tempFolder ?? new DirectoryInfo("Temp");
+        }
 
         public string GetHashForString(string toHash)
         {
@@ -21,6 +30,14 @@ namespace StaticSite.Documents
             return sb.ToString();
         }
 
+        public void Warning(string message, Exception? e = null)
+        {
+            Console.WriteLine(message);
+            if (e != null)
+                Console.WriteLine(e.ToString());
+        }
+
+
         public IDocument<T> Create<T>(T value, string contentHash, string id, MetadataContainer? metadata = null)
         {
             return new Document<T>(value, contentHash, id, metadata, this);
@@ -29,15 +46,19 @@ namespace StaticSite.Documents
 
         public System.IO.DirectoryInfo TempDir()
         {
-            return new DirectoryInfo(Path.Combine(TempFolder, Guid.NewGuid().ToString()));
+            var directoryInfo = new DirectoryInfo(Path.Combine(this.TempFolder.FullName, Guid.NewGuid().ToString()));
+            directoryInfo.Create();
+            return directoryInfo;
         }
         public System.IO.DirectoryInfo ChachDir()
         {
-            throw new NotImplementedException();
+            this.CacheFolder.Create();
+            return this.CacheFolder;
         }
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
+
 
         protected virtual void Dispose(bool disposing)
         {

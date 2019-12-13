@@ -1,6 +1,5 @@
 ﻿using StaticSite.Documents;
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -11,8 +10,22 @@ namespace StaticSite.Modules
     public delegate Task<ModuleResult<TResult, TCache>> ModulePerformHandler<TResult, TCache>([AllowNull] BaseCache cache, OptionToken options);
     public delegate Task<ModuleResultList<TResult, TResultCache, TCache>> ModulePerformHandler<TResult, TResultCache, TCache>([AllowNull] BaseCache cache, OptionToken options);
 
+
     public static class Module
     {
+
+        public static PersistStage<TItemCache, TCache> Persist<TItemCache, TCache>(this MultiModuleBase<System.IO.Stream, TItemCache, TCache> stage, System.IO.DirectoryInfo output, GenerationOptions generatorOptions)
+            where TCache : class
+        {
+            if (stage is null)
+                throw new ArgumentNullException(nameof(stage));
+            if (output is null)
+                throw new ArgumentNullException(nameof(output));
+            if (generatorOptions is null)
+                throw new ArgumentNullException(nameof(generatorOptions));
+            return new PersistStage<TItemCache, TCache>(stage.DoIt, output, generatorOptions, stage.Context);
+        }
+
         public static GitModule<T> GitModul<T>(this ModuleBase<string, T> input)
             where T : class
         {

@@ -1,7 +1,10 @@
 ﻿using StaticSite.Documents;
 using StaticSite.Modules;
 using System;
+using System.Linq;
+using System.IO;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace StaticSite
 {
@@ -11,39 +14,23 @@ namespace StaticSite
         {
             var context = new GeneratorContext();
             var startModule = Module.FromResult("https://github.com/nota-game/nota.git", x => x, context);
-            var generatorOptions = new GenerationOptions();
+            var generatorOptions = new GenerationOptions()
+            {
+                CompressCache = true,
+                Refresh = false
+            };
+            var s = System.Diagnostics.Stopwatch.StartNew();
             var g = startModule
                 .GitModul()
                 .Where(x => x.Id == "origin/master")
                 .Single()
                 .GitRefToFiles()
                 .Where(x => System.IO.Path.GetExtension(x.Id) == ".md")
-
+                .Persist(new DirectoryInfo("out"), generatorOptions)
                 ;
 
-            var task = await g.DoIt(null, generatorOptions.Token).ConfigureAwait(false);
-            Console.WriteLine($"First run changes: {task.HasChanges}");
-            var result = await task.Perform;
-            foreach (var item in result.result)
-                Console.WriteLine($"\t{item.Id}");
-
-            var data = BaseCache.Write(result.cache);
-
-            Console.WriteLine(data.ToString());
-
-            var cache = BaseCache.Load(data);
-
-            var task2 = await g.DoIt(cache, generatorOptions.Token).ConfigureAwait(false);
-            Console.WriteLine($"Seccond run changes: {task2.HasChanges}");
-
-            Console.ReadKey(false);
-            var result2 = await task.Perform;
-            foreach (var item in result2.result)
-                Console.WriteLine($"\t{item.Id}");
-
-            //var g = new Git("https://github.com/nota-game/nota.git", new DirProvider());
+            await g.UpdateFiles().ConfigureAwait(false);
 
         }
     }
-
 }

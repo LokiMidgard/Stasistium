@@ -79,6 +79,7 @@ namespace StaticSite.Modules
     {
         public bool Refresh { set; get; } = true;
 
+        public bool CompressCache { get; set; } = true;
         public OptionToken Token
         {
             get
