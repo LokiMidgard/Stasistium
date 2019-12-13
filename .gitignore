@@ -338,4 +338,4 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
-/StaticSite/Modules/GeneratedBaseModules.tt.cs
+*.tt.cs
