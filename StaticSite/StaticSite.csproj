@@ -20,9 +20,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Stages\GeneratedBaseModules.tt">
+    <None Update="Stages\GeneratedBaseStages.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>GeneratedBaseModules.tt.cs</LastGenOutput>
+      <LastGenOutput>GeneratedBaseStages.tt.cs</LastGenOutput>
     </None>
   </ItemGroup>
 
@@ -31,10 +31,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Update="Stages\GeneratedBaseModules.tt.cs">
+    <Compile Update="Stages\GeneratedBaseStages.tt.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>GeneratedBaseModules.tt</DependentUpon>
+      <DependentUpon>GeneratedBaseStages.tt</DependentUpon>
     </Compile>
   </ItemGroup>
 

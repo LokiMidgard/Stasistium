@@ -16,7 +16,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace StaticSite.Stages
-{
+{ 
 <#
 for(int single = 0; single<=maxSingleParameter;single++)
 for(int list = 0; list<=maxListParameter;list++){
