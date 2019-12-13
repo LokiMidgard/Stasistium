@@ -6,15 +6,15 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace StaticSite.Modules
+namespace StaticSite.Stages
 {
-    public abstract class SingleInputModuleBase<TResult, TCache, TInput, TPreviousCache> : ModuleBase<TResult, CacheId<TCache>>
+    public abstract class SingleInputStageBase<TResult, TCache, TInput, TPreviousCache> : StageBase<TResult, CacheId<TCache>>
         where TCache : class
     {
-        private readonly ModulePerformHandler<TInput, TPreviousCache> input;
+        private readonly StagePerformHandler<TInput, TPreviousCache> input;
         private readonly bool updateOnRefresh;
 
-        public SingleInputModuleBase(ModulePerformHandler<TInput, TPreviousCache> input, GeneratorContext context, bool updateOnRefresh = false) : base(context)
+        public SingleInputStageBase(StagePerformHandler<TInput, TPreviousCache> input, GeneratorContext context, bool updateOnRefresh = false) : base(context)
         {
             this.input = input;
             this.updateOnRefresh = updateOnRefresh;
@@ -22,7 +22,7 @@ namespace StaticSite.Modules
 
         protected abstract Task<(IDocument<TResult> result, BaseCache<TCache> cache)> Work((IDocument<TInput> result, BaseCache<TPreviousCache> cache) input, bool previousHadChanges, OptionToken options);
 
-        protected sealed override async Task<ModuleResult<TResult, CacheId<TCache>>> DoInternal([AllowNull] BaseCache<CacheId<TCache>> cache, OptionToken options)
+        protected sealed override async Task<StageResult<TResult, CacheId<TCache>>> DoInternal([AllowNull] BaseCache<CacheId<TCache>> cache, OptionToken options)
         {
             if (cache != null && cache.PreviousCache.Length != 1)
                 throw new ArgumentException($"This cache should have exactly one predecessor but had {cache.PreviousCache}");
@@ -56,7 +56,7 @@ namespace StaticSite.Modules
             // if currentCache is null, hasChanges must be true and so currentCache will be set.
             var theId = currentCache!.Id;
 
-            return ModuleResult.Create(task, hasChanges, theId);
+            return StageResult.Create(task, hasChanges, theId);
         }
 
         protected virtual Task<bool> Changed([AllowNull]TCache item1, [AllowNull] TCache item2)
@@ -65,21 +65,21 @@ namespace StaticSite.Modules
         }
     }
 
-    public abstract class SingleInputMultipleModuleBase<TResult, TResultCache, TCache, TInput, TPreviousCache> : MultiModuleBase<TResult, TResultCache, CacheIds<TCache>>
+    public abstract class SingleInputMultipleStageBase<TResult, TResultCache, TCache, TInput, TPreviousCache> : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
        where TCache : class
     {
-        private readonly ModulePerformHandler<TInput, TPreviousCache> input;
+        private readonly StagePerformHandler<TInput, TPreviousCache> input;
         private readonly bool updateOnRefresh;
 
-        public SingleInputMultipleModuleBase(ModulePerformHandler<TInput, TPreviousCache> input, GeneratorContext context, bool updateOnRefresh = false) : base(context)
+        public SingleInputMultipleStageBase(StagePerformHandler<TInput, TPreviousCache> input, GeneratorContext context, bool updateOnRefresh = false) : base(context)
         {
             this.input = input;
             this.updateOnRefresh = updateOnRefresh;
         }
 
-        protected abstract Task<(ImmutableList<ModuleResult<TResult, TResultCache>> result, BaseCache<TCache> cache)> Work((IDocument<TInput> result, BaseCache<TPreviousCache> cache) input, bool previousHadChanges, [AllowNull] TCache cache, [AllowNull] ImmutableDictionary<string, BaseCache<TResultCache>> childCaches, OptionToken options);
+        protected abstract Task<(ImmutableList<StageResult<TResult, TResultCache>> result, BaseCache<TCache> cache)> Work((IDocument<TInput> result, BaseCache<TPreviousCache> cache) input, bool previousHadChanges, [AllowNull] TCache cache, [AllowNull] ImmutableDictionary<string, BaseCache<TResultCache>> childCaches, OptionToken options);
 
-        protected sealed override async Task<ModuleResultList<TResult, TResultCache, CacheIds<TCache>>> DoInternal([AllowNull] BaseCache<CacheIds<TCache>> cache, OptionToken options)
+        protected sealed override async Task<StageResultList<TResult, TResultCache, CacheIds<TCache>>> DoInternal([AllowNull] BaseCache<CacheIds<TCache>> cache, OptionToken options)
         {
             if (cache != null && cache.PreviousCache.Length != 1)
                 throw new ArgumentException($"This cache should have exactly one predecessor but had {cache.PreviousCache}");
@@ -138,7 +138,7 @@ namespace StaticSite.Modules
             // if currentCache is null, hasChanges must be true and so currentCache will be set.
             var previousHash = currentCache!.Ids;
 
-            return ModuleResult.Create(task, hasChanges, previousHash.Select(x => x.id).ToImmutableList());
+            return StageResult.Create(task, hasChanges, previousHash.Select(x => x.id).ToImmutableList());
         }
 
         protected virtual Task<bool> CacheEquals([AllowNull]TCache item1, [AllowNull]TCache item2)

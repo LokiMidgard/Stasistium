@@ -4,11 +4,11 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StaticSite.Modules
+namespace StaticSite.Stages
 {
-    public class MarkdownStringModule<TPreviousCache> : SingleInputModuleBase<MarkdownDocument, string, string, TPreviousCache>
+    public class MarkdownStringStage<TPreviousCache> : SingleInputStageBase<MarkdownDocument, string, string, TPreviousCache>
     {
-        public MarkdownStringModule(ModulePerformHandler<string, TPreviousCache> input, GeneratorContext context) : base(input, context)
+        public MarkdownStringStage(StagePerformHandler<string, TPreviousCache> input, GeneratorContext context) : base(input, context)
         {
         }
 

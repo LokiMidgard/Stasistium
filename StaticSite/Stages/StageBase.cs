@@ -3,23 +3,23 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
-namespace StaticSite.Modules
+namespace StaticSite.Stages
 {
 
-    public abstract class ModuleBase<TResult, TCache>
+    public abstract class StageBase<TResult, TCache>
         where TCache : class
     {
 
-        private (Guid lastId, Task<ModuleResult<TResult, TCache>> result) lastRun;
+        private (Guid lastId, Task<StageResult<TResult, TCache>> result) lastRun;
 
-        protected ModuleBase(GeneratorContext context)
+        protected StageBase(GeneratorContext context)
         {
             this.Context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        protected abstract Task<ModuleResult<TResult, TCache>> DoInternal([AllowNull]BaseCache<TCache>? cache, OptionToken options);
+        protected abstract Task<StageResult<TResult, TCache>> DoInternal([AllowNull]BaseCache<TCache>? cache, OptionToken options);
 
-        public Task<ModuleResult<TResult, TCache>> DoIt([AllowNull]BaseCache? cache, OptionToken options)
+        public Task<StageResult<TResult, TCache>> DoIt([AllowNull]BaseCache? cache, OptionToken options)
         {
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
@@ -40,20 +40,20 @@ namespace StaticSite.Modules
         public GeneratorContext Context { get; }
     }
 
-    public abstract class MultiModuleBase<TResult, TCacheResult, TCache>
+    public abstract class MultiStageBase<TResult, TCacheResult, TCache>
      where TCache : class
     {
 
-        private (Guid lastId, Task<ModuleResultList<TResult, TCacheResult, TCache>> result) lastRun;
+        private (Guid lastId, Task<StageResultList<TResult, TCacheResult, TCache>> result) lastRun;
 
-        protected MultiModuleBase(GeneratorContext context)
+        protected MultiStageBase(GeneratorContext context)
         {
             this.Context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        protected abstract Task<ModuleResultList<TResult, TCacheResult, TCache>> DoInternal([AllowNull]BaseCache<TCache>? cache, OptionToken options);
+        protected abstract Task<StageResultList<TResult, TCacheResult, TCache>> DoInternal([AllowNull]BaseCache<TCache>? cache, OptionToken options);
 
-        public Task<ModuleResultList<TResult, TCacheResult, TCache>> DoIt([AllowNull]BaseCache cache, OptionToken options)
+        public Task<StageResultList<TResult, TCacheResult, TCache>> DoIt([AllowNull]BaseCache cache, OptionToken options)
         {
             if (options is null)
                 throw new ArgumentNullException(nameof(options));

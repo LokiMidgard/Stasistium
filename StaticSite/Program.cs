@@ -1,5 +1,5 @@
 ﻿using StaticSite.Documents;
-using StaticSite.Modules;
+using StaticSite.Stages;
 using System;
 using System.Linq;
 using System.IO;
@@ -13,7 +13,7 @@ namespace StaticSite
         static async Task Main(string[] args)
         {
             var context = new GeneratorContext();
-            var startModule = Module.FromResult("https://github.com/nota-game/nota.git", x => x, context);
+            var startModule = Stage.FromResult("https://github.com/nota-game/nota.git", x => x, context);
             var generatorOptions = new GenerationOptions()
             {
                 CompressCache = true,

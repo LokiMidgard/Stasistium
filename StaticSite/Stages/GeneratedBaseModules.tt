@@ -15,7 +15,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace StaticSite.Modules
+namespace StaticSite.Stages
 {
 <#
 for(int single = 0; single<=maxSingleParameter;single++)
@@ -23,7 +23,7 @@ for(int list = 0; list<=maxListParameter;list++){
 if(single == 0 && list == 0)
     continue;
 #>
- public abstract class OutputSingleInputSingle<#= single #>List<#= list #>ModuleBase<
+ public abstract class OutputSingleInputSingle<#= single #>List<#= list #>StageBase<
     <#for(int j = 0; j< single; j++){#>
  TInputSingle<#= j #>, TPreviousSingleCache<#= j #>,
     <#}#>
@@ -31,23 +31,23 @@ if(single == 0 && list == 0)
  TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>,
     <#}#>
  TResult, TCache
- > : ModuleBase<TResult, CacheId<TCache>>
+ > : StageBase<TResult, CacheId<TCache>>
         where TCache : class
     {
     <#for(int j = 0; j< single; j++){#>
-        private readonly ModulePerformHandler<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>;
+        private readonly StagePerformHandler<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>;
     <#}#>
     <#for(int j = 0; j< list; j++){#>
-        private readonly ModulePerformHandler<TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>> inputList<#= j #>;
+        private readonly StagePerformHandler<TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>> inputList<#= j #>;
     <#}#>
         private readonly bool updateOnRefresh;
 
-        public OutputSingleInputSingle<#= single #>List<#= list #>ModuleBase(
+        public OutputSingleInputSingle<#= single #>List<#= list #>StageBase(
     <#for(int j = 0; j< single; j++){#>
-        ModulePerformHandler<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>,
+        StagePerformHandler<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>,
     <#}#>
         <#for(int j = 0; j< list; j++){#>
-        ModulePerformHandler<TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>> inputList<#= j #>,
+        StagePerformHandler<TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>> inputList<#= j #>,
     <#}#>
         GeneratorContext context, bool updateOnRefresh = false) : base(context)
         {
@@ -63,15 +63,15 @@ if(single == 0 && list == 0)
         protected abstract Task<(IDocument<TResult> result, BaseCache<TCache> cache)> Work(
         
     <#for(int j = 0; j< single; j++){#>
-        ModuleResult<TInputSingle<#= j #>,TPreviousSingleCache<#= j #>> inputSingle<#= j#>, 
+        StageResult<TInputSingle<#= j #>,TPreviousSingleCache<#= j #>> inputSingle<#= j#>, 
     <#}#>
     <#for(int j = 0; j< list; j++){#>
-        ModuleResultList<TInputList<#= j #>,TPreviousItemCache<#= j #>,TPreviousListCache<#= j #>> inputList<#= j#>, 
+        StageResultList<TInputList<#= j #>,TPreviousItemCache<#= j #>,TPreviousListCache<#= j #>> inputList<#= j#>, 
     <#}#>
         
         OptionToken options);
 
-        protected sealed override async Task<ModuleResult<TResult, CacheId<TCache>>> DoInternal([AllowNull] BaseCache<CacheId<TCache>>? cache, OptionToken options)
+        protected sealed override async Task<StageResult<TResult, CacheId<TCache>>> DoInternal([AllowNull] BaseCache<CacheId<TCache>>? cache, OptionToken options)
         {
             if (cache != null && cache.PreviousCache.Length != <#= list + single #>)
                 throw new ArgumentException($"This cache should have exactly <#= list + single #> predecessor but had {cache.PreviousCache}");
@@ -127,7 +127,7 @@ if(single == 0 && list == 0)
             // if currentCache is null, hasChanges must be true and so currentCache will be set.
             var theId = currentCache!.Id;
 
-            return ModuleResult.Create(task, hasChanges, theId);
+            return StageResult.Create(task, hasChanges, theId);
         }
 
         protected virtual Task<bool> CacheEquals([AllowNull]TCache item1, [AllowNull] TCache item2)
@@ -137,7 +137,7 @@ if(single == 0 && list == 0)
     }
 
 
-     public abstract class OutputMultiInputSingle<#= single #>List<#= list #>ModuleBase<
+     public abstract class OutputMultiInputSingle<#= single #>List<#= list #>StageBase<
     <#for(int j = 0; j< single; j++){#>
  TInputSingle<#= j #>, TPreviousSingleCache<#= j #>,
     <#}#>
@@ -145,23 +145,23 @@ if(single == 0 && list == 0)
  TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>,
     <#}#>
  TResult, TResultCache, TCache
- > : MultiModuleBase<TResult, TResultCache, CacheIds<TCache>>
+ > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
         where TCache : class
     {
     <#for(int j = 0; j< single; j++){#>
-        private readonly ModulePerformHandler<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>;
+        private readonly StagePerformHandler<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>;
     <#}#>
     <#for(int j = 0; j< list; j++){#>
-        private readonly ModulePerformHandler<TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>> inputList<#= j #>;
+        private readonly StagePerformHandler<TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>> inputList<#= j #>;
     <#}#>
         private readonly bool updateOnRefresh;
 
-        public OutputMultiInputSingle<#= single #>List<#= list #>ModuleBase(
+        public OutputMultiInputSingle<#= single #>List<#= list #>StageBase(
     <#for(int j = 0; j< single; j++){#>
-        ModulePerformHandler<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>,
+        StagePerformHandler<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>,
     <#}#>
         <#for(int j = 0; j< list; j++){#>
-        ModulePerformHandler<TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>> inputList<#= j #>,
+        StagePerformHandler<TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>> inputList<#= j #>,
     <#}#>
         GeneratorContext context, bool updateOnRefresh = false) : base(context)
         {
@@ -174,19 +174,19 @@ if(single == 0 && list == 0)
             this.updateOnRefresh = updateOnRefresh;
         } 
 
-        protected abstract Task<(ImmutableList<ModuleResult<TResult, TResultCache>> result, BaseCache<TCache> cache)> Work(
+        protected abstract Task<(ImmutableList<StageResult<TResult, TResultCache>> result, BaseCache<TCache> cache)> Work(
         
     <#for(int j = 0; j< single; j++){#>
-        ModuleResult<TInputSingle<#= j #>,TPreviousSingleCache<#= j #>> inputSingle<#= j#>, 
+        StageResult<TInputSingle<#= j #>,TPreviousSingleCache<#= j #>> inputSingle<#= j#>, 
     <#}#>
     <#for(int j = 0; j< list; j++){#>
-        ModuleResultList<TInputList<#= j #>,TPreviousItemCache<#= j #>,TPreviousListCache<#= j #>> inputList<#= j#>, 
+        StageResultList<TInputList<#= j #>,TPreviousItemCache<#= j #>,TPreviousListCache<#= j #>> inputList<#= j#>, 
     <#}#>
        [AllowNull] TCache cache,
         [AllowNull] ImmutableDictionary<string, BaseCache<TResultCache>> childCaches,
         OptionToken options);
 
-        protected sealed override async Task<ModuleResultList<TResult, TResultCache, CacheIds<TCache>>> DoInternal([AllowNull] BaseCache<CacheIds<TCache>>? cache, OptionToken options)
+        protected sealed override async Task<StageResultList<TResult, TResultCache, CacheIds<TCache>>> DoInternal([AllowNull] BaseCache<CacheIds<TCache>>? cache, OptionToken options)
         {
             if (cache != null && cache.PreviousCache.Length != <#= list + single #>)
                 throw new ArgumentException($"This cache should have exactly <#= list + single #> predecessor but had {cache.PreviousCache}");
@@ -265,7 +265,7 @@ cache?.Item.Data, oldChildCaches, options).ConfigureAwait(false);
             // if currentCache is null, hasChanges must be true and so currentCache will be set.
             var theId = currentCache!.Ids;
 
-            return ModuleResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
         }
 
       protected virtual Task<bool> CacheEquals([AllowNull]TCache item1, [AllowNull]TCache item2)

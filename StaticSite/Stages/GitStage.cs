@@ -8,20 +8,20 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace StaticSite.Modules
+namespace StaticSite.Stages
 {
-    public class GitModule<TPreviousCache> : SingleInputMultipleModuleBase<GitRef, (GitRefType type, string hash), ImmutableList<string>, string, TPreviousCache>
+    public class GitStage<TPreviousCache> : SingleInputMultipleStageBase<GitRef, (GitRefType type, string hash), ImmutableList<string>, string, TPreviousCache>
     {
         private Repository? repo;
         private System.IO.DirectoryInfo? workingDir;
 
 
-        public GitModule(ModulePerformHandler<string, TPreviousCache> input, GeneratorContext context) : base(input, context, true)
+        public GitStage(StagePerformHandler<string, TPreviousCache> input, GeneratorContext context) : base(input, context, true)
         {
         }
 
 
-        protected override async Task<(ImmutableList<ModuleResult<GitRef, (GitRefType type, string hash)>> result, BaseCache<ImmutableList<string>> cache)> Work((IDocument<string> result, BaseCache<TPreviousCache> cache) input, bool previousHadChanges, [AllowNull] ImmutableList<string> cache, [AllowNull] ImmutableDictionary<string, BaseCache<(GitRefType type, string hash)>> childCaches, OptionToken options)
+        protected override async Task<(ImmutableList<StageResult<GitRef, (GitRefType type, string hash)>> result, BaseCache<ImmutableList<string>> cache)> Work((IDocument<string> result, BaseCache<TPreviousCache> cache) input, bool previousHadChanges, [AllowNull] ImmutableList<string> cache, [AllowNull] ImmutableDictionary<string, BaseCache<(GitRefType type, string hash)>> childCaches, OptionToken options)
         {
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
@@ -58,7 +58,7 @@ namespace StaticSite.Modules
                     if (childCaches != null && childCaches.TryGetValue(x.FrindlyName, out var o))
                         hasChanges = o.Item.hash != x.Hash || o.Item.type != x.Type;
                     var itemCache = BaseCache.Create((x.Type, x.Hash));
-                    return ModuleResult.Create(this.Context.Create(x, x.Hash, x.FrindlyName), itemCache, hasChanges, x.FrindlyName);
+                    return StageResult.Create(this.Context.Create(x, x.Hash, x.FrindlyName), itemCache, hasChanges, x.FrindlyName);
                 }).OrderBy(x => x.Id).ToArray();
             return (refs.ToImmutableList(), BaseCache.Create(refs.Select(x => x.Id).ToImmutableList(), input.cache));
 

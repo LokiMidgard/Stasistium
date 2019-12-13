@@ -6,16 +6,16 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace StaticSite.Modules
+namespace StaticSite.Stages
 {
     public class PersistStage<TPreviousItemCache, TPreviousCache>
     {
         private readonly GenerationOptions generatorOptions;
-        private readonly ModulePerformHandler<Stream, TPreviousItemCache, TPreviousCache> inputList;
+        private readonly StagePerformHandler<Stream, TPreviousItemCache, TPreviousCache> inputList;
         private readonly DirectoryInfo output;
         private readonly GeneratorContext context;
 
-        public PersistStage(ModulePerformHandler<System.IO.Stream, TPreviousItemCache, TPreviousCache> inputList, DirectoryInfo output, GenerationOptions generatorOptions, GeneratorContext context)
+        public PersistStage(StagePerformHandler<System.IO.Stream, TPreviousItemCache, TPreviousCache> inputList, DirectoryInfo output, GenerationOptions generatorOptions, GeneratorContext context)
         {
             this.generatorOptions = generatorOptions;
             this.inputList = inputList;

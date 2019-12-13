@@ -9,13 +9,13 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StaticSite.Modules
+namespace StaticSite.Stages
 {
 
 
-    public class MarkdownStreamModule<TPreviousCache> : SingleInputModuleBase<MarkdownDocument, string, Stream, TPreviousCache>
+    public class MarkdownStreamStage<TPreviousCache> : SingleInputStageBase<MarkdownDocument, string, Stream, TPreviousCache>
     {
-        public MarkdownStreamModule(ModulePerformHandler<Stream, TPreviousCache> input, GeneratorContext context) : base(input, context)
+        public MarkdownStreamStage(StagePerformHandler<Stream, TPreviousCache> input, GeneratorContext context) : base(input, context)
         {
         }
 

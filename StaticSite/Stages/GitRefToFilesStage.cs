@@ -8,24 +8,24 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace StaticSite.Modules
+namespace StaticSite.Stages
 {
-    public class GitRefToFiles<TPreviousCache> : SingleInputMultipleModuleBase<Stream, string, string, GitRef, TPreviousCache>
+    public class GitRefToFilesStage<TPreviousCache> : SingleInputMultipleStageBase<Stream, string, string, GitRef, TPreviousCache>
     {
 
 
-        public GitRefToFiles(ModulePerformHandler<GitRef, TPreviousCache> input, GeneratorContext context) : base(input, context)
+        public GitRefToFilesStage(StagePerformHandler<GitRef, TPreviousCache> input, GeneratorContext context) : base(input, context)
         {
         }
 
-        protected override Task<(ImmutableList<ModuleResult<Stream, string>> result, BaseCache<string> cache)> Work((IDocument<GitRef> result, BaseCache<TPreviousCache> cache) input, bool previousHadChanges, [AllowNull] string cache, [AllowNull] ImmutableDictionary<string, BaseCache<string>> childCaches, OptionToken options)
+        protected override Task<(ImmutableList<StageResult<Stream, string>> result, BaseCache<string> cache)> Work((IDocument<GitRef> result, BaseCache<TPreviousCache> cache) input, bool previousHadChanges, [AllowNull] string cache, [AllowNull] ImmutableDictionary<string, BaseCache<string>> childCaches, OptionToken options)
         {
             var source = input.result;
 
             var queue = new Queue<Tree>();
             queue.Enqueue(source.Value.Tip.Tree);
 
-            var blobs = ImmutableList<ModuleResult<Stream, string>>.Empty.ToBuilder();
+            var blobs = ImmutableList<StageResult<Stream, string>>.Empty.ToBuilder();
 
             while (queue.TryDequeue(out var tree))
             {
@@ -39,7 +39,7 @@ namespace StaticSite.Modules
                             if (childCaches != null && childCaches.TryGetKey(document.Id, out var oldFileHash))
                                 hasChanges = oldFileHash != document.Hash;
 
-                            blobs.Add(ModuleResult.Create(document, BaseCache.Create(document.Hash), hasChanges, document.Id));
+                            blobs.Add(StageResult.Create(document, BaseCache.Create(document.Hash), hasChanges, document.Id));
                             break;
 
                         case Tree subTree:
