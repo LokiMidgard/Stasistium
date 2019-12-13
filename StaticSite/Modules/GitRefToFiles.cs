@@ -4,83 +4,60 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace StaticSite.Modules
 {
-    public class GitRefToFiles<TPreviousCache> : ModuleBase<ImmutableList<IDocument<System.IO.Stream>>, string>
+    public class GitRefToFiles<TPreviousCache> : SingleInputMultipleModuleBase<Stream, string, string, GitRef, TPreviousCache>
     {
-        private readonly ModulePerformHandler<GitRef, TPreviousCache> input;
 
 
-        public GitRefToFiles(ModulePerformHandler<GitRef, TPreviousCache> input, GeneratorContext context) : base(context)
+        public GitRefToFiles(ModulePerformHandler<GitRef, TPreviousCache> input, GeneratorContext context) : base(input, context)
         {
-            this.input = input ?? throw new ArgumentNullException(nameof(input));
         }
 
-
-
-        protected override async Task<ModuleResult<ImmutableList<IDocument<System.IO.Stream>>, string>> Do([AllowNull]BaseCache<string> cache, OptionToken options)
+        protected override Task<(ImmutableList<ModuleResult<Stream, string>> result, BaseCache<string> cache)> Work((IDocument<GitRef> result, BaseCache<TPreviousCache> cache) input, bool previousHadChanges, [AllowNull] string cache, [AllowNull] ImmutableDictionary<string, BaseCache<string>> childCaches, OptionToken options)
         {
-            if (cache != null && cache.PreviousCache.Length != 1)
-                throw new ArgumentException($"This cache should have exactly one predecessor but had {cache.PreviousCache}");
-            var inputResult = await this.input(cache?.PreviousCache.Span[0], options).ConfigureAwait(false);
+            var source = input.result;
 
+            var queue = new Queue<Tree>();
+            queue.Enqueue(source.Value.Tip.Tree);
 
-            var task = LazyTask.Create(async () =>
+            var blobs = ImmutableList<ModuleResult<Stream, string>>.Empty.ToBuilder();
+
+            while (queue.TryDequeue(out var tree))
             {
-                var previousPerform = await inputResult.Perform;
-                var source = previousPerform.result;
-
-                var queue = new Queue<Tree>();
-                queue.Enqueue(source.Tip.Tree);
-
-                var blobs = ImmutableList<IDocument<System.IO.Stream>>.Empty.ToBuilder();
-
-                while (queue.TryDequeue(out var tree))
+                foreach (var entry in tree)
                 {
-                    foreach (var entry in tree)
+                    switch (entry.Target)
                     {
-                        switch (entry.Target)
-                        {
-                            case Blob blob:
-                                var hash = HexHelper.FromHexString(blob.Sha).AsMemory();
-                                var document = new GitFileDocument(entry.Path, blob);
-                                blobs.Add(document);
-                                break;
+                        case Blob blob:
+                            var document = new GitFileDocument(entry.Path, blob, this.Context, MetadataContainer.Empty);
+                            var hasChanges = true;
+                            if (childCaches != null && childCaches.TryGetKey(document.Id, out var oldFileHash))
+                                hasChanges = oldFileHash != document.Hash;
 
-                            case Tree subTree:
-                                queue.Enqueue(subTree);
-                                break;
+                            blobs.Add(ModuleResult.Create(document, BaseCache.Create(document.Hash), hasChanges, document.Id));
+                            break;
 
-                            case GitLink link:
-                                throw new NotSupportedException("Git link is not supported at the momtent");
+                        case Tree subTree:
+                            queue.Enqueue(subTree);
+                            break;
 
-                            default:
-                                throw new NotSupportedException($"The type {entry.Target?.GetType().FullName ?? "<NULL>"} is not supported as target");
-                        }
+                        case GitLink link:
+                            throw new NotSupportedException("Git link is not supported at the momtent");
+
+                        default:
+                            throw new NotSupportedException($"The type {entry.Target?.GetType().FullName ?? "<NULL>"} is not supported as target");
                     }
                 }
-
-                return (result: blobs.ToImmutable(), cache: new BaseCache<string>(source.Tip.Sha, new BaseCache[] { previousPerform.cache }.AsMemory()));
-            });
-
-
-            bool hasChanges = inputResult.HasChanges;
-
-            if (hasChanges)
-            {
-                // if we have changes we'll check if there are acall changes.
-                // since the task is cached in LazyTask, we will NOT perform the work twice.
-                var result = await task;
-                hasChanges = cache?.Item != result.cache.Item;
-
             }
 
-            return ModuleResult.Create(task, hasChanges);
-
-
+            return Task.FromResult((result: blobs.ToImmutable(), cache: BaseCache.Create(source.Hash, input.cache)));
         }
+
     }
 
 }

@@ -6,73 +6,88 @@ using System.Text;
 
 namespace StaticSite.Documents
 {
-    class GitFileDocument : IDocument<Stream>
+
+
+
+    public abstract class DocumentBase
     {
-        private readonly Func<Stream> createStreamCallback;
-
-        internal GitFileDocument(string path, Blob blob, MetadataContainer? metadata = null)
-        {
-            this.Id = path ?? throw new ArgumentNullException(nameof(path));
-            this.Hash = blob.Sha;
-            this.createStreamCallback = () => blob.GetContentStream();
-            this.Metadata = metadata ?? MetadataContainer.Empty;
-        }
-
         public string Id { get; }
 
         public MetadataContainer Metadata { get; }
+        public GeneratorContext Context { get; }
 
         public string Hash { get; }
+
+        public string ContentHash { get; }
+
+        protected DocumentBase(string id, MetadataContainer? metadata, string contetnHash, GeneratorContext context)
+        {
+            this.Id = id ?? throw new ArgumentNullException(nameof(id));
+            this.Metadata = metadata ?? MetadataContainer.Empty;
+            this.ContentHash = contetnHash ?? throw new ArgumentNullException(nameof(contetnHash));
+            this.Context = context ?? throw new ArgumentNullException(nameof(context));
+
+            var toHash = $"<{System.Net.WebUtility.HtmlEncode(this.Id)}><{System.Net.WebUtility.HtmlEncode(this.Metadata.Hash)}><{System.Net.WebUtility.HtmlEncode(this.ContentHash)}>";
+            this.Hash = this.Context.GetHashForString(toHash);
+
+        }
+    }
+    class GitFileDocument : DocumentBase, IDocument<Stream>
+    {
+        private readonly Func<Stream> createStreamCallback;
+
+        private GitFileDocument(string id, string contentHash, Func<Stream> createStreamCallback, MetadataContainer metadata, GeneratorContext context) : base(id, metadata, contentHash, context)
+        {
+            this.createStreamCallback = createStreamCallback;
+        }
+
+        internal GitFileDocument(string path, Blob blob, GeneratorContext context, MetadataContainer? metadata) : base(path, metadata, blob.Sha, context)
+        {
+            this.createStreamCallback = () => blob.GetContentStream();
+        }
 
         public Stream Value => this.CreateReadStream();
 
         public Stream CreateReadStream() => this.createStreamCallback();
+
+        public IDocument<TNew> With<TNew>(TNew newItem, string newHash) => new Document<TNew>(newItem, newHash, this.Id, this.Metadata, this.Context);
+        public IDocument<TNew> With<TNew>(Func<TNew> newItem, string newHash) => new DocumentLazy<TNew>(newItem, newHash, this.Id, this.Metadata, this.Context);
+        public IDocument<Stream> With(MetadataContainer metadata) => new GitFileDocument(this.Id, this.Hash, this.createStreamCallback, metadata, this.Context);
+
+        IDocument IDocument.With(MetadataContainer metadata) => this.With(metadata);
+
     }
 
-    public class DocumentLazy<T> : IDocument<T>
+    public class DocumentLazy<T> : DocumentBase, IDocument<T>
     {
         private readonly Func<T> valueCallback;
-        public DocumentLazy(Func<T> valueCallback, string hash, string id, MetadataContainer metadata)
+        public DocumentLazy(Func<T> valueCallback, string contentHash, string id, MetadataContainer? metadata, GeneratorContext context) : base(id, metadata ?? MetadataContainer.Empty, contentHash, context)
         {
             this.valueCallback = valueCallback;
-            this.Hash = hash ?? throw new ArgumentNullException(nameof(hash));
-            this.Id = id ?? throw new ArgumentNullException(nameof(id));
-            this.Metadata = metadata ?? MetadataContainer.Empty;
         }
 
         public T Value => this.valueCallback();
 
-        public string Hash { get; }
-
-        public string Id { get; }
-
-        public MetadataContainer Metadata { get; }
-
-        public IDocument<TNew> With<TNew>(TNew newItem, string newHash) => new Document<TNew>(newItem, newHash, this.Id, this.Metadata);
-        public IDocument<TNew> With<TNew>(Func<TNew> newItem, string newHash) => new DocumentLazy<TNew>(newItem, newHash, this.Id, this.Metadata);
-        public IDocument<T> With(MetadataContainer metadata) => new Document<T>(this.Value, this.Hash, this.Id, metadata);
+        public IDocument<TNew> With<TNew>(TNew newItem, string newHash) => new Document<TNew>(newItem, newHash, this.Id, this.Metadata, this.Context);
+        public IDocument<TNew> With<TNew>(Func<TNew> newItem, string newHash) => new DocumentLazy<TNew>(newItem, newHash, this.Id, this.Metadata, this.Context);
+        public IDocument<T> With(MetadataContainer metadata) => new Document<T>(this.Value, this.Hash, this.Id, metadata, this.Context);
+        IDocument IDocument.With(MetadataContainer metadata) => this.With(metadata);
     }
 
-    public class Document<T> : IDocument<T>
+    public class Document<T> : DocumentBase, IDocument<T>
     {
-        public Document(T value, string hash, string id, MetadataContainer metadata)
+        public Document(T value, string contentHash, string id, MetadataContainer? metadata, GeneratorContext context) : base(id, metadata, contentHash, context)
         {
             this.Value = value;
-            this.Hash = hash ?? throw new ArgumentNullException(nameof(hash));
-            this.Id = id ?? throw new ArgumentNullException(nameof(id));
-            this.Metadata = metadata ?? MetadataContainer.Empty;
         }
 
         public T Value { get; }
 
-        public string Hash { get; }
 
-        public string Id { get; }
+        public IDocument<TNew> With<TNew>(TNew newItem, string newHash) => new Document<TNew>(newItem, newHash, this.Id, this.Metadata, this.Context);
+        public IDocument<TNew> With<TNew>(Func<TNew> newItem, string newHash) => new DocumentLazy<TNew>(newItem, newHash, this.Id, this.Metadata, this.Context);
+        public IDocument<T> With(MetadataContainer metadata) => new Document<T>(this.Value, this.Hash, this.Id, metadata, this.Context);
+        IDocument IDocument.With(MetadataContainer metadata) => this.With(metadata);
 
-        public MetadataContainer Metadata { get; }
-
-        public IDocument<TNew> With<TNew>(TNew newItem, string newHash) => new Document<TNew>(newItem, newHash, this.Id, this.Metadata);
-        public IDocument<TNew> With<TNew>(Func<TNew> newItem, string newHash) => new DocumentLazy<TNew>(newItem, newHash, this.Id, this.Metadata);
-        public IDocument<T> With(MetadataContainer metadata) => new Document<T>(this.Value, this.Hash, this.Id, metadata);
     }
 }

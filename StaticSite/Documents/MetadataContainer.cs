@@ -16,6 +16,9 @@ namespace StaticSite
             this.values = values ?? throw new ArgumentNullException(nameof(values));
         }
 
+        public string Hash { get; }
+
+
         [return: MaybeNull]
         public T GetValue<T>()
             where T : class

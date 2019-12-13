@@ -10,14 +10,15 @@ namespace StaticSite
         static async Task Main(string[] args)
         {
             var context = new GeneratorContext();
-            var startModule = ModulesEx.FromResult("https://github.com/nota-game/nota.git", context);
+            var startModule = Module.FromResult("https://github.com/nota-game/nota.git", x => x, context);
             var generatorOptions = new GenerationOptions();
             var g = startModule
                 .GitModul()
-                .Where(x => x.FrindlyName == "origin/master", x => x.Hash)
-                .Single(x => Task.FromResult(x.Hash))
+                .Where(x => x.Id == "origin/master")
+                .Single()
                 .GitRefToFiles()
-                .Where(x => System.IO.Path.GetExtension(x.Id) == ".md", x => x.Hash)
+                .Where(x => System.IO.Path.GetExtension(x.Id) == ".md")
+
                 ;
 
             var task = await g.DoIt(null, generatorOptions.Token).ConfigureAwait(false);

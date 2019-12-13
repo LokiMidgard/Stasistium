@@ -2,16 +2,20 @@
 using StaticSite.Documents;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace StaticSite.Modules
 {
-    public class MarkdownModule<TPreviousCache> : SingleInputModuleBase<Documents.IDocument<MarkdownDocument>, string, IDocument<Stream>, TPreviousCache>
+
+
+    public class MarkdownStreamModule<TPreviousCache> : SingleInputModuleBase<MarkdownDocument, string, Stream, TPreviousCache>
     {
-        public MarkdownModule(ModulePerformHandler<IDocument<Stream>, TPreviousCache> input, GeneratorContext context) : base(input, context)
+        public MarkdownStreamModule(ModulePerformHandler<Stream, TPreviousCache> input, GeneratorContext context) : base(input, context)
         {
         }
 
@@ -24,8 +28,10 @@ namespace StaticSite.Modules
                 content = await reader.ReadToEndAsync().ConfigureAwait(false);
             document.Parse(content);
 
-            var hash = document.ToString();
+            var hash = this.Context.GetHashForString(document.ToString());
             return (input.result.With(document, hash), BaseCache.Create(hash, input.cache));
         }
+
+
     }
 }

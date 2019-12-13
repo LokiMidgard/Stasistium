@@ -1,17 +1,19 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace StaticSite.Documents
 {
     public abstract class BaseCache
     {
-        private protected BaseCache(ReadOnlyMemory<BaseCache> previousCache)
+        private protected BaseCache(ReadOnlyMemory<BaseCache> previousCache, ImmutableDictionary<string, BaseCache> childCache)
         {
             this.PreviousCache = previousCache;
-
+            this.ChildCache = childCache;
         }
         public ReadOnlyMemory<BaseCache> PreviousCache { get; }
+        public ImmutableDictionary<string, BaseCache> ChildCache { get; }
 
         public abstract JToken Serelize();
 
@@ -31,6 +33,8 @@ namespace StaticSite.Documents
                 stack.Push(queuEntry);
                 foreach (var item in queuEntry.PreviousCache.Span)
                     queu.Enqueue(item);
+                foreach (var item in queuEntry.ChildCache.Values)
+                    queu.Enqueue(item);
             }
 
             int index = 0;
@@ -45,7 +49,8 @@ namespace StaticSite.Documents
                 int curentIndex;
                 if (idLookup.ContainsKey(current))
                 {
-                    curentIndex = idLookup[current];
+                    continue;
+                    //curentIndex = idLookup[current];
                 }
                 else
                 {
@@ -54,10 +59,14 @@ namespace StaticSite.Documents
                 }
 
                 var previous = new JArray();
+                var child = new JArray();
                 var previousCaches = current.PreviousCache.Span;
+                var childCaches = current.ChildCache;
 
                 for (int i = 0; i < previousCaches.Length; i++)
                     previous.Add(new JValue(idLookup[previousCaches[i]]));
+                foreach (var item in childCaches)
+                    child.Add(new JObject { { "key", item.Key }, { "id", idLookup[item.Value] } });
 
                 var entry = new JObject
                 {
@@ -65,7 +74,8 @@ namespace StaticSite.Documents
                     { "assembly", assembly },
                     { "cache", jObject },
                     { "id", curentIndex },
-                    { "previous",  previous }
+                    { "previous",  previous },
+                    { "child",  child }
                 };
 
                 result.Add(entry);
@@ -87,23 +97,33 @@ namespace StaticSite.Documents
                 var jObject = entry["cache"];
                 var id = entry["id"].ToObject<int>();
                 var previousArray = (JArray)entry["previous"];
+                var childArray = (JArray)entry["child"];
                 var assemblyName = entry["assembly"].ToObject<string>();
                 var typeName = entry["type"].ToObject<string>();
 
 
                 var previous = new BaseCache[previousArray.Count];
-                for (int j = 0; j < previousArray.Count; j++)
+                for (int j = 0; j < previous.Length; j++)
                 {
                     var jValue = (JValue)previousArray[j];
                     var value = (int)(long)jValue.Value;
                     previous[j] = idLookup[value];
                 }
 
+                var child = ImmutableDictionary<string, BaseCache>.Empty.ToBuilder();
+                for (int j = 0; j < childArray.Count; j++)
+                {
+                    var jValue = (JObject)childArray[j];
+                    var key = jValue.Value<string>("key");
+                    var value = (int)jValue.Value<long>("id");
+                    child[key] = idLookup[value];
+                }
+
 
                 var assembly = System.Reflection.Assembly.Load(new System.Reflection.AssemblyName(assemblyName));
                 //var type = assembly.GetType(typeName);
 
-                var constructorArguments = new object[] { jObject, new ReadOnlyMemory<BaseCache>(previous) };
+                var constructorArguments = new object[] { jObject, new ReadOnlyMemory<BaseCache>(previous), child.ToImmutable() };
 
                 previousCache = (BaseCache)assembly.CreateInstance(typeName, false, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance, null, constructorArguments, null, null)!;
 
@@ -117,21 +137,21 @@ namespace StaticSite.Documents
             return previousCache;
         }
 
-        public static BaseCache<T> Create<T>(T item, ReadOnlyMemory<BaseCache> previous)
-            => new BaseCache<T>(item, previous);
-        public static BaseCache<T> Create<T>(T item, BaseCache previous)
-            => new BaseCache<T>(item, new BaseCache[] { previous }.AsMemory());
+        public static BaseCache<T> Create<T>(T item, ReadOnlyMemory<BaseCache> previous, ImmutableDictionary<string, BaseCache>? child = null)
+            => new BaseCache<T>(item, previous, child ?? ImmutableDictionary<string, BaseCache>.Empty);
+        public static BaseCache<T> Create<T>(T item, BaseCache previous, ImmutableDictionary<string, BaseCache>? child = null)
+            => new BaseCache<T>(item, new BaseCache[] { previous }.AsMemory(), child ?? ImmutableDictionary<string, BaseCache>.Empty);
         public static BaseCache<T> Create<T>(T item)
-            => new BaseCache<T>(item, ReadOnlyMemory<BaseCache>.Empty);
+            => new BaseCache<T>(item, ReadOnlyMemory<BaseCache>.Empty, ImmutableDictionary<string, BaseCache>.Empty);
     }
     public sealed class BaseCache<TCacheItem> : BaseCache
     {
-        public BaseCache(TCacheItem item, ReadOnlyMemory<BaseCache> previousCache) : base(previousCache)
+        public BaseCache(TCacheItem item, ReadOnlyMemory<BaseCache> previousCache, ImmutableDictionary<string, BaseCache> childCache) : base(previousCache, childCache)
         {
             this.Item = item;
         }
 
-        internal BaseCache(JToken json, ReadOnlyMemory<BaseCache> previousCache) : base(previousCache)
+        internal BaseCache(JToken json, ReadOnlyMemory<BaseCache> previousCache, ImmutableDictionary<string, BaseCache> childCache) : base(previousCache, childCache)
         {
             this.Item = this.Deserelize(json);
         }

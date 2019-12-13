@@ -11,21 +11,19 @@ namespace StaticSite.Documents
 
         public string Hash { get; }
 
-        private readonly Repository repository;
-
         internal ICommitLog Commits
         {
-            get { return this.repository.Commits.QueryBy(new CommitFilter { IncludeReachableFrom = Tip }); }
+            get { return this.Repository.Commits.QueryBy(new CommitFilter { IncludeReachableFrom = Tip }); }
         }
 
-
+        internal Repository Repository { get; }
 
         internal GitRef(Branch branch, Repository repository)
         {
             this.Type = GitRefType.Branch;
             this.Tip = branch.Tip;
             this.FrindlyName = branch.FriendlyName;
-            this.repository = repository;
+            this.Repository = repository;
             this.Hash = this.Tip.Sha;
         }
 
@@ -34,7 +32,7 @@ namespace StaticSite.Documents
             this.Type = GitRefType.Tag;
             this.Tip = (Commit)tag.Target;
             this.FrindlyName = tag.FriendlyName;
-            this.repository = repository;
+            this.Repository = repository;
             this.Hash = this.Tip.Sha;
         }
     }
