@@ -18,7 +18,7 @@ namespace StaticSite.Stages
         }
 
 
-        protected override async Task<(ImmutableList<StageResult<TOut, string>> result, BaseCache<ImmutableList<string>> cache)> Work(StageResultList<TIn, TInItemCache, TInCache> inputList0, [AllowNull] ImmutableList<string> cache, [AllowNull] ImmutableDictionary<string, BaseCache<string>> childCaches, OptionToken options)
+        protected override async Task<(ImmutableList<StageResult<TOut, string>> result, BaseCache<ImmutableList<string>> cache)> Work(StageResultList<TIn, TInItemCache, TInCache> inputList0, [AllowNull] ImmutableList<string> cache, [AllowNull] ImmutableDictionary<string, BaseCache<string>>? childCaches, OptionToken options)
         {
             if (inputList0 is null)
                 throw new ArgumentNullException(nameof(inputList0));

@@ -23,9 +23,9 @@ namespace StaticSite.Documents
         protected DocumentBase(string id, MetadataContainer? metadata, string contetnHash, GeneratorContext context)
         {
             this.Id = id ?? throw new ArgumentNullException(nameof(id));
-            this.Metadata = metadata ?? MetadataContainer.Empty;
             this.ContentHash = contetnHash ?? throw new ArgumentNullException(nameof(contetnHash));
             this.Context = context ?? throw new ArgumentNullException(nameof(context));
+            this.Metadata = metadata ?? this.Context.EmptyMetadata;
 
             var toHash = $"<{System.Net.WebUtility.HtmlEncode(this.Id)}><{System.Net.WebUtility.HtmlEncode(this.Metadata.Hash)}><{System.Net.WebUtility.HtmlEncode(this.ContentHash)}>";
             this.Hash = this.Context.GetHashForString(toHash);
@@ -61,7 +61,7 @@ namespace StaticSite.Documents
     public class DocumentLazy<T> : DocumentBase, IDocument<T>
     {
         private readonly Func<T> valueCallback;
-        public DocumentLazy(Func<T> valueCallback, string contentHash, string id, MetadataContainer? metadata, GeneratorContext context) : base(id, metadata ?? MetadataContainer.Empty, contentHash, context)
+        public DocumentLazy(Func<T> valueCallback, string contentHash, string id, MetadataContainer? metadata, GeneratorContext context) : base(id, metadata, contentHash, context)
         {
             this.valueCallback = valueCallback;
         }

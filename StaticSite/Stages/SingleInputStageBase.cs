@@ -22,7 +22,7 @@ namespace StaticSite.Stages
 
         protected abstract Task<(IDocument<TResult> result, BaseCache<TCache> cache)> Work((IDocument<TInput> result, BaseCache<TPreviousCache> cache) input, bool previousHadChanges, OptionToken options);
 
-        protected sealed override async Task<StageResult<TResult, CacheId<TCache>>> DoInternal([AllowNull] BaseCache<CacheId<TCache>> cache, OptionToken options)
+        protected override async Task<StageResult<TResult, CacheId<TCache>>> DoInternal([AllowNull] BaseCache<CacheId<TCache>>? cache, OptionToken options)
         {
             if (cache != null && cache.PreviousCache.Length != 1)
                 throw new ArgumentException($"This cache should have exactly one predecessor but had {cache.PreviousCache}");
@@ -79,7 +79,7 @@ namespace StaticSite.Stages
 
         protected abstract Task<(ImmutableList<StageResult<TResult, TResultCache>> result, BaseCache<TCache> cache)> Work((IDocument<TInput> result, BaseCache<TPreviousCache> cache) input, bool previousHadChanges, [AllowNull] TCache cache, [AllowNull] ImmutableDictionary<string, BaseCache<TResultCache>> childCaches, OptionToken options);
 
-        protected sealed override async Task<StageResultList<TResult, TResultCache, CacheIds<TCache>>> DoInternal([AllowNull] BaseCache<CacheIds<TCache>> cache, OptionToken options)
+        protected sealed override async Task<StageResultList<TResult, TResultCache, CacheIds<TCache>>> DoInternal([AllowNull] BaseCache<CacheIds<TCache>>? cache, OptionToken options)
         {
             if (cache != null && cache.PreviousCache.Length != 1)
                 throw new ArgumentException($"This cache should have exactly one predecessor but had {cache.PreviousCache}");
@@ -169,13 +169,14 @@ namespace StaticSite.Stages
 
     }
 
+#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+#pragma warning disable CA1819 // Properties should not return arrays
     public class CacheId<TCache>
              where TCache : class
     {
         public TCache? Data { get; set; }
 
         public string Id { get; set; }
-
     }
 
     public class CacheIds<TCache>
@@ -184,8 +185,9 @@ namespace StaticSite.Stages
         public TCache? Data { get; set; }
 
         public (string id, string hash)[] Ids { get; set; }
-
-
     }
+#pragma warning restore CA1819 // Properties should not return arrays
+#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+
 
 }

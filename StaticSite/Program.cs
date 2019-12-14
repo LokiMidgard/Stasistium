@@ -23,8 +23,10 @@ namespace StaticSite
             var g = startModule
                 .GitModul()
                 .Where(x => x.Id == "origin/master")
-                .Single()
+                .SingleEntry()
                 .GitRefToFiles()
+                .Sidecar()
+                    .For<BookMetadata>(".metadata")
                 .Where(x => System.IO.Path.GetExtension(x.Id) == ".md")
                 .Persist(new DirectoryInfo("out"), generatorOptions)
                 ;
@@ -32,5 +34,13 @@ namespace StaticSite
             await g.UpdateFiles().ConfigureAwait(false);
 
         }
+
+#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+        public class BookMetadata
+        {
+            public string Title { get; set; }
+            public int Chapter { get; set; }
+        }
+#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
     }
 }

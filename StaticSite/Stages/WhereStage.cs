@@ -16,7 +16,7 @@ namespace StaticSite.Stages
             this.predicate = predicate;
         }
 
-        protected override async Task<(ImmutableList<StageResult<TCheck, TPreviousItemCache>> result, BaseCache<ImmutableList<string>> cache)> Work(StageResultList<TCheck, TPreviousItemCache, TPreviousCache> inputList0, [AllowNull] ImmutableList<string> cache, [AllowNull] ImmutableDictionary<string, BaseCache<TPreviousItemCache>> childCaches, OptionToken options)
+        protected override async Task<(ImmutableList<StageResult<TCheck, TPreviousItemCache>> result, BaseCache<ImmutableList<string>> cache)> Work(StageResultList<TCheck, TPreviousItemCache, TPreviousCache> inputList0, [AllowNull] ImmutableList<string> cache, [AllowNull] ImmutableDictionary<string, BaseCache<TPreviousItemCache>>? childCaches, OptionToken options)
         {
             if (inputList0 is null)
                 throw new ArgumentNullException(nameof(inputList0));
@@ -36,6 +36,8 @@ namespace StaticSite.Stages
                 }
                 else
                 {
+                    if (childCaches is null)
+                        throw new InvalidOperationException("This shoudl not happen. if item has no changes, ther must be a child cache.");
                     // since HasChanges if false, it was present in the last invocation
                     // if it is passed this it was added to thec cache otherwise not.
                     pass = childCaches.ContainsKey(item.Id);

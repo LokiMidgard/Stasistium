@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -8,15 +9,19 @@ namespace StaticSite.Documents
     public class GeneratorContext : IDisposable
     {
         private readonly HashAlgorithm algorithm = SHA256.Create();
+        private readonly Func<object, string?>? objectToStingRepresentation;
 
         public DirectoryInfo CacheFolder { get; }
         public DirectoryInfo TempFolder { get; }
 
+        public MetadataContainer EmptyMetadata { get; } 
 
-        public GeneratorContext(DirectoryInfo? cacheFolder = null, DirectoryInfo? tempFolder = null)
+        public GeneratorContext(DirectoryInfo? cacheFolder = null, DirectoryInfo? tempFolder = null, Func<object, string?>? objectToStingRepresentation = null)
         {
             this.CacheFolder = cacheFolder ?? new DirectoryInfo("Cache");
             this.TempFolder = tempFolder ?? new DirectoryInfo("Temp");
+            this.EmptyMetadata = MetadataContainer.EmptyFromContext(this);
+            this.objectToStingRepresentation = objectToStingRepresentation;
         }
 
         public string GetHashForString(string toHash)
@@ -28,6 +33,63 @@ namespace StaticSite.Documents
                 sb.Append(b.ToString("X2", System.Globalization.CultureInfo.InvariantCulture));
 
             return sb.ToString();
+        }
+
+
+
+        internal string GetHashForObject(object? value)
+        {
+
+            var c = System.Globalization.CultureInfo.InvariantCulture;
+            return this.GetHashForString(value switch
+            {
+                string s => s,
+                int i => i.ToString(c),
+                long l => l.ToString(c),
+                uint i => i.ToString(c),
+                ulong l => l.ToString(c),
+                byte b => b.ToString(c),
+                bool b => b.ToString(c),
+                null => "",
+                System.Runtime.CompilerServices.ITuple tuple => TupleToString(tuple),
+                System.Collections.IEnumerable enumerable => EnumberableToString(enumerable),
+                _ => this.GetStringForObject(value)
+            }); ; ;
+
+            string TupleToString(System.Runtime.CompilerServices.ITuple tuple)
+            {
+                var str = new StringBuilder();
+                for (int i = 0; i < tuple.Length; i++)
+                {
+                    str.Append("<");
+                    str.Append(System.Net.WebUtility.HtmlEncode(this.GetHashForObject(tuple[i])));
+                    str.Append(">");
+                }
+
+                return str.ToString();
+            }
+            string EnumberableToString(System.Collections.IEnumerable enumerable)
+            {
+                var str = new StringBuilder();
+                foreach (var item in enumerable)
+                {
+                    str.Append("<");
+                    str.Append(System.Net.WebUtility.HtmlEncode(this.GetHashForObject(item)));
+                    str.Append(">");
+                }
+
+                return str.ToString();
+            }
+        }
+
+
+
+        private string GetStringForObject(object obj)
+        {
+            var result = this.objectToStingRepresentation?.Invoke(obj);
+            if (result is null)
+                throw new InvalidCastException($"For type {obj.GetType().FullName} exists no convertion to string. Use the {nameof(this.objectToStingRepresentation)} paramter of {nameof(GeneratorContext)}.");
+            return result;
         }
 
         public void Warning(string message, Exception? e = null)

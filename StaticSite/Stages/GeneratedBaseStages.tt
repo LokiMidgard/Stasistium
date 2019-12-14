@@ -183,7 +183,7 @@ if(single == 0 && list == 0)
         StageResultList<TInputList<#= j #>,TPreviousItemCache<#= j #>,TPreviousListCache<#= j #>> inputList<#= j#>, 
     <#}#>
        [AllowNull] TCache cache,
-        [AllowNull] ImmutableDictionary<string, BaseCache<TResultCache>> childCaches,
+        [AllowNull] ImmutableDictionary<string, BaseCache<TResultCache>>? childCaches,
         OptionToken options);
 
         protected sealed override async Task<StageResultList<TResult, TResultCache, CacheIds<TCache>>> DoInternal([AllowNull] BaseCache<CacheIds<TCache>>? cache, OptionToken options)

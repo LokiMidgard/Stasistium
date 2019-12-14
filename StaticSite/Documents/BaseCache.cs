@@ -25,7 +25,7 @@ namespace StaticSite.Documents
 
             using var textWriter = new System.IO.StreamWriter(stream);
             using var jsonWriter = new Newtonsoft.Json.JsonTextWriter(textWriter);
-            await array.WriteToAsync(jsonWriter);
+            await array.WriteToAsync(jsonWriter).ConfigureAwait(false);
         }
 
         private static JArray Write(BaseCache baseCache)
@@ -102,6 +102,11 @@ namespace StaticSite.Documents
             var array = await JArray.LoadAsync(jsonReadr).ConfigureAwait(false);
             return (BaseCache<T>)Load(array);
         }
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+#pragma warning disable CS8605 // Unboxing a possibly null value.
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
+#pragma warning disable CS8601 // Possible null reference assignment.
+#pragma warning disable CS8604 // Possible null reference argument.
         internal static BaseCache Load(JArray json)
         {
             if (json.Count == 0)
@@ -154,7 +159,11 @@ namespace StaticSite.Documents
 
             return previousCache;
         }
-
+#pragma warning restore CS8604 // Possible null reference argument.
+#pragma warning restore CS8601 // Possible null reference assignment.
+#pragma warning restore CS8605 // Unboxing a possibly null value.
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
         public static BaseCache<T> Create<T>(T item, ReadOnlyMemory<BaseCache> previous, ImmutableDictionary<string, BaseCache>? child = null)
             => new BaseCache<T>(item, previous, child ?? ImmutableDictionary<string, BaseCache>.Empty);
         public static BaseCache<T> Create<T>(T item, BaseCache previous, ImmutableDictionary<string, BaseCache>? child = null)
@@ -178,8 +187,9 @@ namespace StaticSite.Documents
 
         public override JToken Serelize()
         {
-
-            return JToken.FromObject(Item);
+            if (this.Item is null)
+                throw new InvalidOperationException("This should not happen. (only if base cunstructor calls this method which it should NOT!)");
+            return JToken.FromObject(this.Item);
         }
 
         private TCacheItem Deserelize(JToken json)

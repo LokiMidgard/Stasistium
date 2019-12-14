@@ -34,7 +34,7 @@ namespace StaticSite.Stages
                     switch (entry.Target)
                     {
                         case Blob blob:
-                            var document = new GitFileDocument(entry.Path, blob, this.Context, MetadataContainer.Empty);
+                            var document = new GitFileDocument(entry.Path, blob, this.Context, null);
                             var hasChanges = true;
                             if (childCaches != null && childCaches.TryGetKey(document.Id, out var oldFileHash))
                                 hasChanges = oldFileHash != document.Hash;
