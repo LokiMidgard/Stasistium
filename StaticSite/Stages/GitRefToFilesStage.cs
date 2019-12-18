@@ -10,7 +10,8 @@ using System.Threading.Tasks;
 
 namespace StaticSite.Stages
 {
-    public class GitRefToFilesStage<TPreviousCache> : SingleInputMultipleStageBase<Stream, string, string, GitRef, TPreviousCache>
+    public class GitRefToFilesStage<TPreviousCache> : GeneratedHelper.Multiple.Simple.OutputMultiSimpleInputSingle1List0StageBase<GitRef, TPreviousCache, Stream>
+        where TPreviousCache : class
     {
 
 
@@ -18,14 +19,15 @@ namespace StaticSite.Stages
         {
         }
 
-        protected override Task<(ImmutableList<StageResult<Stream, string>> result, BaseCache<string> cache)> Work((IDocument<GitRef> result, BaseCache<TPreviousCache> cache) input, bool previousHadChanges, [AllowNull] string cache, [AllowNull] ImmutableDictionary<string, BaseCache<string>> childCaches, OptionToken options)
+        protected override Task<ImmutableList<IDocument<Stream>>> Work(IDocument<GitRef> source, OptionToken options)
         {
-            var source = input.result;
+            if (source is null)
+                throw new ArgumentNullException(nameof(source));
 
             var queue = new Queue<Tree>();
             queue.Enqueue(source.Value.Tip.Tree);
 
-            var blobs = ImmutableList<StageResult<Stream, string>>.Empty.ToBuilder();
+            var blobs = ImmutableList<IDocument<Stream>>.Empty.ToBuilder();
 
             while (queue.TryDequeue(out var tree))
             {
@@ -35,11 +37,7 @@ namespace StaticSite.Stages
                     {
                         case Blob blob:
                             var document = new GitFileDocument(entry.Path, blob, this.Context, null);
-                            var hasChanges = true;
-                            if (childCaches != null && childCaches.TryGetKey(document.Id, out var oldFileHash))
-                                hasChanges = oldFileHash != document.Hash;
-
-                            blobs.Add(StageResult.Create(document, BaseCache.Create(document.Hash), hasChanges, document.Id));
+                            blobs.Add(document);
                             break;
 
                         case Tree subTree:
@@ -55,7 +53,7 @@ namespace StaticSite.Stages
                 }
             }
 
-            return Task.FromResult((result: blobs.ToImmutable(), cache: BaseCache.Create(source.Hash, input.cache)));
+            return Task.FromResult(blobs.ToImmutable());
         }
 
     }

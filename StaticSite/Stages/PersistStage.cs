@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 namespace StaticSite.Stages
 {
     public class PersistStage<TPreviousItemCache, TPreviousCache>
+        where TPreviousCache :class
+        where TPreviousItemCache : class
     {
         private readonly GenerationOptions generatorOptions;
         private readonly StagePerformHandler<Stream, TPreviousItemCache, TPreviousCache> inputList;
@@ -29,7 +31,7 @@ namespace StaticSite.Stages
             var cacehFile = new FileInfo(Path.Combine(cacheDir.FullName, "cache"));
 
             // Read the old Cache
-            BaseCache<TPreviousCache>? cache;
+            TPreviousCache? cache;
             if (cacehFile.Exists)
             {
 

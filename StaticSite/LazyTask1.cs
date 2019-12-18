@@ -7,7 +7,8 @@ namespace StaticSite
     public class LazyTask<T>
     {
         private readonly Func<Task<T>> action;
-        private Task<T>? task;
+        private TaskCompletionSource<Task<T>> completionSource;
+        private int set;
 
         //
         // Summary:
@@ -17,9 +18,17 @@ namespace StaticSite
         //     An awaiter instance.
         public TaskAwaiter<T> GetAwaiter()
         {
-            var localTask = this.task ?? (this.task = this.action());
+            var localTask = this.AsTask();
             return localTask.GetAwaiter();
 
+        }
+
+        public Task<T> AsTask()
+        {
+            var old = System.Threading.Interlocked.CompareExchange(ref this.set, 1, 0);
+            if (old == 0)
+                this.completionSource.SetResult(this.action());
+            return this.completionSource.Task.Unwrap();
         }
 
         public LazyTask(Func<Task<T>> action)

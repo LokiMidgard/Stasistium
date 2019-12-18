@@ -10,9 +10,11 @@ using System.Threading.Tasks;
 
 namespace StaticSite.Stages
 {
-    public class GitStage<TPreviousCache> : SingleInputMultipleStageBase<GitRef, (GitRefType type, string hash), ImmutableList<string>, string, TPreviousCache>
+    public class GitStage<TPreviousCache> : GeneratedHelper.Multiple.Simple.OutputMultiSimpleInputSingle1List0StageBase<string, TPreviousCache, GitRef>
+        where TPreviousCache : class
     {
         private Repository? repo;
+        private string? previousSource;
         private System.IO.DirectoryInfo? workingDir;
 
 
@@ -20,14 +22,14 @@ namespace StaticSite.Stages
         {
         }
 
-
-        protected override async Task<(ImmutableList<StageResult<GitRef, (GitRefType type, string hash)>> result, BaseCache<ImmutableList<string>> cache)> Work((IDocument<string> result, BaseCache<TPreviousCache> cache) input, bool previousHadChanges, [AllowNull] ImmutableList<string> cache, [AllowNull] ImmutableDictionary<string, BaseCache<(GitRefType type, string hash)>> childCaches, OptionToken options)
+        protected override async Task<ImmutableList<IDocument<GitRef>>> Work(IDocument<string> source, OptionToken options)
         {
+            if (source is null)
+                throw new ArgumentNullException(nameof(source));
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
-            var source = input.result;
 
-            if (this.repo is null || previousHadChanges)
+            if (this.repo is null || source.Value != this.previousSource)
             {
                 if (this.repo != null)
                 {
@@ -40,6 +42,7 @@ namespace StaticSite.Stages
                 }
 
                 this.workingDir = this.Context.TempDir();
+                this.previousSource = source.Value;
                 this.repo = await Task.Run(() => new Repository(Repository.Clone(source.Value, this.workingDir.FullName, new CloneOptions() { IsBare = true }))).ConfigureAwait(false);
             }
             else if (options.Refresh)
@@ -52,18 +55,18 @@ namespace StaticSite.Stages
 
             // for branches we ignore the local ones. we just cloned the repo and the local one is the same as the remote.
             var refs = this.repo.Tags.Select(x => new GitRef(x, this.repo)).Concat(this.repo.Branches.Where(x => x.IsRemote).Select(x => new GitRef(x, this.repo)))
-                .Select(x =>
-                {
-                    var hasChanges = true;
-                    if (childCaches != null && childCaches.TryGetValue(x.FrindlyName, out var o))
-                        hasChanges = o.Item.hash != x.Hash || o.Item.type != x.Type;
-                    var itemCache = BaseCache.Create((x.Type, x.Hash));
-                    return StageResult.Create(this.Context.Create(x, x.Hash, x.FrindlyName), itemCache, hasChanges, x.FrindlyName);
-                }).OrderBy(x => x.Id).ToArray();
-            return (refs.ToImmutableList(), BaseCache.Create(refs.Select(x => x.Id).ToImmutableList(), input.cache));
+                .Select(x => this.Context.Create(x, x.Hash, x.FrindlyName)).OrderBy(x => x.Id).ToArray();
+            return refs.ToImmutableList();
+
 
         }
 
+        protected override Task<bool?> ForceUpdate((string id, string hash)[]? ids, OptionToken options)
+        {
+            if (options is null)
+                throw new ArgumentNullException(nameof(options));
+            return Task.FromResult<bool?>(options.Refresh);
+        }
     }
 
 }

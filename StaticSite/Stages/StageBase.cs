@@ -17,22 +17,19 @@ namespace StaticSite.Stages
             this.Context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        protected abstract Task<StageResult<TResult, TCache>> DoInternal([AllowNull]BaseCache<TCache>? cache, OptionToken options);
+        protected abstract Task<StageResult<TResult, TCache>> DoInternal([AllowNull]TCache? cache, OptionToken options);
 
-        public Task<StageResult<TResult, TCache>> DoIt([AllowNull]BaseCache? cache, OptionToken options)
+        public Task<StageResult<TResult, TCache>> DoIt([AllowNull]TCache? cache, OptionToken options)
         {
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
 
-            var cast = cache as BaseCache<TCache>;
-            if (cache != null && cast is null)
-                throw new ArgumentException($"Cache must be of type {nameof(BaseCache)}<{typeof(TCache).FullName}> but was {cache.GetType().FullName}", nameof(cache));
 
             var lastRun = this.lastRun;
             if (lastRun.lastId == options.GenerationId)
                 return lastRun.result;
 
-            var result = this.DoInternal(cast, options);
+            var result = this.DoInternal(cache, options);
             this.lastRun = (options.GenerationId, result);
             return result;
         }
@@ -42,6 +39,7 @@ namespace StaticSite.Stages
 
     public abstract class MultiStageBase<TResult, TCacheResult, TCache>
      where TCache : class
+     where TCacheResult : class
     {
 
         private (Guid lastId, Task<StageResultList<TResult, TCacheResult, TCache>> result) lastRun;
@@ -51,22 +49,19 @@ namespace StaticSite.Stages
             this.Context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        protected abstract Task<StageResultList<TResult, TCacheResult, TCache>> DoInternal([AllowNull]BaseCache<TCache>? cache, OptionToken options);
+        protected abstract Task<StageResultList<TResult, TCacheResult, TCache>> DoInternal([AllowNull]TCache? cache, OptionToken options);
 
-        public Task<StageResultList<TResult, TCacheResult, TCache>> DoIt([AllowNull]BaseCache cache, OptionToken options)
+        public Task<StageResultList<TResult, TCacheResult, TCache>> DoIt([AllowNull]TCache? cache, OptionToken options)
         {
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
 
-            var cast = cache as BaseCache<TCache>;
-            if (cache != null && cast is null)
-                throw new ArgumentException($"Cache must be of type {nameof(BaseCache)}<{typeof(TCache).FullName}> but was {cache.GetType().FullName}", nameof(cache));
 
             var lastRun = this.lastRun;
             if (lastRun.lastId == options.GenerationId)
                 return lastRun.result;
 
-            var result = this.DoInternal(cast, options);
+            var result = this.DoInternal(cache, options);
             this.lastRun = (options.GenerationId, result);
             return result;
         }
@@ -108,8 +103,10 @@ namespace StaticSite.Stages
             return obj is OptionToken token && this.Equals(token);
         }
 
-        public bool Equals([AllowNull] OptionToken other)
+        public bool Equals([AllowNull] OptionToken? other)
         {
+            if (other is null)
+                return false;
             return this.GenerationId.Equals(other.GenerationId);
         }
 
@@ -118,12 +115,16 @@ namespace StaticSite.Stages
             return HashCode.Combine(this.GenerationId);
         }
 
-        public static bool operator ==(OptionToken left, OptionToken right)
+        public static bool operator ==(OptionToken? left, OptionToken? right)
         {
+            if (left is null && right is null)
+                return true;
+            if (left is null || right is null)
+                return false;
             return left.Equals(right);
         }
 
-        public static bool operator !=(OptionToken left, OptionToken right)
+        public static bool operator !=(OptionToken? left, OptionToken? right)
         {
             return !(left == right);
         }

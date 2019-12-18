@@ -1,22 +1,23 @@
 ﻿using StaticSite.Documents;
 using System;
-using System.Linq;
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using System.IO;
+using System.Collections.Immutable;
+using System.Collections.Generic;
 
 namespace StaticSite.Stages
 {
-    public delegate Task<StageResult<TResult, TCache>> StagePerformHandler<TResult, TCache>([AllowNull] BaseCache cache, OptionToken options);
-    public delegate Task<StageResultList<TResult, TResultCache, TCache>> StagePerformHandler<TResult, TResultCache, TCache>([AllowNull] BaseCache cache, OptionToken options);
+    public delegate Task<StageResult<TResult, TCache>> StagePerformHandler<TResult, TCache>([AllowNull] TCache cache, OptionToken options);
+    public delegate Task<StageResultList<TResult, TResultCache, TCache>> StagePerformHandler<TResult, TResultCache, TCache>([AllowNull] TCache cache, OptionToken options);
 
 
     public static class Stage
     {
 
-        public static PersistStage<TItemCache, TCache> Persist<TItemCache, TCache>(this MultiStageBase<System.IO.Stream, TItemCache, TCache> stage, System.IO.DirectoryInfo output, GenerationOptions generatorOptions)
+        public static PersistStage<TItemCache, TCache> Persist<TItemCache, TCache>(this MultiStageBase<Stream, TItemCache, TCache> stage, DirectoryInfo output, GenerationOptions generatorOptions)
             where TCache : class
+            where TItemCache : class
         {
             if (stage is null)
                 throw new ArgumentNullException(nameof(stage));
@@ -43,7 +44,7 @@ namespace StaticSite.Stages
             return new GitRefToFilesStage<T>(input.DoIt, input.Context);
         }
 
-        public static MarkdownStreamStage<T> Markdown<T>(this StageBase<System.IO.Stream, T> input)
+        public static MarkdownStreamStage<T> Markdown<T>(this StageBase<Stream, T> input)
             where T : class
         {
             if (input is null)
@@ -60,6 +61,7 @@ namespace StaticSite.Stages
 
         public static WhereStage<TCheck, TPreviousItemCache, TPreviousCache> Where<TCheck, TPreviousItemCache, TPreviousCache>(this MultiStageBase<TCheck, TPreviousItemCache, TPreviousCache> input, Func<IDocument<TCheck>, Task<bool>> predicate)
             where TPreviousCache : class
+            where TPreviousItemCache : class
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
@@ -69,6 +71,7 @@ namespace StaticSite.Stages
         }
         public static WhereStage<TCheck, TPreviousItemCache, TPreviousCache> Where<TCheck, TPreviousItemCache, TPreviousCache>(this MultiStageBase<TCheck, TPreviousItemCache, TPreviousCache> input, Func<IDocument<TCheck>, bool> predicate)
             where TPreviousCache : class
+            where TPreviousItemCache : class
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
@@ -78,6 +81,7 @@ namespace StaticSite.Stages
         }
         public static SingleStage<TCheck, TPreviousItemCache, TPreviousCache> SingleEntry<TCheck, TPreviousItemCache, TPreviousCache>(this MultiStageBase<TCheck, TPreviousItemCache, TPreviousCache> input)
             where TPreviousCache : class
+            where TPreviousItemCache : class
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
@@ -85,6 +89,7 @@ namespace StaticSite.Stages
         }
         public static SelectStage<TIn, TInITemCache, TInCache, TOut> Select<TIn, TInITemCache, TInCache, TOut>(this MultiStageBase<TIn, TInITemCache, TInCache> input, Func<IDocument<TIn>, Task<IDocument<TOut>>> predicate)
             where TInCache : class
+            where TInITemCache : class
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
@@ -96,133 +101,103 @@ namespace StaticSite.Stages
         public static StaticStage<TResult> FromResult<TResult>(TResult result, Func<TResult, string> hashFunction, GeneratorContext context)
             => new StaticStage<TResult>(result, hashFunction, context);
 
-        public static SidecarHelper<TPreviousItemCache, TPreviousListCache> Sidecar<TPreviousItemCache, TPreviousListCache>(this MultiStageBase<System.IO.Stream, TPreviousItemCache, TPreviousListCache> stage)
+        public static SidecarHelper<TPreviousItemCache, TPreviousListCache> Sidecar<TPreviousItemCache, TPreviousListCache>(this MultiStageBase<Stream, TPreviousItemCache, TPreviousListCache> stage)
             where TPreviousListCache : class
+            where TPreviousItemCache : class
         {
             return new SidecarHelper<TPreviousItemCache, TPreviousListCache>(stage);
         }
-    }
 
-    public class SidecarHelper<TPreviousItemCache, TPreviousListCache>
-            where TPreviousListCache : class
-    {
-        private readonly MultiStageBase<Stream, TPreviousItemCache, TPreviousListCache> stage;
-
-        public SidecarHelper(MultiStageBase<Stream, TPreviousItemCache, TPreviousListCache> stage)
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public class SidecarHelper<TPreviousItemCache, TPreviousListCache>
+                where TPreviousListCache : class
+            where TPreviousItemCache : class
         {
-            this.stage = stage;
-        }
+            private readonly MultiStageBase<Stream, TPreviousItemCache, TPreviousListCache> stage;
 
-        public SidecarMetadata<TMetadata, TPreviousItemCache, TPreviousListCache> For<TMetadata>(string extension, MetadataUpdate<TMetadata>? updateCallback = null)
-        {
-            return new SidecarMetadata<TMetadata, TPreviousItemCache, TPreviousListCache>(this.stage.DoIt, extension, updateCallback, this.stage.Context);
-        }
-    }
+            public SidecarHelper(MultiStageBase<Stream, TPreviousItemCache, TPreviousListCache> stage)
+            {
+                this.stage = stage;
+            }
 
-    public class SidecarMetadata<TMetadata, TPreviousItemCache, TPreviousListCache> : OutputMultiInputSingle0List1StageBase<System.IO.Stream, TPreviousItemCache, TPreviousListCache, System.IO.Stream, string, ImmutableList<string>>
-    {
-        private readonly MetadataUpdate<TMetadata>? update;
-
-        public SidecarMetadata(StagePerformHandler<System.IO.Stream, TPreviousItemCache, TPreviousListCache> inputList0, string sidecarExtension, MetadataUpdate<TMetadata>? update, GeneratorContext context) : base(inputList0, context)
-        {
-            if (sidecarExtension is null)
-                throw new ArgumentNullException(nameof(sidecarExtension));
-            if (!sidecarExtension.StartsWith(".", StringComparison.InvariantCultureIgnoreCase))
-                sidecarExtension = "." + sidecarExtension;
-            this.SidecarExtension = sidecarExtension;
-            this.update = update;
-        }
-
-        public string SidecarExtension { get; }
-
-        protected override async Task<(ImmutableList<StageResult<System.IO.Stream, string>> result, BaseCache<ImmutableList<string>> cache)> Work(StageResultList<System.IO.Stream, TPreviousItemCache, TPreviousListCache> inputList0, [AllowNull] ImmutableList<string> cache, [AllowNull] ImmutableDictionary<string, BaseCache<string>>? childCaches, OptionToken options)
-        {
-            if (inputList0 is null)
-                throw new ArgumentNullException(nameof(inputList0));
-            var (result, inputCache) = await inputList0.Perform;
-
-            var sidecarLookup = result.Where(x => System.IO.Path.GetExtension(x.Id) == this.SidecarExtension)
-                .ToDictionary(x => System.IO.Path.Combine(System.IO.Path.GetDirectoryName(x.Id) ?? string.Empty, System.IO.Path.GetFileNameWithoutExtension(x.Id)));
-
-            var files = result.Where(x => System.IO.Path.GetExtension(x.Id) != this.SidecarExtension);
-
-
-
-            var list = await Task.WhenAll(files.Select(async file =>
-           {
-               if (sidecarLookup.TryGetValue(file.Id, out var sidecar) && (file.HasChanges || sidecar.HasChanges))
-               {
-                   var (fileResult, fileCache) = await file.Perform;
-                   var (sidecarResult, sidecarCache) = await sidecar.Perform;
-
-
-
-                   var deserializer = new YamlDotNet.Serialization.DeserializerBuilder()
-                       .WithNamingConvention(YamlDotNet.Serialization.NamingConventions.CamelCaseNamingConvention.Instance)
-                       .Build();
-
-                   var oldMetadata = fileResult.Metadata;
-                   MetadataContainer? newMetadata;
-                   try
-                   {
-                       using var stream = sidecarResult.Value;
-                       using var reader = new System.IO.StreamReader(stream);
-                       var metadata = deserializer.Deserialize<TMetadata>(reader);
-
-                       if (metadata != null)
-                           if (this.update != null)
-                               newMetadata = oldMetadata.AddOrUpdate(metadata.GetType(), metadata, (oldValue, newValue) => this.update((TMetadata)oldValue! /*AllowNull is set, so why the warnign?*/, (TMetadata)newValue));
-                           else
-                               newMetadata = oldMetadata.Add(metadata.GetType(), metadata);
-                       else
-                           newMetadata = null;
-                   }
-                   catch (YamlDotNet.Core.YamlException e) when (e.InnerException is null) // Hope that only happens when it does not match.
-                   {
-                       newMetadata = null;
-                   }
-
-                   if (newMetadata != null)
-                       fileResult = fileResult.With(newMetadata);
-
-                   var hasChanges = true;
-                   if (childCaches != null && childCaches.TryGetValue(fileResult.Id, out var oldChildCache))
-                       hasChanges = oldChildCache.Item != fileResult.Hash;
-
-                   var childCache = BaseCache.Create(fileResult.Hash, new ReadOnlyMemory<BaseCache>(new BaseCache[] { fileCache, sidecarCache }));
-                   return (result: StageResult.Create<System.IO.Stream, string>(fileResult, childCache, hasChanges, fileResult.Id), childCache);
-               }
-               else if (file.HasChanges)
-               {
-                   var (fileResult, fileCache) = await file.Perform;
-                   var hasChanges = true;
-                   if (childCaches != null && childCaches.TryGetValue(fileResult.Id, out var oldChildCache))
-                       hasChanges = oldChildCache.Item != fileResult.Hash;
-                   System.Diagnostics.Debug.Assert(hasChanges); // if the original file had changes so must this have.
-                   var childCache = BaseCache.Create(fileResult.Hash, new ReadOnlyMemory<BaseCache>(new BaseCache[] { fileCache }));
-                   return (result: StageResult.Create<System.IO.Stream, string>(fileResult, childCache, hasChanges, fileResult.Id), childCache);
-               }
-               else
-               {
-                   var task = LazyTask.Create(async () =>
-                   {
-                       var (fileResult, fileCache) = await file.Perform;
-                       var hasChanges = true;
-                       if (childCaches != null && childCaches.TryGetValue(fileResult.Id, out var oldChildCache))
-                           hasChanges = oldChildCache.Item != fileResult.Hash;
-
-                       return (fileResult, BaseCache.Create(fileResult.Hash, fileCache));
-                   });
-                   if (childCaches is null || !childCaches.TryGetValue(file.Id, out var childCache))
-                       throw this.Context.Exception("The previous cache should exist if we had no changes.");
-
-                   return (result: StageResult.Create(task, false, file.Id), childCache);
-               }
-           })).ConfigureAwait(false);
-
-            return (list.Select(x => x.result).ToImmutableList(), BaseCache.Create(list.Select(x => x.result.Id).ToImmutableList(), inputCache, list.ToImmutableDictionary(x => x.result.Id, x => x.childCache as BaseCache)));
+            public SidecarMetadata<TMetadata, TPreviousItemCache, TPreviousListCache> For<TMetadata>(string extension, MetadataUpdate<TMetadata>? updateCallback = null)
+            {
+                return new SidecarMetadata<TMetadata, TPreviousItemCache, TPreviousListCache>(this.stage.DoIt, extension, updateCallback, this.stage.Context);
+            }
         }
     }
 
+    //public class Split<TInputList0, TPreviousItemCache0, TPreviousListCache0, TResult, TResultCache, TCache> : OutputMultiInputSingle0List1StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0, TResult, string, ImmutableList<string>>
+    //where TResultCache : class
+    //where TCache : class
+    //where TPreviousItemCache0 : class
+    //where TPreviousListCache0 : class
+    //{
+
+    //    private readonly Dictionary<string, (Start @in, StageBase<TResult, TResultCache> @out)> startLookup = new Dictionary<string, (Start @in, StageBase<TResult, TResultCache> @out)>();
+
+    //    private readonly Func<StageBase<TInputList0, CacheId<string>>, StageBase<TResult, TResultCache>> createPipline;
+
+    //    protected override async Task<(ImmutableList<StageResult<TResult, string>> result, BaseCache<ImmutableList<string>> cache)> Work(StageResultList<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0, [AllowNull] ImmutableList<string> cache, [AllowNull] ImmutableDictionary<string, BaseCache<string>>? childCaches, OptionToken options)
+    //    {
+
+    //        var (input, _) = await inputList0.Perform;
+
+    //        foreach (var i in input)
+    //        {
+    //            if (this.startLookup.TryGetValue(i.Id, out var pipe))
+    //            {
+    //                pipe.@in.In = i;
+    //            }
+    //            else
+    //            {
+    //                var start = new Start(i, this.Context);
+    //                var end = this.createPipline(start);
+    //                pipe = (start, end);
+    //                this.startLookup.Add(i.Id, pipe);
+    //            }
+
+    //            pipe.@out.DoIt()
+
+    //            StageResult.Create()
+
+    //        }
+
+    //        throw new NotImplementedException();
+    //    }
+
+
+    //    private class Start : OutputSingleInputSingle0List0StageBase<TInputList0, string>
+    //    {
+    //        private bool hasChanges;
+    //        private StageResult<TInputList0, TPreviousItemCache0> @in;
+
+    //        public Start(StageResult<TInputList0, TPreviousItemCache0> initial, GeneratorContext context) : base(context)
+    //        {
+    //            this.In = initial;
+    //        }
+
+    //        public StageResult<TInputList0, TPreviousItemCache0> In
+    //        {
+    //            get => this.@in; set
+    //            {
+    //                this.@in = value;
+    //                this.hasChanges = value.HasChanges;
+    //            }
+    //        }
+
+    //        protected override async Task<(IDocument<TInputList0> result, BaseCache<string> cache)> Work(OptionToken options)
+    //        {
+    //            // reset changes when calculated;
+    //            this.hasChanges = false;
+
+    //            var result = await this.In.Perform;
+
+    //            return (result.result, BaseCache.Create(result.result.Id, result.cache));
+    //        }
+
+    //        protected override bool ForceUpdate(string? cache, OptionToken options) => this.hasChanges;
+    //    }
+    //}
 
 }

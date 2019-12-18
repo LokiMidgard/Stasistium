@@ -17,12 +17,13 @@ namespace StaticSite.Stages
             this.hashFunction = hashFunction ?? throw new ArgumentNullException(nameof(hashFunction));
         }
 
-        protected override Task<StageResult<TResult, string>> DoInternal([AllowNull] BaseCache<string>? cache, OptionToken options)
+        protected override Task<StageResult<TResult, string>> DoInternal([AllowNull] string? cache, OptionToken options)
         {
             var contentHash = this.hashFunction(this.Value);
             return Task.FromResult(StageResult.Create(
-                perform: LazyTask.Create(() => (this.Context.Create(this.Value, contentHash, this.id), BaseCache.Create(contentHash, ReadOnlyMemory<BaseCache>.Empty))),
-                hasChanges: cache == null || !Equals(cache.Item, contentHash),
+                result: this.Context.Create(this.Value, contentHash, this.id),
+                cache: contentHash,
+                hasChanges: cache != contentHash,
                 documentId: this.id));
         }
     }

@@ -1,5 +1,6 @@
 ﻿using StaticSite.Documents;
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -7,51 +8,122 @@ using System.Threading.Tasks;
 
 namespace StaticSite.Stages
 {
-    public class SelectStage<TIn, TInItemCache, TInCache, TOut> : OutputMultiInputSingle0List1StageBase<TIn, TInItemCache, TInCache, TOut, string, ImmutableList<string>>
+    public class SelectStage<TIn, TInItemCache, TInCache, TOut> : MultiStageBase<TOut, string, SelectStageCache<TInCache>>
+        where TInCache : class
+        where TInItemCache : class
     {
+        private readonly StagePerformHandler<TIn, TInItemCache, TInCache> input;
+        private readonly Func<IDocument<TIn>, Task<IDocument<TOut>>> transform;
 
-        private readonly Func<IDocument<TIn>, Task<IDocument<TOut>>> predicate;
-
-        public SelectStage(StagePerformHandler<TIn, TInItemCache, TInCache> inputList0, Func<IDocument<TIn>, Task<IDocument<TOut>>> selector, GeneratorContext context, bool updateOnRefresh = false) : base(inputList0, context, updateOnRefresh)
+        public SelectStage(StagePerformHandler<TIn, TInItemCache, TInCache> input, Func<IDocument<TIn>, Task<IDocument<TOut>>> selector, GeneratorContext context) : base(context)
         {
-            this.predicate = selector;
+            this.input = input;
+            this.transform = selector;
         }
 
-
-        protected override async Task<(ImmutableList<StageResult<TOut, string>> result, BaseCache<ImmutableList<string>> cache)> Work(StageResultList<TIn, TInItemCache, TInCache> inputList0, [AllowNull] ImmutableList<string> cache, [AllowNull] ImmutableDictionary<string, BaseCache<string>>? childCaches, OptionToken options)
+        protected override async Task<StageResultList<TOut, string, SelectStageCache<TInCache>>> DoInternal([AllowNull] SelectStageCache<TInCache>? cache, OptionToken options)
         {
-            if (inputList0 is null)
-                throw new ArgumentNullException(nameof(inputList0));
-            var input = await inputList0.Perform;
 
-            var list = await Task.WhenAll(input.result.Select(async item =>
+            var input = await this.input(cache?.ParentCache, options).ConfigureAwait(false);
+
+            var task = LazyTask.Create(async () =>
             {
-                if (item.HasChanges)
-                {
-                    var newSource = await item.Perform;
-                    var transformed = await this.predicate(newSource.result).ConfigureAwait(false);
 
-                    var hasChanges = true;
-                    if (childCaches != null && childCaches.TryGetValue(transformed.Id, out var oldHash))
-                        hasChanges = oldHash.Item != transformed.Hash;
-                    return StageResult.Create(transformed, BaseCache.Create(transformed.Hash, newSource.cache), hasChanges, transformed.Id);
-                }
-                else
+                var inputList = await input.Perform;
+
+
+                var list = await Task.WhenAll(inputList.result.Select(async subInput =>
                 {
-                    return StageResult.Create(LazyTask.Create(async () =>
+
+                    if (subInput.HasChanges)
                     {
+                        var subResult = await subInput.Perform;
+                        var transformed = await this.transform(subResult.result).ConfigureAwait(false);
+                        bool hasChanges = true;
+                        if (cache != null && cache.Transformed.TryGetValue(transformed.Id, out var oldHash))
+                            hasChanges = oldHash == transformed.Hash;
 
-                        var newSource = await item.Perform;
-                        var transformed = await this.predicate(newSource.result).ConfigureAwait(false);
+                        return (result: StageResult.Create(transformed, transformed.Hash, hasChanges, transformed.Id), inputId: subInput.Id, outputHash: transformed.Hash);
+                    }
+                    else
+                    {
+                        if (cache == null || !cache.InputToOutputId.TryGetValue(subInput.Id, out var oldOutputId) || !cache.Transformed.TryGetValue(subInput.Id, out var oldOutputHash))
+                            throw this.Context.Exception("No changes, so old value should be there.");
 
-                        return (transformed, BaseCache.Create(transformed.Hash, newSource.cache));
-                    }), false, item.Id);
+                        return (result: StageResult.Create(LazyTask.Create(async () =>
+                        {
+
+                            var newSource = await subInput.Perform;
+                            var transformed = await this.transform(newSource.result).ConfigureAwait(false);
+
+                            return (transformed, transformed.Hash);
+                        }), false, oldOutputId),
+                        inputId: subInput.Id,
+                        outputHash: oldOutputHash
+                        );
+
+                    }
+                })).ConfigureAwait(false);
+
+                var newCache = new SelectStageCache<TInCache>()
+                {
+                    InputToOutputId = list.ToDictionary(x => x.inputId, x => x.result.Id),
+                    OutputIdOrder = list.Select(x => x.result.Id).ToArray(),
+                    ParentCache = inputList.cache,
+                    Transformed = list.ToDictionary(x => x.result.Id, x => x.outputHash)
+                };
+                return (result: list.Select(x => x.result).ToImmutableList(), cache: newCache);
+            });
+
+            bool hasChanges = input.HasChanges;
+            var newCache = cache;
+            if (input.HasChanges || newCache == null)
+            {
+
+                var (list, c) = await task;
+                newCache = c;
+
+
+                if (!hasChanges && list.Count != cache?.OutputIdOrder.Length)
+                    hasChanges = true;
+
+                if (!hasChanges && cache != null)
+                {
+                    for (int i = 0; i < cache.OutputIdOrder.Length && !hasChanges; i++)
+                    {
+                        if (list[i].Id != cache.OutputIdOrder[i])
+                            hasChanges = true;
+                        if (list[i].HasChanges)
+                            hasChanges = true;
+                    }
                 }
-            })).ConfigureAwait(false);
-            return (list.ToImmutableList(), BaseCache.Create(list.Select(x => x.Id).ToImmutableList(), input.cache));
+            }
+
+            return StageResultList.Create(task, hasChanges, newCache.OutputIdOrder.ToImmutableList());
         }
+
+
 
     }
+
+#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+#pragma warning disable CA1819 // Properties should not return arrays
+#pragma warning disable CA2227 // Collection properties should be read only
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+    public class SelectStageCache<TInCache>
+        where TInCache : class
+    {
+        public TInCache ParentCache { get; set; }
+
+        public string[] OutputIdOrder { get; set; }
+        public Dictionary<string, string> Transformed { get; set; }
+        public Dictionary<string, string> InputToOutputId { get; set; }
+
+    }
+#pragma warning restore CA1819 // Properties should not return arrays
+#pragma warning restore CA2227 // Collection properties should be read only
+#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+
 
 
 }

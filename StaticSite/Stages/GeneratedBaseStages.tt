@@ -2,6 +2,7 @@
 <#@ assembly name="System.Core" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>
+
 <#@ import namespace="System.Collections.Generic" #>
 <#@ output extension=".tt.cs" #>
 <#int maxSingleParameter = 4;
@@ -10,29 +11,59 @@ int maxListParameter =4;
 #>
 using StaticSite.Documents;
 using System;
+using StaticSite.Stages;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace StaticSite.Stages
+namespace StaticSite.Stages.GeneratedHelper
 { 
 <#
 for(int single = 0; single<=maxSingleParameter;single++)
 for(int list = 0; list<=maxListParameter;list++){
-if(single == 0 && list == 0)
-    continue;
+
 #>
- public abstract class OutputSingleInputSingle<#= single #>List<#= list #>StageBase<
+
+
+    //////////////// SINGLE SIMPLE //////////////// 
+<#{#>
+
+<#
+    var cacheType = "CacheId<string";
+        for (int j = 0; j < single; j++)
+        {
+            cacheType+=", TPreviousSingleCache"+ j ;
+        }
+        for (int j = 0; j < list; j++)
+        {
+            cacheType+=", TPreviousListCache"+ j ;
+        }
+        cacheType+=">";
+
+             
+#>
+namespace Single.Simple {
+     public abstract class OutputSingleInputSingleSimple<#= single #>List<#= list #>StageBase<
     <#for(int j = 0; j< single; j++){#>
  TInputSingle<#= j #>, TPreviousSingleCache<#= j #>,
     <#}#>
         <#for(int j = 0; j< list; j++){#>
  TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>,
     <#}#>
- TResult, TCache
- > : StageBase<TResult, CacheId<TCache>>
-        where TCache : class
+ TResult
+ > : StageBase<TResult, <#=cacheType#>>
+        
+
+            <#for(int j = 0; j< single; j++){#>
+ where TPreviousSingleCache<#= j #> : class
+    <#}#>
+        <#for(int j = 0; j< list; j++){#>
+ where TPreviousListCache<#= j #> : class
+ where TPreviousItemCache<#= j #> : class
+
+    <#}#>
+
     {
     <#for(int j = 0; j< single; j++){#>
         private readonly StagePerformHandler<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>;
@@ -42,7 +73,7 @@ if(single == 0 && list == 0)
     <#}#>
         private readonly bool updateOnRefresh;
 
-        public OutputSingleInputSingle<#= single #>List<#= list #>StageBase(
+        public OutputSingleInputSingleSimple<#= single #>List<#= list #>StageBase(
     <#for(int j = 0; j< single; j++){#>
         StagePerformHandler<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>,
     <#}#>
@@ -59,53 +90,100 @@ if(single == 0 && list == 0)
     <#}#>
             this.updateOnRefresh = updateOnRefresh;
         } 
-
-        protected abstract Task<(IDocument<TResult> result, BaseCache<TCache> cache)> Work(
         
-    <#for(int j = 0; j< single; j++){#>
-        StageResult<TInputSingle<#= j #>,TPreviousSingleCache<#= j #>> inputSingle<#= j#>, 
-    <#}#>
-    <#for(int j = 0; j< list; j++){#>
-        StageResultList<TInputList<#= j #>,TPreviousItemCache<#= j #>,TPreviousListCache<#= j #>> inputList<#= j#>, 
-    <#}#>
-        
-        OptionToken options);
-
-        protected sealed override async Task<StageResult<TResult, CacheId<TCache>>> DoInternal([AllowNull] BaseCache<CacheId<TCache>>? cache, OptionToken options)
+        protected abstract Task<IDocument<TResult>> Work(<#for(int j = 0; j< single; j++)
         {
-            if (cache != null && cache.PreviousCache.Length != <#= list + single #>)
-                throw new ArgumentException($"This cache should have exactly <#= list + single #> predecessor but had {cache.PreviousCache}");
-            
+#>IDocument<TInputSingle<#= j #>> inputSingle<#= j#>, <#}#><#
+        for(int j = 0; j< list; j++){
+#>ImmutableList<IDocument<TInputList<#= j #>>> inputList<#= j#>, <#}
+#>OptionToken options);
 
+        protected sealed override async Task<StageResult<TResult, <#=cacheType#>>> DoInternal([AllowNull] <#=cacheType#>? cache, OptionToken options)
+        {
+            if (options is null)
+                throw new ArgumentNullException(nameof(options));
+
+<#
+                if(single +list >1){
+#>
+            await Task.WhenAll(
 <#for(int j = 0; j< single; j++){#>
-            var inputSingle<#= j #>Result = await this.inputSingle<#= j #>(cache?.PreviousCache.Span[<#= j #>], options).ConfigureAwait(false);
+                this.inputSingle<#= j #>(cache?.PreviousCache<#= j #>, options),
 <#}#>
 <#for(int j = 0; j< list; j++){#>
-            var inputList<#= j #>Result = await this.inputList<#= j #>(cache?.PreviousCache.Span[<#= j + single #>], options).ConfigureAwait(false);
+                this.inputList<#= j #>(cache?.PreviousCache<#= j + single #>, options),
 <#}#>
-
-            var currentCache = cache?.Item;
+                Task.CompletedTask
+            ).ConfigureAwait(false);
+                <#}#>
+<#for(int j = 0; j< single; j++){#>
+            var inputSingle<#= j #>Result = await this.inputSingle<#= j #>(cache?.PreviousCache<#= j #>, options).ConfigureAwait(false);
+<#}#>
+<#for(int j = 0; j< list; j++){#>
+            var inputList<#= j #>Result = await this.inputList<#= j #>(cache?.PreviousCache<#= j + single #>, options).ConfigureAwait(false);
+<#}#>
 
 
             var task = LazyTask.Create(async () =>
             {
-                var work = await this.Work(
-                <#for(int j = 0; j< single; j++){#>
-            inputSingle<#= j #>Result,
+
+        
+<#
+                if(single +list >1){
+#>
+            await Task.WhenAll(
+<#for(int j = 0; j< single; j++){#>
+                this.inputSingle<#= j #>(cache?.PreviousCache<#= j #>, options),
 <#}#>
 <#for(int j = 0; j< list; j++){#>
-            inputList<#= j #>Result,
+                this.inputList<#= j #>(cache?.PreviousCache<#= j + single #>, options),
+<#}#>
+                Task.CompletedTask
+            ).ConfigureAwait(false);
+                <#}#>
+<#for(int j = 0; j< single; j++){#>
+            var inputSingle<#= j #>Performed = await inputSingle<#= j #>Result.Perform;
+<#}#>
+<#for(int j = 0; j< list; j++){#>
+            var inputList<#= j #>Performed = await inputList<#= j #>Result.Perform;
+
+            var inputList<#= j #>PerformedListTask = Task.WhenAll(inputList<#= j #>Performed.result.Select(async x => (await x.Perform).result));
+<#}#>
+
+<#if(list>1){#>
+await Task.WhenAll(
+<#for(int j = 0; j< list; j++){#>
+<#if(j>0){#>, <#}#>
+             inputList<#= j #>PerformedListTask
+<#}#>
+).ConfigureAwait(false);
+<#}#>
+
+<#for(int j = 0; j< list; j++){#>
+            var inputList<#= j #>PerformedList = await inputList<#= j #>PerformedListTask.ConfigureAwait(false);
+<#}#>
+
+
+                var work = await this.Work(
+                <#for(int j = 0; j< single; j++){#>
+            inputSingle<#= j #>Performed.result,
+<#}#>
+<#for(int j = 0; j< list; j++){#>
+            inputList<#= j #>PerformedList.ToImmutableList(),
 <#}#>
 
                 options).ConfigureAwait(false);
-                if(cache != null)
-                    System.Diagnostics.Debug.Assert(work.cache.PreviousCache.Length == cache.PreviousCache.Length, $"Lenth of new presuccseor of new cache and old cache should be the same {work.cache.PreviousCache.Length}(new) {cache.PreviousCache.Length}(old)");
-
-                return (work.result, cache: BaseCache.Create(new CacheId<TCache>() { Data = work.cache.Item, Id = work.result.Id }, work.cache.PreviousCache));
+                
+                return (work, cache: CacheId.Create(work.Id,work.Hash<#for(int j = 0; j< single; j++){#>
+, inputSingle<#= j #>Performed.cache<#
+}#><#
+for(int j = 0; j< list; j++){
+#>, inputList<#= j #>Performed.cache<#
+}#>));
             });
 
 
-            bool hasChanges = false 
+            bool hasChanges = (await this.ForceUpdate(cache?.Id, cache?.Data, options).ConfigureAwait(false) )??false
 <#for(int j = 0; j< single; j++){#>
             || inputSingle<#= j #>Result.HasChanges
 <#}#>
@@ -113,40 +191,82 @@ if(single == 0 && list == 0)
             || inputList<#= j #>Result.HasChanges
 <#}#>;
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
-
+            var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
 
                 var result = await task;
-                currentCache = result.cache.Item;
-                hasChanges = !await this.CacheEquals(cache?.Item.Data, result.cache.Item.Data).ConfigureAwait(false);
+                id = result.work.Id;
+                hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
-            var theId = currentCache!.Id;
-
-            return StageResult.Create(task, hasChanges, theId);
+            // if cache is null, hasChanges must be true and so id will be set.
+            return StageResult.Create(task, hasChanges, id!);
         }
 
-        protected virtual Task<bool> CacheEquals([AllowNull]TCache item1, [AllowNull] TCache item2)
+        protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
+
+        protected Task<bool> CacheEquals([AllowNull]string item1, [AllowNull] string item2)
         {
             return Task.FromResult(Equals(item1, item2));
         }
     }
+}
+<# } #>
 
 
-     public abstract class OutputMultiInputSingle<#= single #>List<#= list #>StageBase<
+    //////////////// MULTI SIMPLE //////////////// 
+<#{#>
+namespace Multiple.Simple {
+<#
+    var cacheType = "CachelessIds";
+    if(single+list>0)  
+    {
+        cacheType+="<";
+        for (int j = 0; j < single; j++)
+        {
+            if(j>0)
+            {
+                cacheType +=", ";
+            }
+            cacheType+="TPreviousSingleCache"+ j ;
+        }
+        for (int j = 0; j < list; j++)
+        {
+            if(j+ single>0)
+            {
+                cacheType +=", ";
+            }
+            cacheType+="TPreviousListCache"+ j ;
+        }
+        cacheType+=">";
+    }
+
+             
+#>
+
+    public abstract class OutputMultiSimpleInputSingle<#= single #>List<#= list #>StageBase<
     <#for(int j = 0; j< single; j++){#>
  TInputSingle<#= j #>, TPreviousSingleCache<#= j #>,
     <#}#>
         <#for(int j = 0; j< list; j++){#>
  TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>,
     <#}#>
- TResult, TResultCache, TCache
- > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
-        where TCache : class
+ TResult
+ > : MultiStageBase<TResult, string,  <#=cacheType#>>
+
+ 
+            <#for(int j = 0; j< single; j++){#>
+ where TPreviousSingleCache<#= j #> : class
+    <#}#>
+        <#for(int j = 0; j< list; j++){#>
+ where TPreviousListCache<#= j #> : class
+ where TPreviousItemCache<#= j #> : class
+
+    <#}#>
+
     {
     <#for(int j = 0; j< single; j++){#>
         private readonly StagePerformHandler<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>;
@@ -156,7 +276,7 @@ if(single == 0 && list == 0)
     <#}#>
         private readonly bool updateOnRefresh;
 
-        public OutputMultiInputSingle<#= single #>List<#= list #>StageBase(
+        public OutputMultiSimpleInputSingle<#= single #>List<#= list #>StageBase(
     <#for(int j = 0; j< single; j++){#>
         StagePerformHandler<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>,
     <#}#>
@@ -174,72 +294,126 @@ if(single == 0 && list == 0)
             this.updateOnRefresh = updateOnRefresh;
         } 
 
-        protected abstract Task<(ImmutableList<StageResult<TResult, TResultCache>> result, BaseCache<TCache> cache)> Work(
+        protected abstract Task<ImmutableList<IDocument<TResult>>> Work(
         
     <#for(int j = 0; j< single; j++){#>
-        StageResult<TInputSingle<#= j #>,TPreviousSingleCache<#= j #>> inputSingle<#= j#>, 
+        IDocument<TInputSingle<#= j #>> inputSingle<#= j#>, 
     <#}#>
     <#for(int j = 0; j< list; j++){#>
-        StageResultList<TInputList<#= j #>,TPreviousItemCache<#= j #>,TPreviousListCache<#= j #>> inputList<#= j#>, 
+        ImmutableList<IDocument<TInputList<#= j #>>> inputList<#= j#>, 
     <#}#>
-       [AllowNull] TCache cache,
-        [AllowNull] ImmutableDictionary<string, BaseCache<TResultCache>>? childCaches,
         OptionToken options);
 
-        protected sealed override async Task<StageResultList<TResult, TResultCache, CacheIds<TCache>>> DoInternal([AllowNull] BaseCache<CacheIds<TCache>>? cache, OptionToken options)
+        protected sealed override async Task<StageResultList<TResult, string, <#=cacheType#>>> DoInternal([AllowNull]  <#=cacheType#>? cache, OptionToken options)
         {
-            if (cache != null && cache.PreviousCache.Length != <#= list + single #>)
-                throw new ArgumentException($"This cache should have exactly <#= list + single #> predecessor but had {cache.PreviousCache}");
-            
+            if (options is null)
+                throw new ArgumentNullException(nameof(options));
 
+
+<#
+                if(single +list >1){
+#>
+            await Task.WhenAll(
 <#for(int j = 0; j< single; j++){#>
-            var inputSingle<#= j #>Result = await this.inputSingle<#= j #>(cache?.PreviousCache.Span[<#= j #>], options).ConfigureAwait(false);
+                this.inputSingle<#= j #>(cache?.PreviousCache<#= j #>, options),
 <#}#>
 <#for(int j = 0; j< list; j++){#>
-            var inputList<#= j #>Result = await this.inputList<#= j #>(cache?.PreviousCache.Span[<#= j + single #>], options).ConfigureAwait(false);
+                this.inputList<#= j #>(cache?.PreviousCache<#= j + single #>, options),
 <#}#>
+                Task.CompletedTask
+            ).ConfigureAwait(false);
+                <#}#>
+<#for(int j = 0; j< single; j++){#>
+            var inputSingle<#= j #>Result = await this.inputSingle<#= j #>(cache?.PreviousCache<#= j #>, options).ConfigureAwait(false);
+<#}#>
+<#for(int j = 0; j< list; j++){
 
-            var currentCache = cache?.Item;
-
+#>
+            var inputList<#= j #>Result = await this.inputList<#= j #>(cache?.PreviousCache<#= j + single #>, options).ConfigureAwait(false);
+<#}#>
              
             var task = LazyTask.Create(async () =>
             {
-                var oldChildCaches = cache?.ChildCache.ToImmutableDictionary(x => x.Key, x => (BaseCache<TResultCache>)x.Value);
+
+            <#
+                if(single +list >1){
+#>
+            await Task.WhenAll(
+<#for(int j = 0; j< single; j++){#>
+                inputSingle<#= j #>Result.Perform.AsTask(),
+<#}#>
+<#for(int j = 0; j< list; j++){#>
+                inputList<#= j #>Result.Perform.AsTask(),
+<#}#>
+                Task.CompletedTask
+            ).ConfigureAwait(false);
+                <#}#>
+<#for(int j = 0; j< single; j++){#>
+            var inputSingle<#= j #>Performed = await inputSingle<#= j #>Result.Perform;
+<#}#>
+<#for(int j = 0; j< list; j++){#>
+            var inputList<#= j #>Performed = await inputList<#= j #>Result.Perform;
+
+            var inputList<#= j #>PerformedListTask = Task.WhenAll(inputList<#= j #>Performed.result.Select(async x => (await x.Perform).result));
+<#}#>
+
+<#if(list>1){#>
+await Task.WhenAll(
+<#for(int j = 0; j< list; j++){#>
+<#if(j>0){#>, <#}#>
+             inputList<#= j #>PerformedListTask
+<#}#>
+).ConfigureAwait(false);
+<#}#>
+
+<#for(int j = 0; j< list; j++){#>
+            var inputList<#= j #>PerformedList = await inputList<#= j #>PerformedListTask.ConfigureAwait(false);
+<#}#>
+
+
+
+                var oldChildCaches = cache?.Ids.ToImmutableDictionary(x => x.id, x => x.hash);
 
                 var work = await this.Work(
                 <#for(int j = 0; j< single; j++){#>
-            inputSingle<#= j #>Result,
+            inputSingle<#= j #>Performed.result,
 <#}#>
 <#for(int j = 0; j< list; j++){#>
-            inputList<#= j #>Result,
+            inputList<#= j #>PerformedList.ToImmutableList(),
 <#}#>
-cache?.Item.Data, oldChildCaches, options).ConfigureAwait(false);
+ options).ConfigureAwait(false);
                              
-                             var oldHashLookup = currentCache?.Ids.ToDictionary(x => x.id, x => x.hash) ?? new System.Collections.Generic.Dictionary<string, string>();
-                var ids = new (string id, string hash)[work.result.Count];
-                var childCaches = ImmutableDictionary<string, BaseCache>.Empty.ToBuilder();
-                for (int i = 0; i < ids.Length; i++)
+                
+                var list = work.Select(x=>
                 {
-                    if (work.result[i].HasChanges)
-                    {
-                        var itemResult = await work.result[i].Perform;
-                        ids[i] = (itemResult.result.Id, itemResult.result.Hash);
-                        childCaches.Add(itemResult.result.Id, itemResult.cache);
-                    }
-                    else
-                    {
-                        if (cache is null || !cache.ChildCache.TryGetValue(work.result[i].Id, out var childCache))
-                            throw this.Context.Exception("The previous cache should exist if we had no changes.");
-                        childCaches.Add(work.result[i].Id, childCache);
-                        ids[i] = (work.result[i].Id, oldHashLookup[work.result[i].Id]);
-                    }
-                }
+                    var hasChanges =true;
+                    if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
+                        hasChanges = x.Hash != oldHash;
+                    return (result: StageResult.Create( x,x.Hash,hasChanges,x.Id), hash: x.Hash);
+                
+                }).ToArray();
 
-                return (work.result, cache: BaseCache.Create(new CacheIds<TCache>() { Data = work.cache.Item, Ids = ids }, work.cache.PreviousCache, childCaches.ToImmutable()));
+<#
+var parameter = new StringBuilder();
+  for (int j = 0; j < single; j++)
+  {
+      parameter.Append(", inputSingle");
+      parameter.Append(j);
+      parameter.Append("Performed.cache");
+  }
+  for (int j = 0; j < list; j++)
+  {
+      parameter.Append(", inputList");
+      parameter.Append(j);
+      parameter.Append("Performed.cache");
+  }
+#>
+
+                return (list.Select(x=>x.result).ToImmutableList(), cache: CachelessIds.Create(list.Select(x=>(x.result.Id, x.hash)).ToArray()<#=parameter#>));// { Data = work.cache.Item, Ids = ids }, work.cache.PreviousCache, childCaches.ToImmutable()));
             });
 
 
-            bool hasChanges = false 
+            bool hasChanges = await this.ForceUpdate(cache?.Ids, options).ConfigureAwait(false) ?? false
 <#for(int j = 0; j< single; j++){#>
             || inputSingle<#= j #>Result.HasChanges
 <#}#>
@@ -247,52 +421,456 @@ cache?.Item.Data, oldChildCaches, options).ConfigureAwait(false);
             || inputList<#= j #>Result.HasChanges
 <#}#>;
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
-
+            var ids = cache?.Ids;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
 
                 var result = await task;
-                currentCache = result.cache.Item;
-                // we want to make sure thate there are actually changes, so we compare the caches.
-                hasChanges = !await this.CacheEquals(cache?.Item.Data, result.cache.Item.Data).ConfigureAwait(false);
-                // if we found that cache had no changes, maybe the childcaches where changed.
-                if (!hasChanges)
-                    hasChanges = !await this.ChildCacheEquals(cache?.ChildCache.ToImmutableDictionary(x => x.Key, x => ((BaseCache<TResultCache>)x.Value).Item), result.cache.ChildCache.ToImmutableDictionary(x => x.Key, x => ((BaseCache<TResultCache>)x.Value).Item)).ConfigureAwait(false);
-           }
+                ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
+                hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+            }
 
             // if currentCache is null, hasChanges must be true and so currentCache will be set.
-            var theId = currentCache!.Ids;
 
-            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+            return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
 
-      protected virtual Task<bool> CacheEquals([AllowNull]TCache item1, [AllowNull]TCache item2)
-        {
-            return Task.FromResult(Equals(item1, item2));
-        }
+        protected virtual Task<bool?> ForceUpdate((string id, string hash)[]? ids, OptionToken options) => Task.FromResult<bool?>(null);
 
-        protected virtual async Task<bool> ChildCacheEquals([AllowNull]ImmutableDictionary<string, TResultCache> item1, [AllowNull]ImmutableDictionary<string, TResultCache> item2)
+
+        private bool CacheEquals((string id, string hash)[]? item1, (string id, string hash)[]? item2)
         {
             if (item1 is null && item2 is null)
                 return true;
-
             if (item1 is null || item2 is null)
                 return false;
 
-            if (item1.Count != item2.Count)
-                return false;
-
-            var itemResults = await Task.WhenAll(item1.Select(async pair => item2.TryGetValue(pair.Key, out var entry) && await this.ChildCacheElementRquals(pair.Value, entry).ConfigureAwait(false))).ConfigureAwait(false);
-            return itemResults.All(x => x);
+            return item1.SequenceEqual(item2);
         }
 
-        protected virtual Task<bool> ChildCacheElementRquals([AllowNull] TResultCache item1, [AllowNull] TResultCache item2)
-        {
-            return Task.FromResult(Equals(item1, item2));
-        }
+    
     }
+}
+<# } #>
+
+
+//    //////////////// MULTI ADVANCED //////////////// 
+//    <#{#>
+//
+//     public abstract class OutputMultiInputSingle<#= single #>List<#= list #>StageBase<
+//    <#for(int j = 0; j< single; j++){#>
+// TInputSingle<#= j #>, TPreviousSingleCache<#= j #>,
+//    <#}#>
+//        <#for(int j = 0; j< list; j++){#>
+// TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>,
+//    <#}#>
+// TResult, TResultCache, TCache
+// > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
+//        where TCache : class
+//    {
+//    <#for(int j = 0; j< single; j++){#>
+//        private readonly StagePerformHandler<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>;
+//    <#}#>
+//    <#for(int j = 0; j< list; j++){#>
+//        private readonly StagePerformHandler<TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>> inputList<#= j #>;
+//    <#}#>
+//        private readonly bool updateOnRefresh;
+//
+//        public OutputMultiInputSingle<#= single #>List<#= list #>StageBase(
+//    <#for(int j = 0; j< single; j++){#>
+//        StagePerformHandler<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>,
+//    <#}#>
+//        <#for(int j = 0; j< list; j++){#>
+//        StagePerformHandler<TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>> inputList<#= j #>,
+//    <#}#>
+//        GeneratorContext context, bool updateOnRefresh = false) : base(context)
+//        {
+//    <#for(int j = 0; j< single; j++){#>
+//            this.inputSingle<#= j #> = inputSingle<#= j #>;
+//    <#}#>
+//    <#for(int j = 0; j< list; j++){#>
+//            this.inputList<#= j #> = inputList<#= j #>;
+//    <#}#>
+//            this.updateOnRefresh = updateOnRefresh;
+//        } 
+//
+//        protected abstract Task<(ImmutableList<StageResult<TResult, TResultCache>> result, BaseCache<TCache> cache)> Work(
+//        
+//    <#for(int j = 0; j< single; j++){#>
+//        StageResult<TInputSingle<#= j #>,TPreviousSingleCache<#= j #>> inputSingle<#= j#>, 
+//    <#}#>
+//    <#for(int j = 0; j< list; j++){#>
+//        StageResultList<TInputList<#= j #>,TPreviousItemCache<#= j #>,TPreviousListCache<#= j #>> inputList<#= j#>, 
+//    <#}#>
+//       [AllowNull] TCache cache,
+//        [AllowNull] ImmutableDictionary<string, BaseCache<TResultCache>>? childCaches,
+//        OptionToken options);
+//
+//        protected sealed override async Task<StageResultList<TResult, TResultCache, CacheIds<TCache>>> DoInternal([AllowNull] CacheIds<TCache>? cache, OptionToken options)
+//        {
+//            if (cache != null && cache.PreviousCache.Length != <#= list + single #>)
+//                throw new ArgumentException($"This cache should have exactly <#= list + single #> predecessor but had {cache.PreviousCache}");
+//            if (options is null)
+//                throw new ArgumentNullException(nameof(options));
+//
+//
+//<#for(int j = 0; j< single; j++){#>
+//            var inputSingle<#= j #>Result = await this.inputSingle<#= j #>(cache?.PreviousCache.Span[<#= j #>], options).ConfigureAwait(false);
+//<#}#>
+//<#for(int j = 0; j< list; j++){#>
+//            var inputList<#= j #>Result = await this.inputList<#= j #>(cache?.PreviousCache.Span[<#= j + single #>], options).ConfigureAwait(false);
+//<#}#>
+//
+//            var currentCache = cache?.Item;
+//
+//             
+//            var task = LazyTask.Create(async () =>
+//            {
+//                var oldChildCaches = cache?.ChildCache.ToImmutableDictionary(x => x.Key, x => (BaseCache<TResultCache>)x.Value);
+//
+//                var work = await this.Work(
+//                <#for(int j = 0; j< single; j++){#>
+//            inputSingle<#= j #>Result,
+//<#}#>
+//<#for(int j = 0; j< list; j++){#>
+//            inputList<#= j #>Result,
+//<#}#>
+//cache?.Item.Data, oldChildCaches, options).ConfigureAwait(false);
+//                             
+//                             var oldHashLookup = currentCache?.Ids.ToDictionary(x => x.id, x => x.hash) ?? new System.Collections.Generic.Dictionary<string, string>();
+//                var ids = new (string id, string hash)[work.result.Count];
+//                var childCaches = ImmutableDictionary<string, BaseCache>.Empty.ToBuilder();
+//                for (int i = 0; i < ids.Length; i++)
+//                {
+//                    if (work.result[i].HasChanges)
+//                    {
+//                        var itemResult = await work.result[i].Perform;
+//                        ids[i] = (itemResult.result.Id, itemResult.result.Hash);
+//                        childCaches.Add(itemResult.result.Id, itemResult.cache);
+//                    }
+//                    else
+//                    {
+//                        if (cache is null || !cache.ChildCache.TryGetValue(work.result[i].Id, out var childCache))
+//                            throw this.Context.Exception("The previous cache should exist if we had no changes.");
+//                        childCaches.Add(work.result[i].Id, childCache);
+//                        ids[i] = (work.result[i].Id, oldHashLookup[work.result[i].Id]);
+//                    }
+//                }
+//
+//                return (work.result, cache: BaseCache.Create(new CacheIds<TCache>() { Data = work.cache.Item, Ids = ids }, work.cache.PreviousCache, childCaches.ToImmutable()));
+//            });
+//
+//
+//            bool hasChanges = this.ForceUpdate(cache?.Item.Data, options) 
+//<#for(int j = 0; j< single; j++){#>
+//            || inputSingle<#= j #>Result.HasChanges
+//<#}#>
+//<#for(int j = 0; j< list; j++){#>
+//            || inputList<#= j #>Result.HasChanges
+//<#}#>;
+//            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
+//
+//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            {
+//                // if we should refresh we need to update the repo or if the previous input was different
+//                // we need to perform the network operation to ensure we have no changes
+//
+//                var result = await task;
+//                currentCache = result.cache.Item;
+//                // we want to make sure thate there are actually changes, so we compare the caches.
+//                hasChanges = !await this.CacheEquals(cache?.Item.Data, result.cache.Item.Data).ConfigureAwait(false);
+//                // if we found that cache had no changes, maybe the childcaches where changed.
+//                if (!hasChanges)
+//                    hasChanges = !await this.ChildCacheEquals(cache?.ChildCache.ToImmutableDictionary(x => x.Key, x => ((BaseCache<TResultCache>)x.Value).Item), result.cache.ChildCache.ToImmutableDictionary(x => x.Key, x => ((BaseCache<TResultCache>)x.Value).Item)).ConfigureAwait(false);
+//           }
+//
+//            // if currentCache is null, hasChanges must be true and so currentCache will be set.
+//            var theId = currentCache!.Ids;
+//
+//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//        }
+//
+//        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
+//
+//
+//        protected virtual Task<bool> CacheEquals([AllowNull]TCache item1, [AllowNull]TCache item2)
+//        {
+//            return Task.FromResult(Equals(item1, item2));
+//        }
+//
+//        protected virtual async Task<bool> ChildCacheEquals([AllowNull]ImmutableDictionary<string, TResultCache> item1, [AllowNull]ImmutableDictionary<string, TResultCache> item2)
+//        {
+//            if (item1 is null && item2 is null)
+//                return true;
+//
+//            if (item1 is null || item2 is null)
+//                return false;
+//
+//            if (item1.Count != item2.Count)
+//                return false;
+//
+//            var itemResults = await Task.WhenAll(item1.Select(async pair => item2.TryGetValue(pair.Key, out var entry) && await this.ChildCacheElementRquals(pair.Value, entry).ConfigureAwait(false))).ConfigureAwait(false);
+//            return itemResults.All(x => x);
+//        }
+//
+//        protected virtual Task<bool> ChildCacheElementRquals([AllowNull] TResultCache item1, [AllowNull] TResultCache item2)
+//        {
+//            return Task.FromResult(Equals(item1, item2));
+//        }
+//    }
+//
+//
+//<# } #>
+//
+//
 
 <# } #>
+
+
+
+    #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+#pragma warning disable CA1819 // Properties should not return arrays
+
+
+<#
+for(int total = 0; total<=maxSingleParameter+maxListParameter;total++)
+{
+
+#>
+
+public static partial class CacheId{
+
+    public static CacheId<TCache<#
+    for (int i = 0; i < total; i++)
+    {#>, TPreview<#=i#><#             }
+    #>> Create<TCache<#
+    for (int i = 0; i < total; i++)
+    {#>, TPreview<#=i#><#             }
+    #>>(string id, TCache cache<#
+    for (int i = 0; i < total; i++)
+    {#>, TPreview<#=i#> preview<#=i#><#             }
+    #>) 
+        where TCache : class
+<#
+    for (int i = 0; i < total; i++)
+    {#>
+        where TPreview<#=i#> : class
+<#             }
+    #>
+ => new CacheId<TCache<#
+    for (int i = 0; i < total; i++)
+    {#>, TPreview<#=i#><#             }
+    #>>(){ Id = id, Data = cache<#
+    for (int i = 0; i < total; i++)
+    {#>, PreviousCache<#=i#> = preview<#=i#><#             }
+    #>};
+}
+
+public static  partial class CacheIds{
+
+    public static CacheIds<TCache<#
+    for (int i = 0; i < total; i++)
+    {#>, TPreview<#=i#><#             }
+    #>> Create<TCache<#
+    for (int i = 0; i < total; i++)
+    {#>, TPreview<#=i#><#             }
+    #>>((string id, string hash)[] ids, TCache cache<#
+    for (int i = 0; i < total; i++)
+    {#>, TPreview<#=i#> preview<#=i#><#             }
+    #>) 
+        where TCache : class
+<#
+    for (int i = 0; i < total; i++)
+    {#>
+        where TPreview<#=i#> : class
+<#             }
+    #>
+ => new CacheIds<TCache<#
+    for (int i = 0; i < total; i++)
+    {#>, TPreview<#=i#><#             }
+    #>>(){ Ids = ids, Data = cache<#
+    for (int i = 0; i < total; i++)
+    {#>, PreviousCache<#=i#> = preview<#=i#><#             }
+    #>};
+}
+
+
+
+    public class CacheId<TCache<#
+    for (int i = 0; i < total; i++)
+    {#>, TPreview<#=i#><#             }
+    #>>
+        where TCache : class
+<#
+    for (int i = 0; i < total; i++)
+    {#>
+        where TPreview<#=i#> : class
+<#             }
+    #>
+    {
+
+<#
+    for (int i = 0; i < total; i++)
+    {#>
+        public TPreview<#=i#>? PreviousCache<#=i#> {get;set;}
+<#             }
+    #>
+
+        public TCache? Data { get; set; }
+
+        public string Id { get; set; }
+    }
+
+        public class CacheIds<TCache<#
+    for (int i = 0; i < total; i++)
+    {#>, TPreview<#=i#><#             }
+    #>>
+        where TCache : class
+<#
+    for (int i = 0; i < total; i++)
+    {#>
+        where TPreview<#=i#> : class
+<#             }
+    #>
+    {
+    <#
+    for (int i = 0; i < total; i++)
+    {#>
+        public TPreview<#=i#>? PreviousCache<#=i#> {get;set;}
+<#             }
+    #>
+
+        public TCache? Data { get; set; }
+
+        public (string id, string hash)[] Ids { get; set; }
+    }
+
+
+public  partial class CachelessId{
+
+    public static CachelessId<#
+    if(total>0){
+    #><<#
+    for (int i = 0; i < total; i++)
+    {#><#if(i>0){#> ,<#}#> TPreview<#=i#><#             }
+    #>><#}#> Create<#
+    if(total>0){
+    #><<#
+    for (int i = 0; i < total; i++)
+    {#><#if(i>0){#> ,<#}#> TPreview<#=i#><#             }
+    #>><#}#>(string id<#
+    for (int i = 0; i < total; i++)
+    {#>, TPreview<#=i#> preview<#=i#><#             }
+    #>) 
+<#
+    for (int i = 0; i < total; i++)
+    {#>
+        where TPreview<#=i#> : class
+<#             }
+    #>
+ => new CachelessId<#
+    if(total>0){
+    #><<#
+    for (int i = 0; i < total; i++)
+    {#><#if(i>0){#> ,<#}#> TPreview<#=i#><#             }
+    #>><#}#>(){ Id = id<#
+    for (int i = 0; i < total; i++)
+    {#>, PreviousCache<#=i#> = preview<#=i#><#             }
+    #>};
+}
+
+public   partial class CachelessIds{
+
+    public static CachelessIds<#
+    if(total>0){
+    #><<#
+    for (int i = 0; i < total; i++)
+    {#><#if(i>0){#> ,<#}#> TPreview<#=i#><#             }
+    #>><#}#> Create<#
+    if(total>0){
+    #><<#
+    for (int i = 0; i < total; i++)
+    {#><#if(i>0){#> ,<#}#> TPreview<#=i#><#             }
+    #>><#}#>((string id, string hash)[] ids<#
+    for (int i = 0; i < total; i++)
+    {#>, TPreview<#=i#> preview<#=i#><#             }
+    #>) 
+<#
+    for (int i = 0; i < total; i++)
+    {#>
+        where TPreview<#=i#> : class
+<#             }
+    #>
+ => new CachelessIds<#
+    if(total>0){
+    #><<#
+    for (int i = 0; i < total; i++)
+    {#><#if(i>0){#> ,<#}#> TPreview<#=i#><#             }
+    #>><#}#>(){ Ids = ids<#
+    for (int i = 0; i < total; i++)
+    {#>, PreviousCache<#=i#> = preview<#=i#><#             }
+    #>};
+}
+
+
+
+    public partial class CachelessId<#
+    if(total>0){
+    #><<#
+    for (int i = 0; i < total; i++)
+    {#><#if(i>0){#> ,<#}#> TPreview<#=i#><#             }
+    #>><#}#>
+<#
+    for (int i = 0; i < total; i++)
+    {#>
+        where TPreview<#=i#> : class
+<#             }
+    #>
+    {
+
+<#
+    for (int i = 0; i < total; i++)
+    {#>
+        public TPreview<#=i#>? PreviousCache<#=i#> {get;set;}
+<#             }
+    #>
+
+
+        public string Id { get; set; }
+    }
+
+        public partial class CachelessIds<#
+    if(total>0){
+    #><<#
+    for (int i = 0; i < total; i++)
+    {#><#if(i>0){#> ,<#}#> TPreview<#=i#><#             }
+    #>><#}#>
+<#
+    for (int i = 0; i < total; i++)
+    {#>
+        where TPreview<#=i#> : class
+<#             }
+    #>
+    {
+    <#
+    for (int i = 0; i < total; i++)
+    {#>
+        public TPreview<#=i#>? PreviousCache<#=i#> {get;set;}
+<#             }
+    #>
+
+
+        public (string id, string hash)[] Ids { get; set; }
+    }
+
+
+  
+
+<# } #>
+
+#pragma warning restore CA1819 // Properties should not return arrays
+#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+
 }
