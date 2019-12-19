@@ -3,8 +3,6 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using System.IO;
-using System.Collections.Immutable;
-using System.Collections.Generic;
 
 namespace StaticSite.Stages
 {
@@ -87,7 +85,7 @@ namespace StaticSite.Stages
                 throw new ArgumentNullException(nameof(input));
             return new SingleStage<TCheck, TPreviousItemCache, TPreviousCache>(input.DoIt, input.Context);
         }
-        public static SelectStage<TIn, TInITemCache, TInCache, TOut> Select<TIn, TInITemCache, TInCache, TOut>(this MultiStageBase<TIn, TInITemCache, TInCache> input, Func<IDocument<TIn>, Task<IDocument<TOut>>> predicate)
+        public static TransformStage<TIn, TInITemCache, TInCache, TOut> Transform<TIn, TInITemCache, TInCache, TOut>(this MultiStageBase<TIn, TInITemCache, TInCache> input, Func<IDocument<TIn>, Task<IDocument<TOut>>> predicate)
             where TInCache : class
             where TInITemCache : class
         {
@@ -95,7 +93,7 @@ namespace StaticSite.Stages
                 throw new ArgumentNullException(nameof(input));
             if (predicate is null)
                 throw new ArgumentNullException(nameof(predicate));
-            return new SelectStage<TIn, TInITemCache, TInCache, TOut>(input.DoIt, predicate, input.Context);
+            return new TransformStage<TIn, TInITemCache, TInCache, TOut>(input.DoIt, predicate, input.Context);
         }
 
         public static StaticStage<TResult> FromResult<TResult>(TResult result, Func<TResult, string> hashFunction, GeneratorContext context)
@@ -108,96 +106,16 @@ namespace StaticSite.Stages
             return new SidecarHelper<TPreviousItemCache, TPreviousListCache>(stage);
         }
 
-        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-        public class SidecarHelper<TPreviousItemCache, TPreviousListCache>
-                where TPreviousListCache : class
-            where TPreviousItemCache : class
+        public static SelectStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache> Select<TInput, TInputItemCache, TInputCache, TResult, TItemCache>(this MultiStageBase<TInput, TInputItemCache, TInputCache> input, Func<StageBase<TInput, GeneratedHelper.CacheId<string>>, StageBase<TResult, TItemCache>> createPipline)
+            where TInputCache : class
+            where TInputItemCache : class
+            where TItemCache : class
         {
-            private readonly MultiStageBase<Stream, TPreviousItemCache, TPreviousListCache> stage;
-
-            public SidecarHelper(MultiStageBase<Stream, TPreviousItemCache, TPreviousListCache> stage)
-            {
-                this.stage = stage;
-            }
-
-            public SidecarMetadata<TMetadata, TPreviousItemCache, TPreviousListCache> For<TMetadata>(string extension, MetadataUpdate<TMetadata>? updateCallback = null)
-            {
-                return new SidecarMetadata<TMetadata, TPreviousItemCache, TPreviousListCache>(this.stage.DoIt, extension, updateCallback, this.stage.Context);
-            }
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            return new SelectStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache>(input.DoIt, createPipline, input.Context);
         }
     }
 
-    //public class Split<TInputList0, TPreviousItemCache0, TPreviousListCache0, TResult, TResultCache, TCache> : OutputMultiInputSingle0List1StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0, TResult, string, ImmutableList<string>>
-    //where TResultCache : class
-    //where TCache : class
-    //where TPreviousItemCache0 : class
-    //where TPreviousListCache0 : class
-    //{
-
-    //    private readonly Dictionary<string, (Start @in, StageBase<TResult, TResultCache> @out)> startLookup = new Dictionary<string, (Start @in, StageBase<TResult, TResultCache> @out)>();
-
-    //    private readonly Func<StageBase<TInputList0, CacheId<string>>, StageBase<TResult, TResultCache>> createPipline;
-
-    //    protected override async Task<(ImmutableList<StageResult<TResult, string>> result, BaseCache<ImmutableList<string>> cache)> Work(StageResultList<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0, [AllowNull] ImmutableList<string> cache, [AllowNull] ImmutableDictionary<string, BaseCache<string>>? childCaches, OptionToken options)
-    //    {
-
-    //        var (input, _) = await inputList0.Perform;
-
-    //        foreach (var i in input)
-    //        {
-    //            if (this.startLookup.TryGetValue(i.Id, out var pipe))
-    //            {
-    //                pipe.@in.In = i;
-    //            }
-    //            else
-    //            {
-    //                var start = new Start(i, this.Context);
-    //                var end = this.createPipline(start);
-    //                pipe = (start, end);
-    //                this.startLookup.Add(i.Id, pipe);
-    //            }
-
-    //            pipe.@out.DoIt()
-
-    //            StageResult.Create()
-
-    //        }
-
-    //        throw new NotImplementedException();
-    //    }
-
-
-    //    private class Start : OutputSingleInputSingle0List0StageBase<TInputList0, string>
-    //    {
-    //        private bool hasChanges;
-    //        private StageResult<TInputList0, TPreviousItemCache0> @in;
-
-    //        public Start(StageResult<TInputList0, TPreviousItemCache0> initial, GeneratorContext context) : base(context)
-    //        {
-    //            this.In = initial;
-    //        }
-
-    //        public StageResult<TInputList0, TPreviousItemCache0> In
-    //        {
-    //            get => this.@in; set
-    //            {
-    //                this.@in = value;
-    //                this.hasChanges = value.HasChanges;
-    //            }
-    //        }
-
-    //        protected override async Task<(IDocument<TInputList0> result, BaseCache<string> cache)> Work(OptionToken options)
-    //        {
-    //            // reset changes when calculated;
-    //            this.hasChanges = false;
-
-    //            var result = await this.In.Perform;
-
-    //            return (result.result, BaseCache.Create(result.result.Id, result.cache));
-    //        }
-
-    //        protected override bool ForceUpdate(string? cache, OptionToken options) => this.hasChanges;
-    //    }
-    //}
 
 }

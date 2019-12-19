@@ -8,7 +8,7 @@ using System.IO;
 
 namespace StaticSite.Stages
 {
-    public class SidecarMetadata<TMetadata, TInItemCache, TInCache> : MultiStageBase<Stream, string, SelectStageCache<TInCache>>//: OutputMultiInputSingle0List1StageBase<Stream, TPreviousItemCache, TPreviousListCache, Stream, string, ImmutableList<string>>
+    public class SidecarMetadata<TMetadata, TInItemCache, TInCache> : MultiStageBase<Stream, string, TransformStageCache<TInCache>>//: OutputMultiInputSingle0List1StageBase<Stream, TPreviousItemCache, TPreviousListCache, Stream, string, ImmutableList<string>>
         where TInCache : class
         where TInItemCache : class
     {
@@ -28,7 +28,7 @@ namespace StaticSite.Stages
 
         public string SidecarExtension { get; }
 
-        protected override async Task<StageResultList<Stream, string, SelectStageCache<TInCache>>> DoInternal([AllowNull] SelectStageCache<TInCache>? cache, OptionToken options)
+        protected override async Task<StageResultList<Stream, string, TransformStageCache<TInCache>>> DoInternal([AllowNull] TransformStageCache<TInCache>? cache, OptionToken options)
         {
             var input = await this.input(cache?.ParentCache, options).ConfigureAwait(false);
 
@@ -115,7 +115,7 @@ namespace StaticSite.Stages
 
 
 
-                var newCache = new SelectStageCache<TInCache>()
+                var newCache = new TransformStageCache<TInCache>()
                 {
                     InputToOutputId = list.ToDictionary(x => x.inputId, x => x.result.Id),
                     OutputIdOrder = list.Select(x => x.result.Id).ToArray(),

@@ -370,12 +370,14 @@ namespace StaticSite
         }
 
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+#pragma warning disable CA1812 // Avoid uninstantiated internal classes
         private class ValueWrapper
         {
             public ValueKind Kind { get; set; }
 
             public object Value { get; set; }
         }
+#pragma warning restore CA1812 // Avoid uninstantiated internal classes
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
     }

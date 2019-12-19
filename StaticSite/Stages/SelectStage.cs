@@ -1,129 +1,152 @@
 ﻿using StaticSite.Documents;
 using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Immutable;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace StaticSite.Stages
 {
-    public class SelectStage<TIn, TInItemCache, TInCache, TOut> : MultiStageBase<TOut, string, SelectStageCache<TInCache>>
-        where TInCache : class
-        where TInItemCache : class
+    public class SelectStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache> : MultiStageBase<TResult, TItemCache, SelectCache<TInputCache, TItemCache>>
+    where TItemCache : class
+    where TInputItemCache : class
+    where TInputCache : class
     {
-        private readonly StagePerformHandler<TIn, TInItemCache, TInCache> input;
-        private readonly Func<IDocument<TIn>, Task<IDocument<TOut>>> transform;
 
-        public SelectStage(StagePerformHandler<TIn, TInItemCache, TInCache> input, Func<IDocument<TIn>, Task<IDocument<TOut>>> selector, GeneratorContext context) : base(context)
+        private readonly Dictionary<string, (Start @in, StageBase<TResult, TItemCache> @out)> startLookup = new Dictionary<string, (Start @in, StageBase<TResult, TItemCache> @out)>();
+
+        private readonly Func<StageBase<TInput, GeneratedHelper.CacheId<string>>, StageBase<TResult, TItemCache>> createPipline;
+
+        private readonly StagePerformHandler<TInput, TInputItemCache, TInputCache> input;
+
+        public SelectStage(StagePerformHandler<TInput, TInputItemCache, TInputCache> input, Func<StageBase<TInput, GeneratedHelper.CacheId<string>>, StageBase<TResult, TItemCache>> createPipline, GeneratorContext context) : base(context)
         {
-            this.input = input;
-            this.transform = selector;
+            this.input = input ?? throw new ArgumentNullException(nameof(input));
+            this.createPipline = createPipline ?? throw new ArgumentNullException(nameof(createPipline));
         }
 
-        protected override async Task<StageResultList<TOut, string, SelectStageCache<TInCache>>> DoInternal([AllowNull] SelectStageCache<TInCache>? cache, OptionToken options)
+        protected override async Task<StageResultList<TResult, TItemCache, SelectCache<TInputCache, TItemCache>>> DoInternal([AllowNull] SelectCache<TInputCache, TItemCache>? cache, OptionToken options)
         {
-
-            var input = await this.input(cache?.ParentCache, options).ConfigureAwait(false);
+            var input = await this.input(cache?.PreviousCache, options).ConfigureAwait(false);
 
             var task = LazyTask.Create(async () =>
             {
+                var (inputResult, inputCache) = await input.Perform;
 
-                var inputList = await input.Perform;
+                var resultList = await Task.WhenAll(inputResult.Select(async item =>
+               {
+
+                   if (this.startLookup.TryGetValue(item.Id, out var pipe))
+                   {
+                       pipe.@in.In = item;
+                   }
+                   else
+                   {
+                       var start = new SelectStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache>.Start(item, this.Context);
+                       var end = this.createPipline(start);
+                       pipe = (start, end);
+                       this.startLookup.Add(item.Id, pipe);
+                   }
+
+                   if (cache == null || !cache.InputItemCacheLookup.TryGetValue(item.Id, out var lastCache) || !cache.InputItemHashLookup.TryGetValue(item.Id, out var lastHash) || !cache.InputItemOutputIdLookup.TryGetValue(item.Id, out var lastOutputId))
+                   {
+                       lastCache = null;
+                       lastHash = null;
+                       lastOutputId = null;
+                   }
+                   var pipeDone = await pipe.@out.DoIt(lastCache, options).ConfigureAwait(false);
+
+                   if (pipeDone.HasChanges)
+                   {
+                       var (itemResult, itemCache) = await pipeDone.Perform;
+
+                       return (result: StageResult.Create(itemResult, itemCache, itemResult.Hash != lastHash, itemResult.Id), lastCache: itemCache, lastHash: itemResult.Hash, inputId: item.Id);
+                   }
+                   else
+                   {
+                       if (lastOutputId is null)
+                           throw new InvalidOperationException("This should not happen.");
+
+                       return (result: StageResult.Create(pipeDone.Perform, false, lastOutputId), lastCache: lastCache, lastHash: lastHash, inputId: item.Id);
+
+                   }
+               })).ConfigureAwait(false);
 
 
-                var list = await Task.WhenAll(inputList.result.Select(async subInput =>
+
+                var newCache = new SelectCache<TInputCache, TItemCache>()
                 {
-
-                    if (subInput.HasChanges)
-                    {
-                        var subResult = await subInput.Perform;
-                        var transformed = await this.transform(subResult.result).ConfigureAwait(false);
-                        bool hasChanges = true;
-                        if (cache != null && cache.Transformed.TryGetValue(transformed.Id, out var oldHash))
-                            hasChanges = oldHash == transformed.Hash;
-
-                        return (result: StageResult.Create(transformed, transformed.Hash, hasChanges, transformed.Id), inputId: subInput.Id, outputHash: transformed.Hash);
-                    }
-                    else
-                    {
-                        if (cache == null || !cache.InputToOutputId.TryGetValue(subInput.Id, out var oldOutputId) || !cache.Transformed.TryGetValue(subInput.Id, out var oldOutputHash))
-                            throw this.Context.Exception("No changes, so old value should be there.");
-
-                        return (result: StageResult.Create(LazyTask.Create(async () =>
-                        {
-
-                            var newSource = await subInput.Perform;
-                            var transformed = await this.transform(newSource.result).ConfigureAwait(false);
-
-                            return (transformed, transformed.Hash);
-                        }), false, oldOutputId),
-                        inputId: subInput.Id,
-                        outputHash: oldOutputHash
-                        );
-
-                    }
-                })).ConfigureAwait(false);
-
-                var newCache = new SelectStageCache<TInCache>()
-                {
-                    InputToOutputId = list.ToDictionary(x => x.inputId, x => x.result.Id),
-                    OutputIdOrder = list.Select(x => x.result.Id).ToArray(),
-                    ParentCache = inputList.cache,
-                    Transformed = list.ToDictionary(x => x.result.Id, x => x.outputHash)
+                    InputItemCacheLookup = resultList.ToDictionary(x => x.inputId, x => x.lastCache),
+                    InputItemHashLookup = resultList.ToDictionary(x => x.inputId, x => x.lastHash),
+                    InputItemOutputIdLookup = resultList.ToDictionary(x => x.inputId, x => x.result.Id),
+                    OutputIdOrder = resultList.Select(x => x.result.Id).ToArray(),
+                    PreviousCache = inputCache
                 };
-                return (result: list.Select(x => x.result).ToImmutableList(), cache: newCache);
+
+
+                return (resultList.Select(x => x.result).ToImmutableList(), newCache);
             });
 
-            bool hasChanges = input.HasChanges;
-            var newCache = cache;
-            if (input.HasChanges || newCache == null)
+            var hasChanges = input.HasChanges;
+            var ids = cache?.OutputIdOrder;
+            if (hasChanges || ids is null)
             {
+                var (work, newCache) = await task;
 
-                var (list, c) = await task;
-                newCache = c;
+                ids = newCache.OutputIdOrder;
 
-
-                if (!hasChanges && list.Count != cache?.OutputIdOrder.Length)
-                    hasChanges = true;
-
-                if (!hasChanges && cache != null)
+                if (cache != null)
                 {
-                    for (int i = 0; i < cache.OutputIdOrder.Length && !hasChanges; i++)
-                    {
-                        if (list[i].Id != cache.OutputIdOrder[i])
-                            hasChanges = true;
-                        if (list[i].HasChanges)
-                            hasChanges = true;
-                    }
+                    hasChanges = newCache.OutputIdOrder.SequenceEqual(cache.OutputIdOrder) || work.Any(x => x.HasChanges);
                 }
+
             }
 
-            return StageResultList.Create(task, hasChanges, newCache.OutputIdOrder.ToImmutableList());
+            return StageResultList.Create(task, hasChanges, ids.ToImmutableList());
         }
 
 
 
+
+        private class Start : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple0List0StageBase<TInput>
+        {
+            private string? lastHash;
+            private StageResult<TInput, TInputItemCache> @in;
+
+            public Start(StageResult<TInput, TInputItemCache> initial, GeneratorContext context) : base(context)
+            {
+                this.@in = initial;
+            }
+
+            public StageResult<TInput, TInputItemCache> In
+            {
+                get => this.@in; set
+                {
+                    this.@in = value;
+                    this.lastHash = null;
+                }
+            }
+
+
+
+            protected override Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options)
+            {
+                return Task.FromResult<bool?>(this.In.Id != id || this.lastHash != hash || hash is null);
+            }
+
+
+            protected override async Task<IDocument<TInput>> Work(OptionToken options)
+            {
+                var result = await this.In.Perform;
+
+                return result.result;
+            }
+        }
     }
-
-#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-#pragma warning disable CA1819 // Properties should not return arrays
-#pragma warning disable CA2227 // Collection properties should be read only
-    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-    public class SelectStageCache<TInCache>
-        where TInCache : class
-    {
-        public TInCache ParentCache { get; set; }
-
-        public string[] OutputIdOrder { get; set; }
-        public Dictionary<string, string> Transformed { get; set; }
-        public Dictionary<string, string> InputToOutputId { get; set; }
-
-    }
-#pragma warning restore CA1819 // Properties should not return arrays
 #pragma warning restore CA2227 // Collection properties should be read only
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-
+#pragma warning restore CA1819 // Properties should not return arrays
 
 
 }

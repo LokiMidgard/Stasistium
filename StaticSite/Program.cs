@@ -28,6 +28,7 @@ namespace StaticSite
                 .Sidecar()
                     .For<BookMetadata>(".metadata")
                 .Where(x => System.IO.Path.GetExtension(x.Id) == ".md")
+                .Select(x=>x.Markdown())
                 //.Select(x=> { 
                 
                 //})
