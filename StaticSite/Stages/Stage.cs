@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using System.IO;
+using Microsoft.Toolkit.Parsers.Markdown;
 
 namespace StaticSite.Stages
 {
@@ -115,7 +116,53 @@ namespace StaticSite.Stages
                 throw new ArgumentNullException(nameof(input));
             return new SelectStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache>(input.DoIt, createPipline, input.Context);
         }
+
+        public static MarkdownToHtmlStage<T> MarkdownToHtml<T>(this StageBase<MarkdownDocument, T> input)
+            where T : class
+        {
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            return new MarkdownToHtmlStage<T>(input.DoIt, input.Context);
+        }
+        public static TextToStreamStage<T> TextToStream<T>(this StageBase<string, T> input)
+            where T : class
+        {
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            return new TextToStreamStage<T>(input.DoIt, input.Context);
+        }
+
     }
 
+    public class MarkdownToHtmlStage<TInputCache> : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple1List0StageBase<Microsoft.Toolkit.Parsers.Markdown.MarkdownDocument, TInputCache, string>
+        where TInputCache : class
+    {
+        public MarkdownToHtmlStage(StagePerformHandler<MarkdownDocument, TInputCache> inputSingle0, GeneratorContext context) : base(inputSingle0, context)
+        {
+        }
+
+        protected override Task<IDocument<string>> Work(IDocument<MarkdownDocument> input, OptionToken options)
+        {
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            var text = input.Value.ToString();
+            return Task.FromResult(input.With(text, this.Context.GetHashForString(text)));
+        }
+    }
+    public class TextToStreamStage<TInputCache> : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple1List0StageBase<string, TInputCache, Stream>
+        where TInputCache : class
+    {
+        public TextToStreamStage(StagePerformHandler<string, TInputCache> inputSingle0, GeneratorContext context) : base(inputSingle0, context)
+        {
+        }
+
+        protected override Task<IDocument<Stream>> Work(IDocument<string> input, OptionToken options)
+        {
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            var output = input.With(() => new MemoryStream(System.Text.Encoding.UTF8.GetBytes(input.Value)), input.Hash);
+            return Task.FromResult<IDocument<Stream>>(output);
+        }
+    }
 
 }

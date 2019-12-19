@@ -16,7 +16,7 @@ namespace StaticSite.Documents
         IDocument With(MetadataContainer metadata);
 
     }
-    public interface IDocument<T> : IDocument
+    public interface IDocument<out T> : IDocument
     {
 
         T Value { get; }
