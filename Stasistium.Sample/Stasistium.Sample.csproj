@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Stasistium.Core\Stasistium.Core.csproj" />
+    <ProjectReference Include="..\Stasistium.Git\Stasistium.Git.csproj" />
+    <ProjectReference Include="..\Stasistium.Markdown\Stasistium.Markdown.csproj" />
+    <ProjectReference Include="..\Stasistium.YAML\Stasistium.YAML.csproj" />
+  </ItemGroup>
+
+</Project>
