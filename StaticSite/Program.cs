@@ -16,7 +16,7 @@ namespace StaticSite
             var startModule = Stage.FromResult("https://github.com/nota-game/nota.git", x => x, context);
             var generatorOptions = new GenerationOptions()
             {
-                CompressCache = true,
+                CompressCache = false,
                 Refresh = false
             };
             var s = System.Diagnostics.Stopwatch.StartNew();

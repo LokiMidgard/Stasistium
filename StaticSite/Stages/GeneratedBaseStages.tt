@@ -413,7 +413,7 @@ var parameter = new StringBuilder();
             });
 
 
-            bool hasChanges = await this.ForceUpdate(cache?.Ids, options).ConfigureAwait(false) ?? false
+                            bool hasChanges = (await this.ForceUpdate(cache?.Ids, options).ConfigureAwait(false) ?? false)
 <#for(int j = 0; j< single; j++){#>
             || inputSingle<#= j #>Result.HasChanges
 <#}#>

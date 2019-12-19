@@ -7,7 +7,7 @@ namespace StaticSite
     public class LazyTask<T>
     {
         private readonly Func<Task<T>> action;
-        private TaskCompletionSource<Task<T>> completionSource;
+        private readonly TaskCompletionSource<Task<T>> completionSource = new TaskCompletionSource<Task<T>>();
         private int set;
 
         //

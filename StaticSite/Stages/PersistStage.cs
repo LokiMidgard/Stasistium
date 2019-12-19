@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace StaticSite.Stages
 {
     public class PersistStage<TPreviousItemCache, TPreviousCache>
-        where TPreviousCache :class
+        where TPreviousCache : class
         where TPreviousItemCache : class
     {
         private readonly GenerationOptions generatorOptions;
@@ -39,7 +39,7 @@ namespace StaticSite.Stages
                 {
                     using var stream = cacehFile.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
                     using var compressed = this.generatorOptions.CompressCache ? new System.IO.Compression.GZipStream(stream, System.IO.Compression.CompressionMode.Decompress) as Stream : stream;
-                    cache = await BaseCache.Load<TPreviousCache>(compressed).ConfigureAwait(false);
+                    cache = await Serelizer.Load<TPreviousCache>(compressed).ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {
@@ -95,7 +95,7 @@ namespace StaticSite.Stages
                 // Write new cache
                 using (var stream = cacehFile.Open(FileMode.Create, FileAccess.Write, FileShare.None))
                 using (var compressed = this.generatorOptions.CompressCache ? new System.IO.Compression.GZipStream(stream, System.IO.Compression.CompressionLevel.Fastest) as Stream : stream)
-                    await BaseCache.Write(newCache, compressed).ConfigureAwait(false);
+                    await Serelizer.Write(newCache, compressed, !this.generatorOptions.CompressCache).ConfigureAwait(false);
             }
 
         }

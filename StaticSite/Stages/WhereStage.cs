@@ -33,7 +33,7 @@ namespace StaticSite.Stages
                 var inputList = await input.Perform;
 
 
-                var list = await Task.WhenAll(inputList.result.Select(async subInput =>
+                var list = (await Task.WhenAll(inputList.result.Select(async subInput =>
                 {
                     bool pass;
 
@@ -57,14 +57,14 @@ namespace StaticSite.Stages
                         return null;
 
 
-                })).ConfigureAwait(false);
+                })).ConfigureAwait(false)).Where(x => x != null);
 
                 var newCache = new WhereStageCache<TInCache>()
                 {
                     OutputIdOrder = list.Select(x => x.Id).ToArray(),
                     ParentCache = inputList.cache
                 };
-                return (result: list.Select(x => x).ToImmutableList(), cache: newCache);
+                return (result: list.ToImmutableList(), cache: newCache);
             });
 
             bool hasChanges = input.HasChanges;
@@ -94,7 +94,7 @@ namespace StaticSite.Stages
             return StageResultList.Create(task, hasChanges, newCache.OutputIdOrder.ToImmutableList());
         }
 
-      
+
     }
 
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
