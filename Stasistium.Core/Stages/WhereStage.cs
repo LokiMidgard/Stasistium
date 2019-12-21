@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace Stasistium.Stages
 {
+
     public class WhereStage<TOut, TInItemCache, TInCache> : MultiStageBase<TOut, TInItemCache, WhereStageCache<TInCache>>// : OutputMultiInputSingle0List1StageBase<TCheck, TPreviousItemCache, TPreviousCache, TCheck, TPreviousItemCache, ImmutableList<string>>
         where TInCache : class
         where TInItemCache : class

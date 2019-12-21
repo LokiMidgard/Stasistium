@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using System.IO;
 using Stasistium.Stages;
+using System.Linq;
 
 namespace Stasistium
 {
@@ -13,6 +14,21 @@ namespace Stasistium
 
     public static class StageExtensions
     {
+
+        public static ToListStage<T, TCache> Concat<T, TCache>(this StageBase<T, TCache> first, params StageBase<T, TCache>[]? rest)
+            where TCache : class
+        {
+            if (first is null)
+                throw new ArgumentNullException(nameof(first));
+            var array = new StagePerformHandler<T, TCache>[(rest?.Length ?? 0) + 1];
+
+            array[0] = first.DoIt;
+            if (rest != null)
+                for (int i = 0; i < rest.Length; i++)
+                    array[i + 1] = rest[i].DoIt;
+
+            return new ToListStage<T, TCache>(first.Context, array);
+        }
 
         public static PersistStage<TItemCache, TCache> Persist<TItemCache, TCache>(this MultiStageBase<Stream, TItemCache, TCache> stage, DirectoryInfo output, GenerationOptions generatorOptions)
             where TCache : class

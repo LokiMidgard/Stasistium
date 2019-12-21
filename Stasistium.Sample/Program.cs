@@ -13,11 +13,11 @@ namespace Stasistium.Sample
             var startModule = StageExtensions.FromResult("https://github.com/nota-game/nota.git", x => x, context);
             var generatorOptions = new GenerationOptions()
             {
-                CompressCache = false,
+                CompressCache = true,
                 Refresh = false
             };
             var s = System.Diagnostics.Stopwatch.StartNew();
-            var g = startModule
+            var files = startModule
                 .GitModul()
                 .Where(x => x.Id == "origin/master")
                 .SingleEntry()
@@ -25,9 +25,14 @@ namespace Stasistium.Sample
                 .Sidecar()
                     .For<BookMetadata>(".metadata")
                 .Where(x => System.IO.Path.GetExtension(x.Id) == ".md")
-                .Select(x => x.Markdown().MarkdownToHtml().TextToStream())
-                .Transform(x => x.WithId(Path.ChangeExtension(x.Id, ".html")))
+                .Select(x => x.Markdown().MarkdownToHtml().TextToStream());
 
+            var razorProvider = files.FileProvider("Content").Concat().RazorProvider("Content");
+
+            var rendered = files.Select(x => x.Razor(razorProvider).TextToStream());
+
+            var g = rendered
+                .Transform(x => x.WithId(Path.ChangeExtension(x.Id, ".html")))
                 .Persist(new DirectoryInfo("out"), generatorOptions)
                 ;
 
