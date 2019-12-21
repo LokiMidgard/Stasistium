@@ -6,7 +6,17 @@
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
+  <!--Source Link Support-->
+  <PropertyGroup>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+  </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All"/>
+  </ItemGroup>
+
+  <!--Package Information-->
   <PropertyGroup>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Authors>Patrick Kranz</Authors>
@@ -16,6 +26,8 @@
     <PackageProjectUrl>https://github.com/LokiMidgard/Stasistium</PackageProjectUrl>
   </PropertyGroup>
 
+  <!--Additional Packages-->
+  
   <ItemGroup>
     <PackageReference Include="GitVersionTask" Version="5.1.2">
       <PrivateAssets>all</PrivateAssets>
