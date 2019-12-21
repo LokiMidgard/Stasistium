@@ -17,4 +17,8 @@
     <ProjectReference Include="..\Stasistium.Core\Stasistium.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="build/Stasistium.Razor.targets" pack="true" PackagePath="build"   ></None>
+  </ItemGroup>
+
 </Project>
