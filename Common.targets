@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <LangVersion>8.0</LangVersion>
+  </PropertyGroup>
+
+
   <PropertyGroup>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Authors>Patrick Kranz</Authors>

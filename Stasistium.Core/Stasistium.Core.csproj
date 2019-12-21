@@ -3,8 +3,6 @@
   <PropertyGroup>
     <RootNamespace>Stasistium</RootNamespace>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Nullable>enable</Nullable>
-    <LangVersion>8.0</LangVersion>
     <TransformOnBuild>true</TransformOnBuild>
   </PropertyGroup>
 
@@ -13,15 +11,6 @@
   <ItemGroup>
     <PackageReference Include="System.Collections.Immutable" Version="1.7.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-  </ItemGroup>
-
-
-  <ItemGroup>
-    <None Remove=".editorconfig" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <AdditionalFiles Include=".editorconfig" />
   </ItemGroup>
 
   <ItemGroup>

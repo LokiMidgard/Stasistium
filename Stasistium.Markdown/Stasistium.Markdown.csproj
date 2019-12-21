@@ -2,9 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <Nullable>enable</Nullable>
-    <LangVersion>8.0</LangVersion>
-    <TransformOnBuild>true</TransformOnBuild>
   </PropertyGroup>
 
   <Import Project="$(SolutionDir)Common.targets" />
