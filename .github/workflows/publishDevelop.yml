@@ -35,6 +35,13 @@ jobs:
         echo '        </github>' >> nuget.config
         echo '    </packageSourceCredentials>' >> nuget.config
         echo '</configuration>' >> nuget.config
+    - name: Publish nuget
+      run: |
+           for f in ./Stasistium.Core/bin/Release/*.nupkg
+           do
+             curl -vX PUT -u "LokiMidgard:${{ secrets.GITHUB_TOKEN }}" -F package=@$f https://nuget.pkg.github.com/LokiMidgard/
+           done
+      shell: bash
     - name: publish Core to GitHub
       run: dotnet nuget push "Stasistium.Core/bin/Release/*.nupkg" --source "github" -k "${{ secrets.GITHUB_TOKEN }}"
     - name: publish Razor to GitHub
