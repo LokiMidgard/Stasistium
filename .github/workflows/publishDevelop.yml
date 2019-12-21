@@ -20,5 +20,13 @@ jobs:
       run: dotnet build --configuration Release
     - name: Pack
       run: dotnet pack --configuration Release
-    - name: publish to GitHub
-      run: dotnet nuget push "bin/Release/*.nupkg" --source "https://nuget.pkg.github.com/LokiMidgard/index.json" -k ${{ secrets.GITHUB_TOKEN }}
+    - name: publish Core to GitHub
+      run: dotnet nuget push "Stasistium.Core/bin/Release/*.nupkg" --source "https://nuget.pkg.github.com/LokiMidgard/index.json" -k ${{ secrets.GITHUB_TOKEN }}
+    - name: publish Razor to GitHub
+      run: dotnet nuget push "Stasistium.Razor/bin/Release/*.nupkg" --source "https://nuget.pkg.github.com/LokiMidgard/index.json" -k ${{ secrets.GITHUB_TOKEN }}
+    - name: publish YAML to GitHub
+      run: dotnet nuget push "Stasistium.YAML/bin/Release/*.nupkg" --source "https://nuget.pkg.github.com/LokiMidgard/index.json" -k ${{ secrets.GITHUB_TOKEN }}
+    - name: publish Markdown to GitHub
+      run: dotnet nuget push "Stasistium.Markdown/bin/Release/*.nupkg" --source "https://nuget.pkg.github.com/LokiMidgard/index.json" -k ${{ secrets.GITHUB_TOKEN }}
+    - name: publish Git to GitHub
+      run: dotnet nuget push "Stasistium.Git/bin/Release/*.nupkg" --source "https://nuget.pkg.github.com/LokiMidgard/index.json" -k ${{ secrets.GITHUB_TOKEN }}
