@@ -338,4 +338,6 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
-*.tt.cs
+
+# For now ignored untill I find out how to build t4 on build in a linux enviroment.
+# *.tt.cs
