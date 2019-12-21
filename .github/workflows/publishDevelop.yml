@@ -31,7 +31,7 @@ jobs:
         echo '    <packageSourceCredentials>' >> nuget.config
         echo '        <github>' >> nuget.config
         echo '            <add key="Username" value="LokiMidgard" />' >> nuget.config
-        echo '            <add key="ClearTextPassword" value="{{ secrets.GITHUB_TOKEN }}" />' >> nuget.config
+        echo '            <add key="ClearTextPassword" value="${{ secrets.GITHUB_TOKEN }}" />' >> nuget.config
         echo '        </github>' >> nuget.config
         echo '    </packageSourceCredentials>' >> nuget.config
         echo '</configuration>' >> nuget.config
