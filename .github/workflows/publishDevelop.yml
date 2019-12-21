@@ -20,21 +20,6 @@ jobs:
       run: dotnet build --configuration Release
     - name: Pack
       run: dotnet pack --configuration Release
-    - name: prepare Creadentials
-      run: |
-        echo '<?xml version="1.0" encoding="utf-8"?>' >> nuget.config
-        echo '<configuration>' >> nuget.config
-        echo '    <packageSources>' >> nuget.config
-        echo '        <clear />' >> nuget.config
-        echo '        <add key="github" value="https://nuget.pkg.github.com/LokiMidgard/index.json" />' >> nuget.config
-        echo '    </packageSources>' >> nuget.config
-        echo '    <packageSourceCredentials>' >> nuget.config
-        echo '        <github>' >> nuget.config
-        echo '            <add key="Username" value="LokiMidgard" />' >> nuget.config
-        echo '            <add key="ClearTextPassword" value="${{ secrets.GITHUB_TOKEN }}" />' >> nuget.config
-        echo '        </github>' >> nuget.config
-        echo '    </packageSourceCredentials>' >> nuget.config
-        echo '</configuration>' >> nuget.config
     - name: Publish nuget
       run: |
            for f in ./*/bin/Release/*.nupkg
@@ -42,13 +27,3 @@ jobs:
              curl -vX PUT -u "LokiMidgard:${{ secrets.GITHUB_TOKEN }}" -F package=@$f https://nuget.pkg.github.com/LokiMidgard/
            done
       shell: bash
-    - name: publish Core to GitHub
-      run: dotnet nuget push "Stasistium.Core/bin/Release/*.nupkg" --source "github" -k "${{ secrets.GITHUB_TOKEN }}"
-    - name: publish Razor to GitHub
-      run: dotnet nuget push "Stasistium.Razor/bin/Release/*.nupkg" --source "github"
-    - name: publish YAML to GitHub
-      run: dotnet nuget push "Stasistium.YAML/bin/Release/*.nupkg" --source "github"
-    - name: publish Markdown to GitHub
-      run: dotnet nuget push "Stasistium.Markdown/bin/Release/*.nupkg" --source "github"
-    - name: publish Git to GitHub
-      run: dotnet nuget push "Stasistium.Git/bin/Release/*.nupkg" --source "github"
