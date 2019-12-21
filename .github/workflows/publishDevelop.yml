@@ -36,7 +36,7 @@ jobs:
         echo '    </packageSourceCredentials>' >> nuget.config
         echo '</configuration>' >> nuget.config
     - name: publish Core to GitHub
-      run: dotnet nuget push "Stasistium.Core/bin/Release/*.nupkg" --source "github"
+      run: dotnet nuget push "Stasistium.Core/bin/Release/*.nupkg" --source "github" -k "${{ secrets.GITHUB_TOKEN }}"
     - name: publish Razor to GitHub
       run: dotnet nuget push "Stasistium.Razor/bin/Release/*.nupkg" --source "github"
     - name: publish YAML to GitHub
