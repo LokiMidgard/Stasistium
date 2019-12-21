@@ -4,7 +4,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Authors>Patrick Kranz</Authors>
     <Company />
-    <RepositoryUrl>https://github.com/LokiMidgard/Stasistium.git</RepositoryUrl>
+    <RepositoryUrl>https://github.com/LokiMidgard/Stasistium</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/LokiMidgard/Stasistium</PackageProjectUrl>
   </PropertyGroup>
