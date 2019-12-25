@@ -10,7 +10,7 @@ namespace Stasistium
     public static class RazorStageExtension
     {
 
-        public static RazorProviderStage<TInputItemCache, TInputCache> RazorProvider<TInputItemCache, TInputCache>(this MultiStageBase<IFileProvider, TInputItemCache, TInputCache> input, string contentProviderId, string? id = null)
+        public static RazorProviderStage<TInputItemCache, TInputCache> RazorProvider<TInputItemCache, TInputCache>(this MultiStageBase<IFileProvider, TInputItemCache, TInputCache> input, string contentProviderId, string? viewStartId = null, string? id = null)
             where TInputCache : class
             where TInputItemCache : class
         {
@@ -18,7 +18,7 @@ namespace Stasistium
                 throw new ArgumentNullException(nameof(input));
             if (contentProviderId is null)
                 throw new ArgumentNullException(nameof(contentProviderId));
-            return new RazorProviderStage<TInputItemCache, TInputCache>(input.DoIt, contentProviderId, id, input.Context);
+            return new RazorProviderStage<TInputItemCache, TInputCache>(input.DoIt, contentProviderId, id, viewStartId, input.Context);
         }
 
         public static RazorStage<T, TDocumentCache, TRenderCache> Razor<T, TDocumentCache, TRenderCache>(this StageBase<T, TDocumentCache> input, StageBase<RazorProvider, TRenderCache> renderer)

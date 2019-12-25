@@ -15,18 +15,20 @@ namespace Stasistium.Stages
         where TInputCache : class
     {
         private readonly string id;
+        private readonly string? viewStartId;
 
-        public RazorProviderStage(StagePerformHandler<IFileProvider, TInputItemCache, TInputCache> inputList0, string contentId, string? id, GeneratorContext context) : base(inputList0, context)
+        public RazorProviderStage(StagePerformHandler<IFileProvider, TInputItemCache, TInputCache> inputList0, string contentId, string? id, string? viewStartId, GeneratorContext context) : base(inputList0, context)
         {
             this.ContentId = contentId;
             this.id = id ?? Guid.NewGuid().ToString();
+            this.viewStartId = viewStartId;
         }
 
         public string ContentId { get; }
 
         protected override Task<IDocument<RazorProvider>> Work(ImmutableList<IDocument<IFileProvider>> inputList0, OptionToken options)
         {
-            var render = new RazorProvider(RazorViewToStringRenderer.GetRenderer(inputList0.Select(x => x.Value), this.ContentId));
+            var render = new RazorProvider(RazorViewToStringRenderer.GetRenderer(inputList0.Select(x => x.Value), new RenderConfiguration(this.ContentId) { ViewStartId = this.viewStartId }));
             var hash = this.Context.GetHashForString(string.Join(",", inputList0.Select(x => x.Hash)));
 
             return Task.FromResult(this.Context.Create(render, hash, this.id));

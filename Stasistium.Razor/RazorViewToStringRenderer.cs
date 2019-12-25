@@ -77,14 +77,27 @@ namespace Stasistium.Razor
         private IView FindView(ActionContext actionContext, string viewName)
         {
             var razorPageFactoryProvider = this._serviceProvider.GetRequiredService<IRazorPageFactoryProvider>();
-            var razorPageFactoryResult = razorPageFactoryProvider.CreateFactory(Path.Combine(this.configuration.ContentId, viewName));
+            var razorPageFactoryResult = razorPageFactoryProvider.CreateFactory(Path.Combine(this.configuration.ContentProviderId, viewName));
             var razorPage = razorPageFactoryResult.RazorPageFactory();
 
             var pageActivator = this._serviceProvider.GetRequiredService<IRazorPageActivator>();
             var htmlEncoder = this._serviceProvider.GetRequiredService<HtmlEncoder>();
             var diagnosticSource = this._serviceProvider.GetRequiredService<DiagnosticSource>();
 
-            return new RazorView(this._viewEngine, pageActivator, new List<IRazorPage>(), razorPage, htmlEncoder, diagnosticSource);
+            IReadOnlyList<IRazorPage>? viewStart = null;
+
+            if (this.configuration.ViewStartId != null)
+            {
+                var result = razorPageFactoryProvider.CreateFactory(this.configuration.ViewStartId);
+                if (result.Success)
+                    viewStart = new IRazorPage[] { result.RazorPageFactory() };
+            }
+
+            if (viewStart is null)
+                viewStart = Array.Empty<IRazorPage>();
+
+
+            return new RazorView(this._viewEngine, pageActivator, viewStart, razorPage, htmlEncoder, diagnosticSource);
             var getViewResult = this._viewEngine.GetView(executingFilePath: null, viewPath: viewName, isMainPage: true);
 
             if (getViewResult.Success)
@@ -106,12 +119,9 @@ namespace Stasistium.Razor
             throw new InvalidOperationException(errorMessage);
         }
 
-        internal static RazorViewToStringRenderer GetRenderer(IEnumerable<IFileProvider> fileProviders, string contentId)
+        internal static RazorViewToStringRenderer GetRenderer(IEnumerable<IFileProvider> fileProviders, RenderConfiguration renderConfiguration)
         {
-            var renderConvfiguration = new RenderConfiguration()
-            {
-                ContentId = contentId,
-            };
+
 
             var services = new ServiceCollection();
             var applicationEnvironment = PlatformServices.Default.Application;
@@ -125,10 +135,10 @@ namespace Stasistium.Razor
 
             //services.Configure<RazorViewEngineOptions>(options =>
             //{
-              
+
             //});
 
-            services.AddSingleton(renderConvfiguration);
+            services.AddSingleton(renderConfiguration);
 
             services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
 
@@ -191,6 +201,14 @@ namespace Stasistium.Razor
 
     public class RenderConfiguration
     {
-        public string ContentId { get; set; }
+        public RenderConfiguration(string contentProviderId)
+        {
+            this.ContentProviderId = contentProviderId ?? throw new ArgumentNullException(nameof(contentProviderId));
+        }
+
+        public string ContentProviderId { get; }
+
+        public string? ViewStartId { get; set; }
+
     }
 }
