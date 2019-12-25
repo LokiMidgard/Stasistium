@@ -20,6 +20,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.Extensions.FileProviders;
 using System.Collections.Generic;
+using System.Text.Encodings.Web;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Stasistium.Razor
 {
@@ -27,18 +29,21 @@ namespace Stasistium.Razor
 #pragma warning disable CA1812 // Avoid uninstantiated internal classes
     internal class RazorViewToStringRenderer
     {
-        private IRazorViewEngine _viewEngine;
-        private ITempDataProvider _tempDataProvider;
-        private IServiceProvider _serviceProvider;
+        private readonly IRazorViewEngine _viewEngine;
+        private readonly ITempDataProvider _tempDataProvider;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly RenderConfiguration configuration;
 
         public RazorViewToStringRenderer(
             IRazorViewEngine viewEngine,
             ITempDataProvider tempDataProvider,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider,
+            RenderConfiguration configuration)
         {
             this._viewEngine = viewEngine;
             this._tempDataProvider = tempDataProvider;
             this._serviceProvider = serviceProvider;
+            this.configuration = configuration;
         }
 
         public async Task<string> RenderViewToStringAsync<TModel>(string viewName, TModel model)
@@ -71,7 +76,17 @@ namespace Stasistium.Razor
 
         private IView FindView(ActionContext actionContext, string viewName)
         {
+            var razorPageFactoryProvider = this._serviceProvider.GetRequiredService<IRazorPageFactoryProvider>();
+            var razorPageFactoryResult = razorPageFactoryProvider.CreateFactory(Path.Combine(this.configuration.ContentId, viewName));
+            var razorPage = razorPageFactoryResult.RazorPageFactory();
+
+            var pageActivator = this._serviceProvider.GetRequiredService<IRazorPageActivator>();
+            var htmlEncoder = this._serviceProvider.GetRequiredService<HtmlEncoder>();
+            var diagnosticSource = this._serviceProvider.GetRequiredService<DiagnosticSource>();
+
+            return new RazorView(this._viewEngine, pageActivator, new List<IRazorPage>(), razorPage, htmlEncoder, diagnosticSource);
             var getViewResult = this._viewEngine.GetView(executingFilePath: null, viewPath: viewName, isMainPage: true);
+
             if (getViewResult.Success)
             {
                 return getViewResult.View;
@@ -93,27 +108,27 @@ namespace Stasistium.Razor
 
         internal static RazorViewToStringRenderer GetRenderer(IEnumerable<IFileProvider> fileProviders, string contentId)
         {
+            var renderConvfiguration = new RenderConfiguration()
+            {
+                ContentId = contentId,
+            };
+
             var services = new ServiceCollection();
             var applicationEnvironment = PlatformServices.Default.Application;
             services.AddSingleton(applicationEnvironment);
-            
+
             var environment = new HostingEnvironment
-            { 
-                ApplicationName =  Assembly.GetEntryAssembly().GetName().Name
+            {
+                ApplicationName = Assembly.GetEntryAssembly().GetName().Name
             };
             services.AddSingleton<IHostingEnvironment>(environment);
 
-            services.Configure<RazorViewEngineOptions>(options =>
-            {
-                options.FileProviders.Clear();
-                options.ViewLocationFormats.Clear();
-                options.PageViewLocationFormats.Clear();
-                options.ViewLocationFormats.Add($"/{contentId}/{{0}}");
-                options.PageViewLocationFormats.Add($"/{contentId}/{{0}}");
-                foreach (var provider in fileProviders)
-                    options.FileProviders.Add(provider);
-                    options.FileProviders.Add(new PhysicalFileProvider(Directory.GetCurrentDirectory()));
-            });
+            //services.Configure<RazorViewEngineOptions>(options =>
+            //{
+              
+            //});
+
+            services.AddSingleton(renderConvfiguration);
 
             services.AddSingleton<ObjectPoolProvider, DefaultObjectPoolProvider>();
 
@@ -123,13 +138,46 @@ namespace Stasistium.Razor
 #pragma warning restore CA2000 // Dispose objects before losing scope
             services.AddSingleton<DiagnosticSource>(diagnosticSource);
 
+            //services.AddSingleton<IRazorViewEngineFileProviderAccessor, DefaultRazorViewEngineFileProviderAccessor>()
+
+
             services.AddLogging();
-            services.AddMvc();
+            services.AddMvc()
+                .AddRazorOptions(options =>
+                {
+                    options.ViewLocationExpanders.Clear();
+                    options.FileProviders.Clear();
+                    options.ViewLocationFormats.Clear();
+                    options.PageViewLocationFormats.Clear();
+
+                    options.ViewLocationFormats.Clear();
+                    options.ViewLocationExpanders.Clear();
+                    options.PageViewLocationFormats.Clear();
+                    options.AreaViewLocationFormats.Clear();
+                    options.AreaPageViewLocationFormats.Clear();
+
+                    options.ViewLocationFormats.Add("{0}");
+                    //options.ViewLocationExpanders.Add("{0}");
+                    options.PageViewLocationFormats.Add("{0}");
+                    options.AreaViewLocationFormats.Add("{0}");
+                    options.AreaPageViewLocationFormats.Add("{0}");
+
+
+
+                    //options.ViewLocationFormats.Add($"/{contentId}/{{0}}");
+                    //options.PageViewLocationFormats.Add($"/{contentId}/{{0}}");
+                    foreach (var provider in fileProviders)
+                        options.FileProviders.Add(provider);
+                })
+                .AddRazorPagesOptions(options =>
+                {
+
+                });
+
             services.AddSingleton<RazorViewToStringRenderer>();
             var provider = services.BuildServiceProvider();
             return provider.GetRequiredService<RazorViewToStringRenderer>();
         }
-
 
         private ActionContext GetActionContext()
         {
@@ -139,5 +187,10 @@ namespace Stasistium.Razor
             };
             return new ActionContext(httpContext, new RouteData(), new ActionDescriptor());
         }
+    }
+
+    public class RenderConfiguration
+    {
+        public string ContentId { get; set; }
     }
 }

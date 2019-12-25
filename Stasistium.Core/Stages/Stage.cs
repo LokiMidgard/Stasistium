@@ -12,22 +12,15 @@ namespace Stasistium
     public delegate Task<StageResultList<TResult, TResultCache, TCache>> StagePerformHandler<TResult, TResultCache, TCache>([AllowNull] TCache cache, OptionToken options);
 
 
-    public static class StageExtensions
+    public static partial class StageExtensions
     {
 
-        public static ToListStage<T, TCache> Concat<T, TCache>(this StageBase<T, TCache> first, params StageBase<T, TCache>[]? rest)
-            where TCache : class
+        public static FileSystemStage<T> FileSystem<T>(this StageBase<string, T> input)
+            where T : class
         {
-            if (first is null)
-                throw new ArgumentNullException(nameof(first));
-            var array = new StagePerformHandler<T, TCache>[(rest?.Length ?? 0) + 1];
-
-            array[0] = first.DoIt;
-            if (rest != null)
-                for (int i = 0; i < rest.Length; i++)
-                    array[i + 1] = rest[i].DoIt;
-
-            return new ToListStage<T, TCache>(first.Context, array);
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            return new FileSystemStage<T>(input.DoIt, input.Context);
         }
 
         public static PersistStage<TItemCache, TCache> Persist<TItemCache, TCache>(this MultiStageBase<Stream, TItemCache, TCache> stage, DirectoryInfo output, GenerationOptions generatorOptions)
@@ -92,8 +85,6 @@ namespace Stasistium
             return new TransformStage<TIn, TInITemCache, TInCache, TOut>(input.DoIt, x => Task.FromResult(predicate(x)), input.Context);
         }
 
-        public static StaticStage<TResult> FromResult<TResult>(TResult result, Func<TResult, string> hashFunction, GeneratorContext context)
-            => new StaticStage<TResult>(result, hashFunction, context);
 
         public static SelectStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache> Select<TInput, TInputItemCache, TInputCache, TResult, TItemCache>(this MultiStageBase<TInput, TInputItemCache, TInputCache> input, Func<StageBase<TInput, Stages.GeneratedHelper.CacheId<string>>, StageBase<TResult, TItemCache>> createPipline)
             where TInputCache : class

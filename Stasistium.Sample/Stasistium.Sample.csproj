@@ -17,4 +17,13 @@
     <ProjectReference Include="..\Stasistium.YAML\Stasistium.YAML.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Layout\base.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Layout\ViewStart.cshtml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

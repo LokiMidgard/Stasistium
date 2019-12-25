@@ -9,11 +9,24 @@
   <Import Project="$(SolutionDir)Common.targets" />
 
   <ItemGroup>
+    <None Include="Stages\ConcatStage.tt.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ConcatStage.tt</DependentUpon>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="System.Collections.Immutable" Version="1.7.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Stages\ConcatStage.tt.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>ConcatStage.tt</DependentUpon>
+    </Compile>
     <Compile Update="Stages\GeneratedBaseStages.tt.cs">
       <DependentUpon>GeneratedBaseStages.tt</DependentUpon>
       <DesignTime>True</DesignTime>
@@ -22,6 +35,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Stages\ConcatStage.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>ConcatStage.tt.cs</LastGenOutput>
+    </None>
     <None Update="Stages\GeneratedBaseStages.tt">
       <LastGenOutput>GeneratedBaseStages.tt.cs</LastGenOutput>
       <Generator>TextTemplatingFileGenerator</Generator>

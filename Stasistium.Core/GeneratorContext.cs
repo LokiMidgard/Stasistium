@@ -35,6 +35,20 @@ namespace Stasistium.Documents
             return sb.ToString();
         }
 
+        public string GetHashForStream(Stream toHash)
+        {
+            var bytes = this.algorithm.ComputeHash(toHash);
+
+            var sb = new StringBuilder(bytes.Length << 1);
+            foreach (byte b in bytes)
+                sb.Append(b.ToString("X2", System.Globalization.CultureInfo.InvariantCulture));
+
+            return sb.ToString();
+        }
+
+        public Stages.StaticStage<TResult> StageFromResult<TResult>(TResult result, Func<TResult, string> hashFunction)
+    => new Stages.StaticStage<TResult>(result, hashFunction, this);
+
 
 
         internal string GetHashForObject(object? value)

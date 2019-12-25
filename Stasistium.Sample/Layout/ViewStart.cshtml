@@ -1,0 +1,10 @@
+﻿@using Stasistium.Sample
+@model Stasistium.Documents.MetadataContainer;
+@{
+    string? l = Model.GetValue<PageLayoutMetadata>()?.Layout;
+    if (String.IsNullOrWhiteSpace(l))
+    {
+        l = @"base.cshtml";
+    }
+    Layout = l;
+}
