@@ -105,6 +105,22 @@ namespace Stasistium.Stages
 
 
     }
+    public class TransformStage<TIn, TInCache, TOut> : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple1List0StageBase<TIn, TInCache, TOut>
+        where TInCache : class
+    {
+        private readonly Func<IDocument<TIn>, Task<IDocument<TOut>>> transform;
+
+        public TransformStage(StagePerformHandler<TIn, TInCache> inputSingle0, Func<IDocument<TIn>, Task<IDocument<TOut>>> selector, GeneratorContext context) : base(inputSingle0, context)
+        {
+            this.transform = selector;
+        }
+
+        protected override Task<IDocument<TOut>> Work(IDocument<TIn> inputSingle0, OptionToken options)
+        {
+            return this.transform(inputSingle0);
+        }
+
+    }
 
 
 

@@ -145,9 +145,7 @@ namespace Stasistium.Stages
             }
         }
     }
-#pragma warning restore CA2227 // Collection properties should be read only
-#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-#pragma warning restore CA1819 // Properties should not return arrays
+
 
 
 }

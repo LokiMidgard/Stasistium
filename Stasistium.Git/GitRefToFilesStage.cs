@@ -34,7 +34,7 @@ namespace Stasistium.Stages
                     switch (entry.Target)
                     {
                         case Blob blob:
-                            var document = new GitFileDocument(entry.Path, blob, this.Context, null);
+                            var document = new GitFileDocument(entry.Path, blob, this.Context, null).With(source.Metadata);
                             blobs.Add(document);
                             break;
 

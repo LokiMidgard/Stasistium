@@ -9,7 +9,16 @@ namespace Stasistium.Sample
     {
         static async Task Main(string[] args)
         {
-            using var context = new GeneratorContext();
+            using var context = new GeneratorContext(objectToStingRepresentation: obj =>
+
+
+                obj switch
+                {
+                    GitMetadata meta => $"{meta.Name}|{meta.Type}",
+                    _ => throw new NotSupportedException()
+                }
+
+            );
             var startModule = context.StageFromResult("https://github.com/nota-game/nota.git", x => x);
 
             var layoutProvider = context.StageFromResult("layout", x => x).FileSystem().FileProvider("Layout");
@@ -22,18 +31,24 @@ namespace Stasistium.Sample
             var s = System.Diagnostics.Stopwatch.StartNew();
             var files = startModule
                 .GitModul()
-                .Where(x => x.Id == "origin/master")
-                .SingleEntry()
-                .GitRefToFiles()
-                .Sidecar()
-                    .For<BookMetadata>(".metadata")
-                .Where(x => System.IO.Path.GetExtension(x.Id) == ".md")
-                .Select(x => x.Markdown().MarkdownToHtml().TextToStream());
+                .SelectMany(input =>
+
+                    input
+                    .Transform(x => x.With(x.Metadata.Add(new GitMetadata() { Name = x.Value.FrindlyName, Type = x.Value.Type })))
+                    .GitRefToFiles()
+                    .Sidecar()
+                        .For<BookMetadata>(".metadata")
+                    .Where(x => System.IO.Path.GetExtension(x.Id) == ".md")
+                    .Select(x => x.Markdown().MarkdownToHtml().TextToStream())
+                    .Transform(x => x.WithId(Path.Combine(Enum.GetName(typeof(GitRefType), x.Metadata.GetValue<GitMetadata>()!.Type)!, x.Metadata.GetValue<GitMetadata>()!.Name, x.Id)))
+                );
+            //.Where(x => x.Id == "origin/master")
+            //.SingleEntry()
 
             var razorProvider = files
                 .FileProvider("Content")
                 .Concat(layoutProvider)
-                .RazorProvider("Content","Layout/ViewStart.cshtml");
+                .RazorProvider("Content", "Layout/ViewStart.cshtml");
 
 
 
@@ -51,6 +66,11 @@ namespace Stasistium.Sample
 
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
+        public class GitMetadata
+        {
+            public string Name { get; internal set; }
+            public GitRefType Type { get; internal set; }
+        }
 
         public class BookMetadata
         {

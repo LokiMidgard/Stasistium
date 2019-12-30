@@ -85,6 +85,25 @@ namespace Stasistium
             return new TransformStage<TIn, TInITemCache, TInCache, TOut>(input.DoIt, x => Task.FromResult(predicate(x)), input.Context);
         }
 
+        public static TransformStage<TIn, TInCache, TOut> Transform<TIn, TInCache, TOut>(this StageBase<TIn, TInCache> input, Func<IDocument<TIn>, Task<IDocument<TOut>>> predicate)
+    where TInCache : class
+        {
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            if (predicate is null)
+                throw new ArgumentNullException(nameof(predicate));
+            return new TransformStage<TIn,  TInCache, TOut>(input.DoIt, predicate, input.Context);
+        }
+
+        public static TransformStage<TIn, TInCache, TOut> Transform<TIn, TInCache, TOut>(this StageBase<TIn, TInCache> input, Func<IDocument<TIn>, IDocument<TOut>> predicate)
+            where TInCache : class
+        {
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            if (predicate is null)
+                throw new ArgumentNullException(nameof(predicate));
+            return new TransformStage<TIn,  TInCache, TOut>(input.DoIt, x => Task.FromResult(predicate(x)), input.Context);
+        }
 
         public static SelectStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache> Select<TInput, TInputItemCache, TInputCache, TResult, TItemCache>(this MultiStageBase<TInput, TInputItemCache, TInputCache> input, Func<StageBase<TInput, Stages.GeneratedHelper.CacheId<string>>, StageBase<TResult, TItemCache>> createPipline)
             where TInputCache : class
@@ -94,6 +113,17 @@ namespace Stasistium
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
             return new SelectStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache>(input.DoIt, createPipline, input.Context);
+        }
+
+        public static SelectManyStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache> SelectMany<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache>(this MultiStageBase<TInput, TInputItemCache, TInputCache> input, Func<StageBase<TInput, Stages.GeneratedHelper.CacheId<string>>, MultiStageBase<TResult, TItemCache, TCache>> createPipline)
+            where TCache : class
+            where TInputCache : class
+            where TInputItemCache : class
+            where TItemCache : class
+        {
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            return new SelectManyStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache>(input.DoIt, createPipline, input.Context);
         }
 
         public static TextToStreamStage<T> TextToStream<T>(this StageBase<string, T> input)
