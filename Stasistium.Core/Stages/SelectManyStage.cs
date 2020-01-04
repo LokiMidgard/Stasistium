@@ -92,7 +92,7 @@ where TInputCache : class
                                 var currentPerform = await curentValue.Perform;
                                 return currentPerform;
                             });
-                            if (cache.OutputItemIdToHash.TryGetValue(resultIds[i], out string lastItemHash))
+                            if (!cache.OutputItemIdToHash.TryGetValue(resultIds[i], out string lastItemHash))
                                 throw this.Context.Exception("Should not happen");
 
                             list.Add((result: StageResult.Create(subTask, false, resultIds[i]), lastItemHash));

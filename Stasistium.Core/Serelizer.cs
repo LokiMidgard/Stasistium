@@ -141,6 +141,21 @@ namespace Stasistium.Serelizer
                             valueObject.Add("value", JValue.CreateString(s));
                             break;
 
+                        case DateTime dateTime:
+                            valueObject.Add("Kind", scalarKind);
+                            valueObject.Add("value", JValue.CreateString(dateTime.ToString(System.Globalization.CultureInfo.InvariantCulture)));
+                            break;
+
+                        case DateTimeOffset dateTime:
+                            valueObject.Add("Kind", scalarKind);
+                            valueObject.Add("value", JValue.CreateString(dateTime.ToString(System.Globalization.CultureInfo.InvariantCulture)));
+                            break;
+
+                        case TimeSpan dateTime:
+                            valueObject.Add("Kind", scalarKind);
+                            valueObject.Add("value", JValue.FromObject(dateTime.Ticks));
+                            break;
+
                         case int _:
                         case byte _:
                         case short _:
@@ -249,7 +264,22 @@ namespace Stasistium.Serelizer
                         value = deserelizedObjects[(int)(long)valueWrapper.Value];
                     }
                     else if (valueWrapper.Kind == ValueKind.scalar)
-                        value = valueWrapper.Value;
+                    {
+                        if (targetType == typeof(DateTime))
+                        {
+                            value = DateTime.Parse((string)valueWrapper.Value, System.Globalization.CultureInfo.InvariantCulture);
+                        }
+                        else if (targetType == typeof(DateTimeOffset))
+                        {
+                            value = DateTimeOffset.Parse((string)valueWrapper.Value, System.Globalization.CultureInfo.InvariantCulture);
+                        }
+                        else if (targetType == typeof(TimeSpan))
+                        {
+                            value = TimeSpan.FromTicks((long)valueWrapper.Value);
+                        }
+                        else
+                            value = valueWrapper.Value;
+                    }
                     else
                         throw new NotSupportedException();
 

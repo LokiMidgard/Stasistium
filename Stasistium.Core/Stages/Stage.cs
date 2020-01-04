@@ -15,6 +15,39 @@ namespace Stasistium
     public static partial class StageExtensions
     {
 
+
+        public static FileStage<T> File<T>(this StageBase<string, T> input)
+            where T : class
+        {
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            return new FileStage<T>(input.DoIt, input.Context);
+        }
+
+        public class JsonHelper<TInCache>
+            where TInCache : class
+        {
+            private readonly StageBase<Stream, TInCache> input;
+
+            internal JsonHelper(StageBase<Stream, TInCache> input)
+            {
+                this.input = input;
+            }
+
+            public JsonStage<TInCache, TOut> For<TOut>()
+            {
+                return new JsonStage<TInCache, TOut>(this.input.DoIt, this.input.Context);
+            }
+        }
+        public static JsonHelper<TInCache> Json<TInCache>(this StageBase<Stream, TInCache> input)
+            where TInCache : class
+        {
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            return new JsonHelper<TInCache>(input);
+        }
+
+
         public static FileSystemStage<T> FileSystem<T>(this StageBase<string, T> input)
             where T : class
         {
@@ -92,7 +125,7 @@ namespace Stasistium
                 throw new ArgumentNullException(nameof(input));
             if (predicate is null)
                 throw new ArgumentNullException(nameof(predicate));
-            return new TransformStage<TIn,  TInCache, TOut>(input.DoIt, predicate, input.Context);
+            return new TransformStage<TIn, TInCache, TOut>(input.DoIt, predicate, input.Context);
         }
 
         public static TransformStage<TIn, TInCache, TOut> Transform<TIn, TInCache, TOut>(this StageBase<TIn, TInCache> input, Func<IDocument<TIn>, IDocument<TOut>> predicate)
@@ -102,7 +135,7 @@ namespace Stasistium
                 throw new ArgumentNullException(nameof(input));
             if (predicate is null)
                 throw new ArgumentNullException(nameof(predicate));
-            return new TransformStage<TIn,  TInCache, TOut>(input.DoIt, x => Task.FromResult(predicate(x)), input.Context);
+            return new TransformStage<TIn, TInCache, TOut>(input.DoIt, x => Task.FromResult(predicate(x)), input.Context);
         }
 
         public static SelectStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache> Select<TInput, TInputItemCache, TInputCache, TResult, TItemCache>(this MultiStageBase<TInput, TInputItemCache, TInputCache> input, Func<StageBase<TInput, Stages.GeneratedHelper.CacheId<string>>, StageBase<TResult, TItemCache>> createPipline)

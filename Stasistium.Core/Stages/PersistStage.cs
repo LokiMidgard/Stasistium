@@ -59,18 +59,26 @@ namespace Stasistium.Stages
 
                 // find all files that no longer exist and delete those
                 var allFiles = new HashSet<string>(result.Ids.Select(x => Path.Combine(this.output.FullName, x)));
-                var directoryQueue = new Stack<DirectoryInfo>();
-                directoryQueue.Push(this.output);
-                while (directoryQueue.TryPop(out var currentDirectory))
+                var directoryQueue = new Queue<DirectoryInfo>();
+                var directoryStack = new Stack<DirectoryInfo>();
+                directoryQueue.Enqueue(this.output);
+
+                while (directoryQueue.TryDequeue(out var current))
+                {
+                    if (!current.Exists)
+                        continue;
+                    
+                    directoryStack.Push(current);
+
+                    var subDirectorys = current.GetDirectories();
+                    foreach (var subDirectory in subDirectorys)
+                        directoryStack.Push(subDirectory);
+                }
+
+                while (directoryStack.TryPop(out var currentDirectory))
                 {
                     if (!currentDirectory.Exists)
                         continue;
-
-                    var subDirectorys = currentDirectory.GetDirectories();
-                    if (subDirectorys.Length > 0)
-                        directoryQueue.Push(currentDirectory); // we wan't to delete the current Directory when empty. For that we need to visit it again after we visited all subdirectorys
-                    foreach (var subDirectory in subDirectorys)
-                        directoryQueue.Push(subDirectory);
 
                     foreach (var subFile in currentDirectory.GetFiles())
                         if (!allFiles.Contains(subFile.FullName))

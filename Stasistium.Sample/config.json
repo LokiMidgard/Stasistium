@@ -1,0 +1,6 @@
+{
+  "ContentRepo": "https://github.com/nota-game/nota.git",
+  "SchemaRepo": "https://github.com/nota-game/nota-schema.git",
+  "Layouts": "layout",
+  "Host": "https://nota-game2.azurewebsites.net"
+}

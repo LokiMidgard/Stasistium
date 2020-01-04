@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -64,6 +65,8 @@ namespace Stasistium.Documents
                 ulong l => l.ToString(c),
                 byte b => b.ToString(c),
                 bool b => b.ToString(c),
+                DateTime date=> date.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                DateTimeOffset date=> date.ToString(System.Globalization.CultureInfo.InvariantCulture),
                 null => "",
                 System.Runtime.CompilerServices.ITuple tuple => TupleToString(tuple),
                 System.Collections.IEnumerable enumerable => EnumberableToString(enumerable),
@@ -102,7 +105,22 @@ namespace Stasistium.Documents
         {
             var result = this.objectToStingRepresentation?.Invoke(obj);
             if (result is null)
-                throw new InvalidCastException($"For type {obj.GetType().FullName} exists no convertion to string. Use the {nameof(this.objectToStingRepresentation)} paramter of {nameof(GeneratorContext)}.");
+            {
+                var type = obj.GetType();
+                if (type.IsEnum)
+                    return obj.ToString();
+
+                var str = new StringBuilder();
+                foreach (var property in type.GetProperties().OrderBy(x => x.Name))
+                {
+                    str.Append("<");
+                    str.Append(property.Name);
+                    str.Append("><");
+                    str.Append(this.GetHashForObject(property.GetValue(obj)));
+                    str.Append(">");
+                }
+                return str.ToString();
+            }
             return result;
         }
 

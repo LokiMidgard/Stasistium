@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Stasistium.Stages
 {
-    public class GitStage<TPreviousCache> : GeneratedHelper.Multiple.Simple.OutputMultiSimpleInputSingle1List0StageBase<string, TPreviousCache, GitRef>
+    public class GitStage<TPreviousCache> : GeneratedHelper.Multiple.Simple.OutputMultiSimpleInputSingle1List0StageBase<string, TPreviousCache, GitRefStage>
         where TPreviousCache : class
     {
         private Repository? repo;
@@ -19,7 +19,7 @@ namespace Stasistium.Stages
         {
         }
 
-        protected override async Task<ImmutableList<IDocument<GitRef>>> Work(IDocument<string> source, OptionToken options)
+        protected override async Task<ImmutableList<IDocument<GitRefStage>>> Work(IDocument<string> source, OptionToken options)
         {
             if (source is null)
                 throw new ArgumentNullException(nameof(source));
@@ -51,11 +51,9 @@ namespace Stasistium.Stages
 
 
             // for branches we ignore the local ones. we just cloned the repo and the local one is the same as the remote.
-            var refs = this.repo.Tags.Select(x => new GitRef(x, this.repo)).Concat(this.repo.Branches.Where(x => x.IsRemote).Select(x => new GitRef(x, this.repo)))
-                .Select(x => this.Context.Create(x, x.Hash, x.FrindlyName)).OrderBy(x => x.Id).ToArray();
+            var refs = this.repo.Tags.Select(x => new GitRefStage(x, this.repo)).Concat(this.repo.Branches.Where(x => x.IsRemote).Select(x => new GitRefStage(x, this.repo)))
+                .Select(x => this.Context.Create(x, x.Hash, x.FrindlyName).With(source.Metadata.Add(new Metadata(x.GetCommits().Select(y=>new Commit(y)).ToImmutableList())))).OrderBy(x => x.Id).ToArray();
             return refs.ToImmutableList();
-
-
         }
 
         protected override Task<bool?> ForceUpdate((string id, string hash)[]? ids, OptionToken options)
@@ -63,6 +61,16 @@ namespace Stasistium.Stages
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
             return Task.FromResult<bool?>(options.Refresh);
+        }
+
+        public class Metadata
+        {
+            public Metadata(ImmutableList<Commit> commits)
+            {
+                this.Commits = commits ?? throw new ArgumentNullException(nameof(commits));
+            }
+
+            public ImmutableList<Commit> Commits { get; }
         }
     }
 

@@ -43,55 +43,57 @@ namespace Stasistium.Stages
 
             return Task.FromResult(list.Select(x => new FileDocument(x, root, null, this.Context) as IDocument<Stream>).ToImmutableList());
         }
-        private class FileDocument : DocumentBase, IDocument<Stream>
+    }
+
+    internal class FileDocument : DocumentBase, IDocument<Stream>
+    {
+        public FileDocument(FileInfo fileInfo, DirectoryInfo root, MetadataContainer? metadata, GeneratorContext context) : base(Path.GetRelativePath(root.FullName, fileInfo.FullName), metadata, GetHash(fileInfo, context), context)
         {
-            public FileDocument(FileInfo fileInfo, DirectoryInfo root, MetadataContainer? metadata, GeneratorContext context) : base(Path.GetRelativePath(root.FullName, fileInfo.FullName), metadata, GetHash(fileInfo, context), context)
-            {
-                this.FileInfo = fileInfo;
-                this.Root = root;
-            }
+            this.FileInfo = fileInfo;
+            this.Root = root;
+        }
 
-            private static string GetHash(FileInfo fileInfo, GeneratorContext context)
-            {
-                using var stream = fileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
-                return context.GetHashForStream(stream);
-            }
+        private static string GetHash(FileInfo fileInfo, GeneratorContext context)
+        {
+            using var stream = fileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
+            return context.GetHashForStream(stream);
+        }
 
-            public Stream Value => this.FileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
+        public Stream Value => this.FileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
 
-            public FileInfo FileInfo { get; }
-            public DirectoryInfo Root { get; }
+        public FileInfo FileInfo { get; }
+        public DirectoryInfo Root { get; }
 
-            public IDocument<TNew> With<TNew>(TNew newItem, string newHash)
-            {
-                return new Document<TNew>(newItem, newHash, this.Id, this.Metadata, this.Context);
-            }
+        public IDocument<TNew> With<TNew>(TNew newItem, string newHash)
+        {
+            return new Document<TNew>(newItem, newHash, this.Id, this.Metadata, this.Context);
+        }
 
-            public IDocument<TNew> With<TNew>(Func<TNew> newItem, string newHash)
-            {
-                return new DocumentLazy<TNew>(newItem, newHash, this.Id, this.Metadata, this.Context);
-            }
+        public IDocument<TNew> With<TNew>(Func<TNew> newItem, string newHash)
+        {
+            return new DocumentLazy<TNew>(newItem, newHash, this.Id, this.Metadata, this.Context);
+        }
 
-            public IDocument<Stream> With(MetadataContainer metadata)
-            {
-                return new DocumentLazy<Stream>(() => this.Value, this.ContentHash, this.Id, metadata, this.Context);
-            }
+        public IDocument<Stream> With(MetadataContainer metadata)
+        {
+            return new DocumentLazy<Stream>(() => this.Value, this.ContentHash, this.Id, metadata, this.Context);
+        }
 
-            public IDocument<Stream> WithId(string id)
-            {
-                return new DocumentLazy<Stream>(() => this.Value, this.ContentHash, id, this.Metadata, this.Context);
-            }
+        public IDocument<Stream> WithId(string id)
+        {
+            return new DocumentLazy<Stream>(() => this.Value, this.ContentHash, id, this.Metadata, this.Context);
+        }
 
-            IDocument IDocument.With(MetadataContainer metadata)
-            {
-                return this.With(metadata);
-            }
+        IDocument IDocument.With(MetadataContainer metadata)
+        {
+            return this.With(metadata);
+        }
 
-            IDocument IDocument.WithId(string id)
-            {
-                return this.WithId(id);
-            }
+        IDocument IDocument.WithId(string id)
+        {
+            return this.WithId(id);
         }
     }
+
 
 }

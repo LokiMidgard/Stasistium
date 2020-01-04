@@ -14,7 +14,7 @@ namespace Stasistium
             return new GitStage<T>(input.DoIt, input.Context);
         }
 
-        public static GitRefToFilesStage<T> GitRefToFiles<T>(this StageBase<GitRef, T> input)
+        public static GitRefToFilesStage<T> GitRefToFiles<T>(this StageBase<GitRefStage, T> input)
             where T : class
         {
             if (input is null)
