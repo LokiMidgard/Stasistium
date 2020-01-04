@@ -242,7 +242,8 @@ namespace Stasistium.Serelizer
             }
 
             // Fill Objects
-            for (int i = 0; i < json.Count; i++)
+            for (int i = json.Count - 1; i >= 0; i--)
+            //for (int i = 0; i < json.Count; i++)
             {
                 var entry = json[i];
 

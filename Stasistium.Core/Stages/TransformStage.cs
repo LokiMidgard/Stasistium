@@ -47,7 +47,7 @@ namespace Stasistium.Stages
                     }
                     else
                     {
-                        if (cache == null || !cache.InputToOutputId.TryGetValue(subInput.Id, out var oldOutputId) || !cache.Transformed.TryGetValue(subInput.Id, out var oldOutputHash))
+                        if (cache == null || !cache.InputToOutputId.TryGetValue(subInput.Id, out var oldOutputId) || !cache.Transformed.TryGetValue(oldOutputId, out var oldOutputHash))
                             throw this.Context.Exception("No changes, so old value should be there.");
 
                         return (result: StageResult.Create(LazyTask.Create(async () =>
