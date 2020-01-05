@@ -12,17 +12,20 @@ namespace Stasistium.Documents
         private readonly HashAlgorithm algorithm = SHA256.Create();
         private readonly Func<object, string?>? objectToStingRepresentation;
 
+        public Logger Logger { get; }
+
         public DirectoryInfo CacheFolder { get; }
         public DirectoryInfo TempFolder { get; }
 
         public MetadataContainer EmptyMetadata { get; }
 
-        public GeneratorContext(DirectoryInfo? cacheFolder = null, DirectoryInfo? tempFolder = null, Func<object, string?>? objectToStingRepresentation = null)
+        public GeneratorContext(DirectoryInfo? cacheFolder = null, DirectoryInfo? tempFolder = null, Func<object, string?>? objectToStingRepresentation = null, TextWriter? logger = null)
         {
             this.CacheFolder = cacheFolder ?? new DirectoryInfo("Cache");
             this.TempFolder = tempFolder ?? new DirectoryInfo("Temp");
             this.EmptyMetadata = MetadataContainer.EmptyFromContext(this);
             this.objectToStingRepresentation = objectToStingRepresentation;
+            this.Logger = new Logger(logger ?? Console.Out);
         }
 
         public string GetHashForString(string toHash)
@@ -65,8 +68,8 @@ namespace Stasistium.Documents
                 ulong l => l.ToString(c),
                 byte b => b.ToString(c),
                 bool b => b.ToString(c),
-                DateTime date=> date.ToString(System.Globalization.CultureInfo.InvariantCulture),
-                DateTimeOffset date=> date.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                DateTime date => date.ToString(System.Globalization.CultureInfo.InvariantCulture),
+                DateTimeOffset date => date.ToString(System.Globalization.CultureInfo.InvariantCulture),
                 null => "",
                 System.Runtime.CompilerServices.ITuple tuple => TupleToString(tuple),
                 System.Collections.IEnumerable enumerable => EnumberableToString(enumerable),
@@ -166,8 +169,53 @@ namespace Stasistium.Documents
 
         public Exception Exception(string message)
         {
+
             throw new NotImplementedException(message);
         }
     }
 
+    public class Logger
+    {
+        private readonly System.CodeDom.Compiler.IndentedTextWriter logger;
+
+        internal Logger(TextWriter writer)
+        {
+            this.logger = new System.CodeDom.Compiler.IndentedTextWriter(writer);
+        }
+
+        public void Info(string text)
+        {
+            this.logger.WriteLine(text);
+        }
+
+        public IDisposable Indent()
+        {
+            this.logger.Indent++;
+            return new IndentWrapper(this);
+        }
+
+        private sealed class IndentWrapper : IDisposable
+        {
+            private readonly Logger logger;
+
+            #region IDisposable Support
+            private bool disposedValue = false; // To detect redundant calls
+
+            public IndentWrapper(Logger logger)
+            {
+                this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            }
+
+            public void Dispose()
+            {
+                if (!this.disposedValue)
+                {
+                    this.logger.logger.Indent--;
+                    this.disposedValue = true;
+                }
+            }
+            #endregion
+
+        }
+    }
 }
