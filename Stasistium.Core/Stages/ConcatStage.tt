@@ -10,6 +10,10 @@ using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Stasistium.Stages;
 using System;
+using Stasistium.Core;
+using System.Diagnostics.CodeAnalysis;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Stasistium.Stages
 {
@@ -59,47 +63,233 @@ for (int i = 1; i <= numberOfElements; i++)
 for (int i = 1; i <= numberOfElements; i++)
 {
     string classGenerics = string.Join(", ", Enumerable.Range(1,i).Select(x=> "TItemCache"+x+", TCache"+x) );
-    string baseGenerics = string.Join(", ", Enumerable.Range(1,i).Select(x=> "T, TItemCache"+x+", TCache"+x) );
+    string baseGenerics = string.Join(", ", Enumerable.Range(1,i).Select(x=> "TCache"+x) );
     string whereStatements = string.Join("\n        ", Enumerable.Range(1,i).Select(x=> "where TItemCache"+x+" : class\n        where TCache"+x+" : class") );
 
     string constructorArguments = string.Join(", ", Enumerable.Range(1,i).Select(x=> "StagePerformHandler<T, TItemCache"+x+", TCache"+x+"> input"+x) );
-    string baseArguments = string.Join(", ", Enumerable.Range(1,i).Select(x=> "input"+x) );
     
     string overideArguments =string.Join(", ", Enumerable.Range(1,i).Select(x=> "ImmutableList<IDocument<T>> input"+x) );
     string toListArguments =string.Join(", ", Enumerable.Range(1,i).Select(x=> "input"+x) );
 
 #>
 
-    public class ConcatStageMany<T, <#=classGenerics#>> : GeneratedHelper.Multiple.Simple.OutputMultiSimpleInputSingle0List<#=i#>StageBase<<#=baseGenerics#>, T>
+    public class ConcatManyStage<T, <#=classGenerics#>> : MultiStageBase<T, string, ConcatStageManyCache<<#=baseGenerics#>>>
         <#=whereStatements#>
     {
-        public ConcatStageMany(<#=constructorArguments#>, GeneratorContext context) : base(<#=baseArguments #>, context)
-        {
-        }
 
-        protected override Task<ImmutableList<IDocument<T>>> Work(<#=overideArguments#>, OptionToken options)
-        {
-            if (input1 is null)
-                throw new ArgumentNullException(nameof(input1));
-
-            return Task.FromResult(input1
 <#
-for (int j = 2; j <= i; j++)
+for (int j = 1; j <= i; j++)
 {
 #>
-                .AddRange(input<#= j #>)
+        private readonly StagePerformHandler<T, TItemCache<#= j #>, TCache<#= j #>> input<#= j #>;
 <#
 }
 #>
-            );
+        public ConcatManyStage(<#=constructorArguments#>, GeneratorContext context) : base(context)
+        {
+<#
+for (int j = 1; j <= i; j++)
+{
+#>
+            this.input<#= j #> = input<#= j #>;
+<#
+}
+#>
+        }
+
+        protected override async Task<StageResultList<T, string, ConcatStageManyCache<<#=baseGenerics#>>>> DoInternal([AllowNull] ConcatStageManyCache<<#=baseGenerics#>>? cache, OptionToken options)
+        {
+<#
+for (int j = 1; j <= i; j++)
+{
+#>
+            var resultTask<#= j #> = this.input<#= j #>(cache?.PreviouseCache<#= j #>, options);
+<#
+}
+#>
+await Task.WhenAll(
+<#
+for (int j = 1; j <= i; j++)
+{
+#>
+             <#if(j>1){#>,<#}#>resultTask<#= j #>
+<#
+}
+#>
+).ConfigureAwait(false);
+<#
+for (int j = 1; j <= i; j++)
+{
+#>
+            var result<#= j #> = await resultTask<#= j #>.ConfigureAwait(false);
+<#
+}
+#>
+            var task = LazyTask.Create(async () =>
+            {
+                var list = ImmutableList<StageResult<T, string>>.Empty.ToBuilder();
+                var newCache = new ConcatStageManyCache<<#=baseGenerics#>>();
+
+<#
+for (int j = 1; j <= i; j++)
+{
+#>
+
+                if (result<#= j #>.HasChanges)
+                {
+                    var performed = await result<#= j #>.Perform;
+                    newCache.Ids<#= j #> = new string[performed.result.Count];
+                    newCache.PreviouseCache<#= j #> = performed.cache;
+
+                    for (int i = 0; i < performed.result.Count; i++)
+                    {
+                        var child = performed.result[i];
+
+                        if (child.HasChanges)
+                        {
+                            var childPerformed = await child.Perform;
+
+                            string? oldHash = null;
+                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out oldHash))
+                                throw this.Context.Exception("Should Not Happen");
+                            var childHashChanges = oldHash != childPerformed.result.Hash;
+
+                            list.Add(StageResult.Create(childPerformed.result, childPerformed.result.Hash, childHashChanges, childPerformed.result.Id));
+                            newCache.IdToHash.Add(child.Id, childPerformed.result.Id);
+
+                        }
+                        else
+                        {
+
+                            var childTask = LazyTask.Create(async () =>
+                            {
+                                var childPerform = await child.Perform;
+                                return (childPerform.result, childPerform.result.Hash);
+                            });
+                            list.Add(StageResult.Create(childTask, false, child.Id));
+                            if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
+                                throw this.Context.Exception("Should Not Happen");
+                            newCache.IdToHash.Add(child.Id, oldHash);
+
+                        }
+                        newCache.Ids<#= j #>[i] = child.Id;
+                    }
+
+                }
+                else
+                {
+                    if (cache is null)
+                        throw this.Context.Exception("Should Not Happen");
+                    for (int i = 0; i < cache.Ids<#= j #>.Length; i++)
+                    {
+
+                        var childTask = LazyTask.Create(async () =>
+                        {
+                            var performed = await result<#= j #>.Perform;
+                            var chiledIndex = performed.result[i];
+                            var childPerform = await chiledIndex.Perform;
+                            // We are in the no changes part. So ther must be no changes.
+                            System.Diagnostics.Debug.Assert(!chiledIndex.HasChanges);
+
+                            return (childPerform.result, childPerform.result.Hash);
+                        });
+                        list.Add(StageResult.Create(childTask, false, cache.Ids<#= j #>[i]));
+                    }
+                    newCache.PreviouseCache<#= j #> = cache.PreviouseCache<#= j #>;
+                    newCache.Ids<#= j #> = cache.Ids<#= j #>;
+                    foreach (var id in newCache.Ids<#= j #>)
+                    {
+                        if (!cache.IdToHash.TryGetValue(id, out var oldHash))
+                            throw this.Context.Exception("Should Not Happen");
+                        newCache.IdToHash.Add(id, oldHash);
+                    }
+                }
+
+<#
+}
+#>
+
+                return (result:list.ToImmutable(),cache: newCache);
+            });
+
+            var hasChanges = false
+<#
+for (int j = 1; j <= i; j++)
+{
+#>
+                ||result<#= j #>.HasChanges
+<#
+}
+#>                ;
+            var ids = ImmutableList<string>.Empty.ToBuilder();
+
+            if (hasChanges || cache is null)
+            {
+                var performed = await task;
+                hasChanges = performed.result.Any(x => x.HasChanges);
+<#
+for (int j = 1; j <= i; j++)
+{
+#>                if (!hasChanges && cache != null)
+                    hasChanges = !performed.cache.Ids<#= j #>.SequenceEqual(cache.Ids<#= j #>);
+<#
+}
+#>
+<#
+for (int j = 1; j <= i; j++)
+{
+#>
+                ids.AddRange(performed.cache.Ids<#= j #>);
+<#
+}
+#>
+            }
+            else
+            {
+<#
+for (int j = 1; j <= i; j++)
+{
+#>
+                ids.AddRange(cache.Ids<#= j #>);
+<#
+}
+#>
+            }
+
+            return StageResultList.Create(task, hasChanges, ids.ToImmutable());
         }
     }
+#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+#pragma warning disable CA1819 // Properties should not return arrays
+#pragma warning disable CA2227 // Collection properties should be read only
 
+    public class ConcatStageManyCache<<#=baseGenerics#>>
+    {
+<#
+for (int j = 1; j <= i; j++)
+{
+#>
+        public string[] Ids<#= j #> { get; set; }
+        public TCache<#= j #> PreviouseCache<#= j #> { get; set; }
 
+<#
+}
+#>
+        public Dictionary<string, string> IdToHash { get; set; }
+
+        public ConcatStageManyCache()
+        {
+            this.IdToHash = new Dictionary<string, string>();
+        }
+    }
+#pragma warning restore CA2227 // Collection properties should be read only
+#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+#pragma warning restore CA1819 // Properties should not return arrays
 <#
              }
 
 #>
+
 
 }
 
@@ -144,11 +334,11 @@ for (int i = 1; i <= numberOfElements; i++)
     string notNull = string.Join("\n            ", Enumerable.Range(1,i).Select(x=> "if(input"+x+" is null)\n                 throw new ArgumentNullException(nameof(input"+x+"));") );
 
 #>
-        public static ConcatStageMany<T, <#=classGenerics#>> Concat<T, <#=generics #>>(this <#=argumentList#>)
+        public static ConcatManyStage<T, <#=classGenerics#>> Concat<T, <#=generics #>>(this <#=argumentList#>)
             <#=whereStatements#>
         {
             <#=notNull#>
-            return new ConcatStageMany<T, <#=classGenerics#>>(<#=argumentList2 #>, input1.Context);
+            return new ConcatManyStage<T, <#=classGenerics#>>(<#=argumentList2 #>, input1.Context);
         }
 <#
              }
