@@ -29,14 +29,19 @@ namespace Stasistium.Stages
             return Task.FromResult(input.With(text, this.Context.GetHashForString(text)));
         }
 
-        private void Render(StringBuilder builder, IEnumerable<Blocks.MarkdownBlock> blocks)
+        protected void Render(StringBuilder builder, IEnumerable<Blocks.MarkdownBlock> blocks)
         {
+            if (blocks is null)
+                throw new ArgumentNullException(nameof(blocks));
             foreach (var block in blocks)
                 this.Render(builder, block);
         }
-        private void Render(StringBuilder builder, Blocks.MarkdownBlock block)
+        protected virtual void Render(StringBuilder builder, Blocks.MarkdownBlock block)
         {
-
+            if (builder is null)
+                throw new ArgumentNullException(nameof(builder));
+            if (block is null)
+                throw new ArgumentNullException(nameof(block));
             switch (block)
             {
                 case Blocks.ParagraphBlock paragraph:
@@ -113,13 +118,19 @@ namespace Stasistium.Stages
 
         }
 
-        private void Render(StringBuilder builder, IEnumerable<Inlines.MarkdownInline> inlines)
+        protected void Render(StringBuilder builder, IEnumerable<Inlines.MarkdownInline> inlines)
         {
+            if (inlines is null)
+                throw new ArgumentNullException(nameof(inlines));
             foreach (var inline in inlines)
                 this.Render(builder, inline);
         }
-        private void Render(StringBuilder builder, Inlines.MarkdownInline inline)
+        protected virtual void Render(StringBuilder builder, Inlines.MarkdownInline inline)
         {
+            if (builder is null)
+                throw new ArgumentNullException(nameof(builder));
+            if (inline is null)
+                throw new ArgumentNullException(nameof(inline));
             switch (inline)
             {
                 case Inlines.BoldTextInline bold:
