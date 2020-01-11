@@ -16,6 +16,10 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '3.1.100'
+    - name: Add Nuget credentials
+      shell: bash
+      run: |
+        echo '<?xml version="1.0" encoding="utf-8"?><configuration><packageSources><add key="github" value="https://nuget.pkg.github.com/LokiMidgard/index.json" /></packageSources>  <packageSourceCredentials>    <github>      <add key="Username" value="LokiMidgard" />      <add key="ClearTextPassword" value="${{ secrets.GITHUB_TOKEN }}" />    </github>  </packageSourceCredentials></configuration>' > nuget.config
     - name: Build with dotnet
       run: dotnet build --configuration Release
     - name: Pack
