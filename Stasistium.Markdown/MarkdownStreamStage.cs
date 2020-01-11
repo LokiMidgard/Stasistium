@@ -16,15 +16,18 @@ namespace Stasistium.Stages
     public class MarkdownStreamStage<TPreviousCache> : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple1List0StageBase<Stream, TPreviousCache, MarkdownDocument>
         where TPreviousCache : class
     {
-        public MarkdownStreamStage(StagePerformHandler<Stream, TPreviousCache> input, GeneratorContext context) : base(input, context)
+        private readonly Func<MarkdownDocument>? generateDocuement;
+
+        public MarkdownStreamStage(StagePerformHandler<Stream, TPreviousCache> input, Func<MarkdownDocument>? generateDocuement, GeneratorContext context) : base(input, context)
         {
+            this.generateDocuement = generateDocuement;
         }
 
         protected override async Task<IDocument<MarkdownDocument>> Work(IDocument<Stream> input, OptionToken options)
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
-            var document = new MarkdownDocument();
+            var document = this.generateDocuement?.Invoke() ?? new MarkdownDocument();
             string content;
             using (var stream = input.Value)
             using (var reader = new StreamReader(stream))

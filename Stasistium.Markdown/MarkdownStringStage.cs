@@ -11,15 +11,18 @@ namespace Stasistium.Stages
     public class MarkdownStringStage<TPreviousCache> : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple1List0StageBase<string, TPreviousCache, MarkdownDocument>
         where TPreviousCache : class
     {
-        public MarkdownStringStage(StagePerformHandler<string, TPreviousCache> input, GeneratorContext context) : base(input, context)
+        private readonly Func<MarkdownDocument>? generateDocuement;
+
+        public MarkdownStringStage(StagePerformHandler<string, TPreviousCache> input, Func<MarkdownDocument>? generateDocuement, GeneratorContext context) : base(input, context)
         {
+            this.generateDocuement = generateDocuement;
         }
 
         protected override Task<IDocument<MarkdownDocument>> Work(IDocument<string> input, OptionToken options)
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
-            var document = new MarkdownDocument();
+            var document = this.generateDocuement?.Invoke() ?? new MarkdownDocument();
             document.Parse(input.Value);
 
             var hash = this.Context.GetHashForString(document.ToString());
