@@ -124,7 +124,6 @@ namespace Stasistium.Sample
             public string Title { get; set; }
             public int Chapter { get; set; }
         }
-#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
     }
 
     public class Config
@@ -140,6 +139,7 @@ namespace Stasistium.Sample
     {
         public string Host { get; set; }
     }
+#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
     public class PageLayoutMetadata
     {
