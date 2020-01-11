@@ -13,12 +13,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stasistium.YAML", "Stasisti
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stasistium.Sample", "Stasistium.Sample\Stasistium.Sample.csproj", "{3A607238-CE92-400E-A4C4-63C2F919C3D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stasistium.Razor", "Stasistium.Razor\Stasistium.Razor.csproj", "{B8451FCC-CE8C-4693-8AE0-B269BDD9AA5C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stasistium.Razor", "Stasistium.Razor\Stasistium.Razor.csproj", "{B8451FCC-CE8C-4693-8AE0-B269BDD9AA5C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2663A809-01EC-48A9-97BF-617BACE0648C}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		Common.targets = Common.targets
+		nuget.config = nuget.config
 	EndProjectSection
 EndProject
 Global
