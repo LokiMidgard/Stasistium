@@ -77,7 +77,7 @@ namespace Stasistium.Stages
                 var (list, c) = await task;
                 newCache = c;
 
-
+                hasChanges = false;
                 if (!hasChanges && list.Count != cache?.OutputIdOrder.Length)
                     hasChanges = true;
 
