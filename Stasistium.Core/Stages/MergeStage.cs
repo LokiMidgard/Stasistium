@@ -103,6 +103,11 @@ namespace Stasistium.Stages
             {
                 var perform = await task;
                 documentIds = perform.newCache.DocumentIds.ToImmutableList();
+                if (!inputSingle.HasChanges && cache != null)
+                {
+                    hasChanges = perform.Item1.Any(x => x.HasChanges)
+                        || cache.DocumentIds.SequenceEqual(documentIds);
+                }
             }
             else
             {
