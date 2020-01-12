@@ -58,7 +58,7 @@ namespace Stasistium.Stages
                 var (files, newCache) = await result.Perform;
 
                 // find all files that no longer exist and delete those
-                var allFiles = new HashSet<string>(result.Ids.Select(x => Path.Combine(this.output.FullName, x).Replace('/','\\')));
+                var allFiles = new HashSet<string>(result.Ids.Select(x => Path.Combine(this.output.FullName, x).Replace('\\','/')));
                 var directoryQueue = new Queue<DirectoryInfo>();
                 var directoryStack = new Stack<DirectoryInfo>();
                 directoryQueue.Enqueue(this.output);
@@ -81,7 +81,7 @@ namespace Stasistium.Stages
                         continue;
 
                     foreach (var subFile in currentDirectory.GetFiles())
-                        if (!allFiles.Contains(subFile.FullName))
+                        if (!allFiles.Contains(subFile.FullName.Replace('\\', '/')))
                             subFile.Delete();
 
                     if (currentDirectory.GetFiles().Length == 0 && currentDirectory.GetDirectories().Length == 0)
