@@ -119,7 +119,7 @@ await Task.WhenAll(
                             var childPerformed = await child.Perform;
 
                             
-                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
                                 oldHash = null;
                             var childHashChanges = oldHash != childPerformed.result.Hash;
 
@@ -265,7 +265,7 @@ await Task.WhenAll(
                             var childPerformed = await child.Perform;
 
                             
-                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
                                 oldHash = null;
                             var childHashChanges = oldHash != childPerformed.result.Hash;
 
@@ -336,7 +336,7 @@ await Task.WhenAll(
                             var childPerformed = await child.Perform;
 
                             
-                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
                                 oldHash = null;
                             var childHashChanges = oldHash != childPerformed.result.Hash;
 
@@ -497,7 +497,7 @@ await Task.WhenAll(
                             var childPerformed = await child.Perform;
 
                             
-                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
                                 oldHash = null;
                             var childHashChanges = oldHash != childPerformed.result.Hash;
 
@@ -568,7 +568,7 @@ await Task.WhenAll(
                             var childPerformed = await child.Perform;
 
                             
-                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
                                 oldHash = null;
                             var childHashChanges = oldHash != childPerformed.result.Hash;
 
@@ -639,7 +639,7 @@ await Task.WhenAll(
                             var childPerformed = await child.Perform;
 
                             
-                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
                                 oldHash = null;
                             var childHashChanges = oldHash != childPerformed.result.Hash;
 
@@ -815,7 +815,7 @@ await Task.WhenAll(
                             var childPerformed = await child.Perform;
 
                             
-                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
                                 oldHash = null;
                             var childHashChanges = oldHash != childPerformed.result.Hash;
 
@@ -886,7 +886,7 @@ await Task.WhenAll(
                             var childPerformed = await child.Perform;
 
                             
-                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
                                 oldHash = null;
                             var childHashChanges = oldHash != childPerformed.result.Hash;
 
@@ -957,7 +957,7 @@ await Task.WhenAll(
                             var childPerformed = await child.Perform;
 
                             
-                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
                                 oldHash = null;
                             var childHashChanges = oldHash != childPerformed.result.Hash;
 
@@ -1028,7 +1028,7 @@ await Task.WhenAll(
                             var childPerformed = await child.Perform;
 
                             
-                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
                                 oldHash = null;
                             var childHashChanges = oldHash != childPerformed.result.Hash;
 
