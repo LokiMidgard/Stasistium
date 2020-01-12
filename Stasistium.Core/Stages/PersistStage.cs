@@ -72,7 +72,7 @@ namespace Stasistium.Stages
 
                     var subDirectorys = current.GetDirectories();
                     foreach (var subDirectory in subDirectorys)
-                        directoryStack.Push(subDirectory);
+                        directoryQueue.Enqueue(subDirectory);
                 }
 
                 while (directoryStack.TryPop(out var currentDirectory))
