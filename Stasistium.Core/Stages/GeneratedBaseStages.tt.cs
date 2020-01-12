@@ -58,6 +58,9 @@ namespace Single.Simple {
 
             bool hasChanges = (await this.ForceUpdate(cache?.Id, cache?.Data, options).ConfigureAwait(false) )??false
 ;
+
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
@@ -360,6 +363,12 @@ namespace Single.Simple {
             bool hasChanges = (await this.ForceUpdate(cache?.Id, cache?.Data, options).ConfigureAwait(false) )??false
             || inputList0Result.HasChanges
 ;
+
+            if(inputList0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
@@ -713,6 +722,15 @@ await Task.WhenAll(
             || inputList0Result.HasChanges
             || inputList1Result.HasChanges
 ;
+
+            if(inputList0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+
+            if(inputList1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
@@ -1120,6 +1138,18 @@ await Task.WhenAll(
             || inputList1Result.HasChanges
             || inputList2Result.HasChanges
 ;
+
+            if(inputList0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+
+            if(inputList1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+
+            if(inputList2Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
@@ -1570,6 +1600,21 @@ await Task.WhenAll(
             || inputList2Result.HasChanges
             || inputList3Result.HasChanges
 ;
+
+            if(inputList0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+
+            if(inputList1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+
+            if(inputList2Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+
+            if(inputList3Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
+
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
@@ -1979,6 +2024,11 @@ namespace Single.Simple {
             bool hasChanges = (await this.ForceUpdate(cache?.Id, cache?.Data, options).ConfigureAwait(false) )??false
             || inputSingle0Result.HasChanges
 ;
+
+            if(inputSingle0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
@@ -2318,6 +2368,14 @@ namespace Single.Simple {
             || inputSingle0Result.HasChanges
             || inputList0Result.HasChanges
 ;
+
+            if(inputSingle0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+            if(inputList0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
@@ -2710,6 +2768,17 @@ await Task.WhenAll(
             || inputList0Result.HasChanges
             || inputList1Result.HasChanges
 ;
+
+            if(inputSingle0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+            if(inputList0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+
+            if(inputList1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
@@ -3148,6 +3217,20 @@ await Task.WhenAll(
             || inputList1Result.HasChanges
             || inputList2Result.HasChanges
 ;
+
+            if(inputSingle0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+            if(inputList0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+
+            if(inputList1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+
+            if(inputList2Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
@@ -3629,6 +3712,23 @@ await Task.WhenAll(
             || inputList2Result.HasChanges
             || inputList3Result.HasChanges
 ;
+
+            if(inputSingle0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+            if(inputList0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+
+            if(inputList1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+
+            if(inputList2Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+
+            if(inputList3Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
+
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
@@ -4077,6 +4177,13 @@ namespace Single.Simple {
             || inputSingle0Result.HasChanges
             || inputSingle1Result.HasChanges
 ;
+
+            if(inputSingle0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+            if(inputSingle1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
@@ -4455,6 +4562,16 @@ namespace Single.Simple {
             || inputSingle1Result.HasChanges
             || inputList0Result.HasChanges
 ;
+
+            if(inputSingle0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+            if(inputSingle1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+            if(inputList0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
@@ -4878,6 +4995,19 @@ await Task.WhenAll(
             || inputList0Result.HasChanges
             || inputList1Result.HasChanges
 ;
+
+            if(inputSingle0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+            if(inputSingle1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+            if(inputList0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+
+            if(inputList1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
@@ -5347,6 +5477,22 @@ await Task.WhenAll(
             || inputList1Result.HasChanges
             || inputList2Result.HasChanges
 ;
+
+            if(inputSingle0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+            if(inputSingle1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+            if(inputList0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+
+            if(inputList1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+
+            if(inputList2Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
@@ -5859,6 +6005,25 @@ await Task.WhenAll(
             || inputList2Result.HasChanges
             || inputList3Result.HasChanges
 ;
+
+            if(inputSingle0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+            if(inputSingle1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+            if(inputList0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+
+            if(inputList1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+
+            if(inputList2Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+
+            if(inputList3Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
+
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
@@ -6338,6 +6503,15 @@ namespace Single.Simple {
             || inputSingle1Result.HasChanges
             || inputSingle2Result.HasChanges
 ;
+
+            if(inputSingle0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+            if(inputSingle1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+            if(inputSingle2Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
@@ -6747,6 +6921,18 @@ namespace Single.Simple {
             || inputSingle2Result.HasChanges
             || inputList0Result.HasChanges
 ;
+
+            if(inputSingle0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+            if(inputSingle1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+            if(inputSingle2Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+            if(inputList0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
@@ -7201,6 +7387,21 @@ await Task.WhenAll(
             || inputList0Result.HasChanges
             || inputList1Result.HasChanges
 ;
+
+            if(inputSingle0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+            if(inputSingle1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+            if(inputSingle2Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+            if(inputList0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+
+            if(inputList1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
@@ -7701,6 +7902,24 @@ await Task.WhenAll(
             || inputList1Result.HasChanges
             || inputList2Result.HasChanges
 ;
+
+            if(inputSingle0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+            if(inputSingle1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+            if(inputSingle2Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+            if(inputList0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+
+            if(inputList1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+
+            if(inputList2Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
@@ -8244,6 +8463,27 @@ await Task.WhenAll(
             || inputList2Result.HasChanges
             || inputList3Result.HasChanges
 ;
+
+            if(inputSingle0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+            if(inputSingle1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+            if(inputSingle2Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+            if(inputList0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+
+            if(inputList1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+
+            if(inputList2Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+
+            if(inputList3Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
+
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
@@ -8754,6 +8994,17 @@ namespace Single.Simple {
             || inputSingle2Result.HasChanges
             || inputSingle3Result.HasChanges
 ;
+
+            if(inputSingle0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+            if(inputSingle1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+            if(inputSingle2Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+            if(inputSingle3Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle3Result.Id}");
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
@@ -9194,6 +9445,20 @@ namespace Single.Simple {
             || inputSingle3Result.HasChanges
             || inputList0Result.HasChanges
 ;
+
+            if(inputSingle0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+            if(inputSingle1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+            if(inputSingle2Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+            if(inputSingle3Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle3Result.Id}");
+            if(inputList0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
@@ -9679,6 +9944,23 @@ await Task.WhenAll(
             || inputList0Result.HasChanges
             || inputList1Result.HasChanges
 ;
+
+            if(inputSingle0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+            if(inputSingle1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+            if(inputSingle2Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+            if(inputSingle3Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle3Result.Id}");
+            if(inputList0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+
+            if(inputList1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
@@ -10210,6 +10492,26 @@ await Task.WhenAll(
             || inputList1Result.HasChanges
             || inputList2Result.HasChanges
 ;
+
+            if(inputSingle0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+            if(inputSingle1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+            if(inputSingle2Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+            if(inputSingle3Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle3Result.Id}");
+            if(inputList0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+
+            if(inputList1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+
+            if(inputList2Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
@@ -10784,6 +11086,29 @@ await Task.WhenAll(
             || inputList2Result.HasChanges
             || inputList3Result.HasChanges
 ;
+
+            if(inputSingle0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+            if(inputSingle1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+            if(inputSingle2Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+            if(inputSingle3Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle3Result.Id}");
+            if(inputList0Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+
+            if(inputList1Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+
+            if(inputList2Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+
+            if(inputList3Result.HasChanges)
+                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
+
+;
+
             System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh))
