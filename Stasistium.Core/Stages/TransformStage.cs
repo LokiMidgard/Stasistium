@@ -41,7 +41,7 @@ namespace Stasistium.Stages
                         var transformed = await this.transform(subResult.result).ConfigureAwait(false);
                         bool hasChanges = true;
                         if (cache != null && cache.Transformed.TryGetValue(transformed.Id, out var oldHash))
-                            hasChanges = oldHash == transformed.Hash;
+                            hasChanges = oldHash != transformed.Hash;
 
                         return (result: StageResult.Create(transformed, transformed.Hash, hasChanges, transformed.Id), inputId: subInput.Id, outputHash: transformed.Hash);
                     }
