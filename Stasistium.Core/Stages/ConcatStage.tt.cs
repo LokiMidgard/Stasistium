@@ -118,9 +118,9 @@ await Task.WhenAll(
                         {
                             var childPerformed = await child.Perform;
 
-                            string? oldHash = null;
-                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out oldHash))
-                                throw this.Context.Exception("Should Not Happen");
+                            
+                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                                oldHash = null;
                             var childHashChanges = oldHash != childPerformed.result.Hash;
 
                             list.Add(StageResult.Create(childPerformed.result, childPerformed.result.Hash, childHashChanges, childPerformed.result.Id));
@@ -264,9 +264,9 @@ await Task.WhenAll(
                         {
                             var childPerformed = await child.Perform;
 
-                            string? oldHash = null;
-                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out oldHash))
-                                throw this.Context.Exception("Should Not Happen");
+                            
+                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                                oldHash = null;
                             var childHashChanges = oldHash != childPerformed.result.Hash;
 
                             list.Add(StageResult.Create(childPerformed.result, childPerformed.result.Hash, childHashChanges, childPerformed.result.Id));
@@ -335,9 +335,9 @@ await Task.WhenAll(
                         {
                             var childPerformed = await child.Perform;
 
-                            string? oldHash = null;
-                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out oldHash))
-                                throw this.Context.Exception("Should Not Happen");
+                            
+                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                                oldHash = null;
                             var childHashChanges = oldHash != childPerformed.result.Hash;
 
                             list.Add(StageResult.Create(childPerformed.result, childPerformed.result.Hash, childHashChanges, childPerformed.result.Id));
@@ -496,9 +496,9 @@ await Task.WhenAll(
                         {
                             var childPerformed = await child.Perform;
 
-                            string? oldHash = null;
-                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out oldHash))
-                                throw this.Context.Exception("Should Not Happen");
+                            
+                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                                oldHash = null;
                             var childHashChanges = oldHash != childPerformed.result.Hash;
 
                             list.Add(StageResult.Create(childPerformed.result, childPerformed.result.Hash, childHashChanges, childPerformed.result.Id));
@@ -567,9 +567,9 @@ await Task.WhenAll(
                         {
                             var childPerformed = await child.Perform;
 
-                            string? oldHash = null;
-                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out oldHash))
-                                throw this.Context.Exception("Should Not Happen");
+                            
+                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                                oldHash = null;
                             var childHashChanges = oldHash != childPerformed.result.Hash;
 
                             list.Add(StageResult.Create(childPerformed.result, childPerformed.result.Hash, childHashChanges, childPerformed.result.Id));
@@ -638,9 +638,9 @@ await Task.WhenAll(
                         {
                             var childPerformed = await child.Perform;
 
-                            string? oldHash = null;
-                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out oldHash))
-                                throw this.Context.Exception("Should Not Happen");
+                            
+                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                                oldHash = null;
                             var childHashChanges = oldHash != childPerformed.result.Hash;
 
                             list.Add(StageResult.Create(childPerformed.result, childPerformed.result.Hash, childHashChanges, childPerformed.result.Id));
@@ -814,9 +814,9 @@ await Task.WhenAll(
                         {
                             var childPerformed = await child.Perform;
 
-                            string? oldHash = null;
-                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out oldHash))
-                                throw this.Context.Exception("Should Not Happen");
+                            
+                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                                oldHash = null;
                             var childHashChanges = oldHash != childPerformed.result.Hash;
 
                             list.Add(StageResult.Create(childPerformed.result, childPerformed.result.Hash, childHashChanges, childPerformed.result.Id));
@@ -885,9 +885,9 @@ await Task.WhenAll(
                         {
                             var childPerformed = await child.Perform;
 
-                            string? oldHash = null;
-                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out oldHash))
-                                throw this.Context.Exception("Should Not Happen");
+                            
+                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                                oldHash = null;
                             var childHashChanges = oldHash != childPerformed.result.Hash;
 
                             list.Add(StageResult.Create(childPerformed.result, childPerformed.result.Hash, childHashChanges, childPerformed.result.Id));
@@ -956,9 +956,9 @@ await Task.WhenAll(
                         {
                             var childPerformed = await child.Perform;
 
-                            string? oldHash = null;
-                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out oldHash))
-                                throw this.Context.Exception("Should Not Happen");
+                            
+                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                                oldHash = null;
                             var childHashChanges = oldHash != childPerformed.result.Hash;
 
                             list.Add(StageResult.Create(childPerformed.result, childPerformed.result.Hash, childHashChanges, childPerformed.result.Id));
@@ -1027,9 +1027,9 @@ await Task.WhenAll(
                         {
                             var childPerformed = await child.Perform;
 
-                            string? oldHash = null;
-                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out oldHash))
-                                throw this.Context.Exception("Should Not Happen");
+                            
+                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                                oldHash = null;
                             var childHashChanges = oldHash != childPerformed.result.Hash;
 
                             list.Add(StageResult.Create(childPerformed.result, childPerformed.result.Hash, childHashChanges, childPerformed.result.Id));
