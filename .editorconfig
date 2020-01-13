@@ -8,3 +8,6 @@ dotnet_diagnostic.CA1031.severity = suggestion
 
 # CA1716: Identifiers should not match keywords
 dotnet_diagnostic.CA1716.severity = silent
+
+# CA1814: Prefer jagged arrays over multidimensional
+dotnet_diagnostic.CA1814.severity = none
