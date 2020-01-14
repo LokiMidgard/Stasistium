@@ -82,7 +82,7 @@ namespace Single.Simple {
         <#for(int j = 0; j< list; j++){#>
         StagePerformHandler<TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>> inputList<#= j #>,
     <#}#>
-        GeneratorContext context, bool updateOnRefresh = false) : base(context)
+        IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
     <#for(int j = 0; j< single; j++){#>
             this.inputSingle<#= j #> = inputSingle<#= j #>;
@@ -296,7 +296,7 @@ namespace Multiple.Simple {
         <#for(int j = 0; j< list; j++){#>
         StagePerformHandler<TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>> inputList<#= j #>,
     <#}#>
-        GeneratorContext context, bool updateOnRefresh = false) : base(context)
+        IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
     <#for(int j = 0; j< single; j++){#>
             this.inputSingle<#= j #> = inputSingle<#= j #>;

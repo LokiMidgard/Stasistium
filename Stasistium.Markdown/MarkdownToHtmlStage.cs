@@ -12,7 +12,7 @@ namespace Stasistium.Stages
     public class MarkdownToHtmlStage<TInputCache> : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple1List0StageBase<MarkdownDocument, TInputCache, string>
         where TInputCache : class
     {
-        public MarkdownToHtmlStage(StagePerformHandler<MarkdownDocument, TInputCache> inputSingle0, GeneratorContext context) : base(inputSingle0, context)
+        public MarkdownToHtmlStage(StagePerformHandler<MarkdownDocument, TInputCache> inputSingle0, IGeneratorContext context, string? name) : base(inputSingle0, context,name )
         {
         }
 

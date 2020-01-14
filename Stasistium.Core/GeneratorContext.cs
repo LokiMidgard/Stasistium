@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Stasistium.Stages;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,12 +8,84 @@ using System.Text;
 
 namespace Stasistium.Documents
 {
-    public sealed class GeneratorContext : IDisposable
+
+
+
+    internal sealed class GeneratorContextWrapper : IGeneratorContext
+    {
+        public IGeneratorContext BaseContext { get; }
+        public string Name { get; }
+
+        public GeneratorContextWrapper(IGeneratorContext baseContext, string name)
+        {
+            this.BaseContext = baseContext ?? throw new ArgumentNullException(nameof(baseContext));
+            this.Name = name;
+        }
+
+        public DirectoryInfo CacheFolder => this.BaseContext.CacheFolder;
+
+        public MetadataContainer EmptyMetadata => this.BaseContext.EmptyMetadata;
+
+        public ILogger Logger => this.BaseContext.Logger.WithName(this.Name);
+
+        public DirectoryInfo TempFolder => this.BaseContext.TempFolder;
+
+        public DirectoryInfo ChachDir()
+        {
+            return this.BaseContext.ChachDir();
+        }
+
+        public IDocument<T> Create<T>(T value, string contentHash, string id, MetadataContainer? metadata = null)
+        {
+            return this.BaseContext.Create(value, contentHash, id, metadata);
+        }
+
+        public void Dispose()
+        {
+            this.BaseContext.Dispose();
+        }
+
+        public Exception Exception(string message)
+        {
+            return this.BaseContext.Exception(message);
+        }
+
+        public string GetHashForStream(Stream toHash)
+        {
+            return this.BaseContext.GetHashForStream(toHash);
+        }
+
+        public string GetHashForString(string toHash)
+        {
+            return this.BaseContext.GetHashForString(toHash);
+        }
+
+        public StaticStage<TResult> StageFromResult<TResult>(TResult result, Func<TResult, string> hashFunction)
+        {
+            return this.BaseContext.StageFromResult(result, hashFunction);
+        }
+
+        public DirectoryInfo TempDir()
+        {
+            return this.BaseContext.TempDir();
+        }
+
+        public void Warning(string message, Exception? e = null)
+        {
+            this.BaseContext.Warning(message, e);
+        }
+
+        public string GetHashForObject(object? value)
+        {
+            return this.BaseContext.GetHashForObject(value);
+        }
+    }
+    public sealed class GeneratorContext : IGeneratorContext
     {
         private readonly HashAlgorithm algorithm = SHA256.Create();
         private readonly Func<object, string?>? objectToStingRepresentation;
 
-        public Logger Logger { get; }
+        public ILogger Logger { get; }
 
         public DirectoryInfo CacheFolder { get; }
         public DirectoryInfo TempFolder { get; }
@@ -55,7 +128,7 @@ namespace Stasistium.Documents
 
 
 
-        internal string GetHashForObject(object? value)
+        public string GetHashForObject(object? value)
         {
 
             var c = System.Globalization.CultureInfo.InvariantCulture;
@@ -174,7 +247,28 @@ namespace Stasistium.Documents
         }
     }
 
-    public class Logger
+    internal class LoggerWrapper : ILogger
+    {
+        public LoggerWrapper(Logger baseLogger, string name)
+        {
+            this.BaseLogger = baseLogger ?? throw new ArgumentNullException(nameof(baseLogger));
+            this.Name = name ?? throw new ArgumentNullException(nameof(name));
+        }
+
+        public Logger BaseLogger { get; }
+        public string Name { get; }
+
+        public IDisposable Indent()
+        {
+            return ((ILogger)this.BaseLogger).Indent();
+        }
+
+        public void Info(string text)
+        {
+            ((ILogger)this.BaseLogger).Info($"{this.Name}: {text}");
+        }
+    }
+    internal class Logger : ILogger
     {
         private readonly System.CodeDom.Compiler.IndentedTextWriter logger;
 

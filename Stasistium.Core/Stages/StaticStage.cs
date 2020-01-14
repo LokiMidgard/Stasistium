@@ -15,7 +15,7 @@ namespace Stasistium.Stages
         private readonly Func<TResult, string> hashFunction;
         public TResult Value { get; set; }
 
-        public StaticStage(TResult result, Func<TResult, string> hashFunction, GeneratorContext context) : base(context)
+        public StaticStage(TResult result, Func<TResult, string> hashFunction, IGeneratorContext context, string? name = null) : base(context, name)
         {
             this.Value = result;
             this.hashFunction = hashFunction ?? throw new ArgumentNullException(nameof(hashFunction));

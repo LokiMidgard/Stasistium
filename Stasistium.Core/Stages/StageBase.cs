@@ -12,9 +12,10 @@ namespace Stasistium.Stages
 
         private (Guid lastId, Task<StageResult<TResult, TCache>> result) lastRun;
 
-        protected StageBase(GeneratorContext context)
+        protected StageBase(IGeneratorContext context, string? name)
         {
-            this.Context = context ?? throw new ArgumentNullException(nameof(context));
+            this.Name = name ?? this.GetType().GetGenericTypeDefinition().Name + Guid.NewGuid().ToString();
+            this.Context = context?.ForName(this.Name) ?? throw new ArgumentNullException(nameof(context));
         }
 
         protected abstract Task<StageResult<TResult, TCache>> DoInternal([AllowNull]TCache? cache, OptionToken options);
@@ -41,23 +42,27 @@ namespace Stasistium.Stages
             finally
             {
                 stopWatch.Stop();
-                this.Context.Logger.Info($"END {this.GetType().Name} Took {stopWatch.Elapsed}");
+                this.Context.Logger.Info($"END Took {stopWatch.Elapsed}");
             }
         }
 
-        public GeneratorContext Context { get; }
+        public IGeneratorContext Context { get; }
+        public string Name { get; }
+
     }
 
     public abstract class MultiStageBase<TResult, TCacheResult, TCache>
      where TCache : class
      where TCacheResult : class
     {
+        public string Name { get; }
 
         private (Guid lastId, Task<StageResultList<TResult, TCacheResult, TCache>> result) lastRun;
 
-        protected MultiStageBase(GeneratorContext context)
+        protected MultiStageBase(IGeneratorContext context, string? name = null)
         {
-            this.Context = context ?? throw new ArgumentNullException(nameof(context));
+            this.Name = name ?? this.GetType().GetGenericTypeDefinition().Name + Guid.NewGuid().ToString();
+            this.Context = context?.ForName(this.Name) ?? throw new ArgumentNullException(nameof(context));
         }
 
         protected abstract Task<StageResultList<TResult, TCacheResult, TCache>> DoInternal([AllowNull]TCache? cache, OptionToken options);
@@ -77,7 +82,7 @@ namespace Stasistium.Stages
             return result;
         }
 
-        public GeneratorContext Context { get; }
+        public IGeneratorContext Context { get; }
     }
 
     public class OptionToken : IEquatable<OptionToken>

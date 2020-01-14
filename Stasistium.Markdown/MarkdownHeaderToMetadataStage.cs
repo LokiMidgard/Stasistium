@@ -14,7 +14,7 @@ namespace Stasistium.Stages
     {
         private readonly MetadataUpdate<TMetadata>? update;
 
-        public MarkdownHeaderToMetadataStage(StagePerformHandler<MarkdownDocument, TPreviousCache> input, MetadataUpdate<TMetadata>? update, GeneratorContext context) : base(input, context)
+        public MarkdownHeaderToMetadataStage(StagePerformHandler<MarkdownDocument, TPreviousCache> input, MetadataUpdate<TMetadata>? update, IGeneratorContext context, string? name) : base(input, context,name)
         {
             this.update = update;
         }

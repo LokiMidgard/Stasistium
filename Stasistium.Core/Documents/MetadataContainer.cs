@@ -18,7 +18,7 @@ namespace Stasistium.Documents
 
         private readonly ImmutableDictionary<Type, object> values;
 
-        private MetadataContainer(ImmutableDictionary<Type, object> values, GeneratorContext context)
+        private MetadataContainer(ImmutableDictionary<Type, object> values, IGeneratorContext context)
         {
             this.values = values ?? throw new ArgumentNullException(nameof(values));
             this.Context = context;
@@ -50,7 +50,7 @@ namespace Stasistium.Documents
             }
         }
 
-        public GeneratorContext Context { get; }
+        public IGeneratorContext Context { get; }
 
         [return: MaybeNull]
         public T GetValue<T>()

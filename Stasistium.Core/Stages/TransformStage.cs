@@ -15,7 +15,7 @@ namespace Stasistium.Stages
         private readonly StagePerformHandler<TIn, TInItemCache, TInCache> input;
         private readonly Func<IDocument<TIn>, Task<IDocument<TOut>>> transform;
 
-        public TransformStage(StagePerformHandler<TIn, TInItemCache, TInCache> input, Func<IDocument<TIn>, Task<IDocument<TOut>>> selector, GeneratorContext context) : base(context)
+        public TransformStage(StagePerformHandler<TIn, TInItemCache, TInCache> input, Func<IDocument<TIn>, Task<IDocument<TOut>>> selector, IGeneratorContext context, string? name = null) : base(context, name)
         {
             this.input = input;
             this.transform = selector;
@@ -110,7 +110,7 @@ namespace Stasistium.Stages
     {
         private readonly Func<IDocument<TIn>, Task<IDocument<TOut>>> transform;
 
-        public TransformStage(StagePerformHandler<TIn, TInCache> inputSingle0, Func<IDocument<TIn>, Task<IDocument<TOut>>> selector, GeneratorContext context) : base(inputSingle0, context)
+        public TransformStage(StagePerformHandler<TIn, TInCache> inputSingle0, Func<IDocument<TIn>, Task<IDocument<TOut>>> selector, IGeneratorContext context, string? name = null) : base(inputSingle0, context,name)
         {
             this.transform = selector;
         }

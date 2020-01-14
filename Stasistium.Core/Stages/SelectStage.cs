@@ -21,7 +21,7 @@ namespace Stasistium.Stages
 
         private readonly StagePerformHandler<TInput, TInputItemCache, TInputCache> input;
 
-        public SelectStage(StagePerformHandler<TInput, TInputItemCache, TInputCache> input, Func<StageBase<TInput, GeneratedHelper.CacheId<string>>, StageBase<TResult, TItemCache>> createPipline, GeneratorContext context) : base(context)
+        public SelectStage(StagePerformHandler<TInput, TInputItemCache, TInputCache> input, Func<StageBase<TInput, GeneratedHelper.CacheId<string>>, StageBase<TResult, TItemCache>> createPipline, IGeneratorContext context, string? name = null) : base(context, name)
         {
             this.input = input ?? throw new ArgumentNullException(nameof(input));
             this.createPipline = createPipline ?? throw new ArgumentNullException(nameof(createPipline));
@@ -115,7 +115,7 @@ namespace Stasistium.Stages
             private string? lastHash;
             private StageResult<TInput, TInputItemCache> @in;
 
-            public Start(StageResult<TInput, TInputItemCache> initial, GeneratorContext context) : base(context)
+            public Start(StageResult<TInput, TInputItemCache> initial, IGeneratorContext context, string? name = null) : base(context, name)
             {
                 this.@in = initial;
             }

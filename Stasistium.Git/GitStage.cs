@@ -15,7 +15,7 @@ namespace Stasistium.Stages
         private System.IO.DirectoryInfo? workingDir;
 
 
-        public GitStage(StagePerformHandler<string, TPreviousCache> input, GeneratorContext context) : base(input, context, true)
+        public GitStage(StagePerformHandler<string, TPreviousCache> input, IGeneratorContext context, string? name) : base(input, context, name, true)
         {
         }
 
@@ -52,7 +52,7 @@ namespace Stasistium.Stages
 
             // for branches we ignore the local ones. we just cloned the repo and the local one is the same as the remote.
             var refs = this.repo.Tags.Select(x => new GitRefStage(x, this.repo)).Concat(this.repo.Branches.Where(x => x.IsRemote).Select(x => new GitRefStage(x, this.repo)))
-                .Select(x => this.Context.Create(x, x.Hash, x.FrindlyName).With(source.Metadata.Add(new Metadata(x.GetCommits().Select(y=>new Commit(y)).ToImmutableList())))).OrderBy(x => x.Id).ToArray();
+                .Select(x => this.Context.Create(x, x.Hash, x.FrindlyName).With(source.Metadata.Add(new Metadata(x.GetCommits().Select(y => new Commit(y)).ToImmutableList())))).OrderBy(x => x.Id).ToArray();
             return refs.ToImmutableList();
         }
 

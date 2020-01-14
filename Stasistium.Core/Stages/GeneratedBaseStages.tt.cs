@@ -26,7 +26,7 @@ namespace Single.Simple {
                 private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple0List0StageBase(
-                    GeneratorContext context, bool updateOnRefresh = false) : base(context)
+                    IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                     this.updateOnRefresh = updateOnRefresh;
         } 
@@ -100,7 +100,7 @@ namespace Multiple.Simple {
                 private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle0List0StageBase(
-                    GeneratorContext context, bool updateOnRefresh = false) : base(context)
+                    IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                     this.updateOnRefresh = updateOnRefresh;
         } 
@@ -326,7 +326,7 @@ namespace Single.Simple {
 
         public OutputSingleInputSingleSimple0List1StageBase(
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                     this.inputList0 = inputList0;
                 this.updateOnRefresh = updateOnRefresh;
@@ -417,7 +417,7 @@ namespace Multiple.Simple {
 
         public OutputMultiSimpleInputSingle0List1StageBase(
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                     this.inputList0 = inputList0;
                 this.updateOnRefresh = updateOnRefresh;
@@ -669,7 +669,7 @@ namespace Single.Simple {
         public OutputSingleInputSingleSimple0List2StageBase(
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                     this.inputList0 = inputList0;
                 this.inputList1 = inputList1;
@@ -791,7 +791,7 @@ namespace Multiple.Simple {
         public OutputMultiSimpleInputSingle0List2StageBase(
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                     this.inputList0 = inputList0;
                 this.inputList1 = inputList1;
@@ -1083,7 +1083,7 @@ namespace Single.Simple {
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                     this.inputList0 = inputList0;
                 this.inputList1 = inputList1;
@@ -1225,7 +1225,7 @@ namespace Multiple.Simple {
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                     this.inputList0 = inputList0;
                 this.inputList1 = inputList1;
@@ -1546,7 +1546,7 @@ namespace Single.Simple {
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
             StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                     this.inputList0 = inputList0;
                 this.inputList1 = inputList1;
@@ -1708,7 +1708,7 @@ namespace Multiple.Simple {
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
             StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                     this.inputList0 = inputList0;
                 this.inputList1 = inputList1;
@@ -2032,7 +2032,7 @@ namespace Single.Simple {
 
         public OutputSingleInputSingleSimple1List0StageBase(
             StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-                    GeneratorContext context, bool updateOnRefresh = false) : base(context)
+                    IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                     this.updateOnRefresh = updateOnRefresh;
@@ -2117,7 +2117,7 @@ namespace Multiple.Simple {
 
         public OutputMultiSimpleInputSingle1List0StageBase(
             StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-                    GeneratorContext context, bool updateOnRefresh = false) : base(context)
+                    IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                     this.updateOnRefresh = updateOnRefresh;
@@ -2363,7 +2363,7 @@ namespace Single.Simple {
         public OutputSingleInputSingleSimple1List1StageBase(
             StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                     this.inputList0 = inputList0;
@@ -2475,7 +2475,7 @@ namespace Multiple.Simple {
         public OutputMultiSimpleInputSingle1List1StageBase(
             StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                     this.inputList0 = inputList0;
@@ -2757,7 +2757,7 @@ namespace Single.Simple {
             StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                     this.inputList0 = inputList0;
@@ -2892,7 +2892,7 @@ namespace Multiple.Simple {
             StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                     this.inputList0 = inputList0;
@@ -3206,7 +3206,7 @@ namespace Single.Simple {
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                     this.inputList0 = inputList0;
@@ -3361,7 +3361,7 @@ namespace Multiple.Simple {
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                     this.inputList0 = inputList0;
@@ -3704,7 +3704,7 @@ namespace Single.Simple {
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
             StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                     this.inputList0 = inputList0;
@@ -3879,7 +3879,7 @@ namespace Multiple.Simple {
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
             StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                     this.inputList0 = inputList0;
@@ -4225,7 +4225,7 @@ namespace Single.Simple {
         public OutputSingleInputSingleSimple2List0StageBase(
             StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
             StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-                    GeneratorContext context, bool updateOnRefresh = false) : base(context)
+                    IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -4331,7 +4331,7 @@ namespace Multiple.Simple {
         public OutputMultiSimpleInputSingle2List0StageBase(
             StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
             StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-                    GeneratorContext context, bool updateOnRefresh = false) : base(context)
+                    IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -4607,7 +4607,7 @@ namespace Single.Simple {
             StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
             StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -4732,7 +4732,7 @@ namespace Multiple.Simple {
             StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
             StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -5036,7 +5036,7 @@ namespace Single.Simple {
             StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -5184,7 +5184,7 @@ namespace Multiple.Simple {
             StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -5520,7 +5520,7 @@ namespace Single.Simple {
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -5688,7 +5688,7 @@ namespace Multiple.Simple {
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -6053,7 +6053,7 @@ namespace Single.Simple {
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
             StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -6241,7 +6241,7 @@ namespace Multiple.Simple {
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
             StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -6609,7 +6609,7 @@ namespace Single.Simple {
             StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
             StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
             StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-                    GeneratorContext context, bool updateOnRefresh = false) : base(context)
+                    IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -6728,7 +6728,7 @@ namespace Multiple.Simple {
             StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
             StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
             StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-                    GeneratorContext context, bool updateOnRefresh = false) : base(context)
+                    IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -7026,7 +7026,7 @@ namespace Single.Simple {
             StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
             StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -7164,7 +7164,7 @@ namespace Multiple.Simple {
             StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
             StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -7490,7 +7490,7 @@ namespace Single.Simple {
             StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -7651,7 +7651,7 @@ namespace Multiple.Simple {
             StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -8009,7 +8009,7 @@ namespace Single.Simple {
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -8190,7 +8190,7 @@ namespace Multiple.Simple {
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -8577,7 +8577,7 @@ namespace Single.Simple {
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
             StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -8778,7 +8778,7 @@ namespace Multiple.Simple {
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
             StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -9168,7 +9168,7 @@ namespace Single.Simple {
             StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
             StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
             StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3,
-                    GeneratorContext context, bool updateOnRefresh = false) : base(context)
+                    IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -9300,7 +9300,7 @@ namespace Multiple.Simple {
             StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
             StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
             StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3,
-                    GeneratorContext context, bool updateOnRefresh = false) : base(context)
+                    IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -9620,7 +9620,7 @@ namespace Single.Simple {
             StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
             StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3,
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -9771,7 +9771,7 @@ namespace Multiple.Simple {
             StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
             StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3,
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -10119,7 +10119,7 @@ namespace Single.Simple {
             StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3,
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -10293,7 +10293,7 @@ namespace Multiple.Simple {
             StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3,
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -10673,7 +10673,7 @@ namespace Single.Simple {
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -10867,7 +10867,7 @@ namespace Multiple.Simple {
                     StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -11276,7 +11276,7 @@ namespace Single.Simple {
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
             StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;
@@ -11490,7 +11490,7 @@ namespace Multiple.Simple {
             StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
             StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
-            GeneratorContext context, bool updateOnRefresh = false) : base(context)
+            IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
                 this.inputSingle1 = inputSingle1;

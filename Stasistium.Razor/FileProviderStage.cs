@@ -18,7 +18,7 @@ namespace Stasistium.Razor
         where TInputCache : class
         where TInputItemCache : class
     {
-        public FileProviderStage(string providerId, StagePerformHandler<Stream, TInputItemCache, TInputCache> inputList0, GeneratorContext context) : base(inputList0, context)
+        public FileProviderStage(string providerId, StagePerformHandler<Stream, TInputItemCache, TInputCache> inputList0, IGeneratorContext context, string? name) : base(inputList0, context,name)
         {
             this.ProviderId = providerId;
         }

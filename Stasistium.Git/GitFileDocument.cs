@@ -8,12 +8,12 @@ namespace Stasistium.Documents
     {
         private readonly Func<Stream> createStreamCallback;
 
-        private GitFileDocument(string id, string contentHash, Func<Stream> createStreamCallback, MetadataContainer metadata, GeneratorContext context) : base(id, metadata, contentHash, context)
+        private GitFileDocument(string id, string contentHash, Func<Stream> createStreamCallback, MetadataContainer metadata, IGeneratorContext context) : base(id, metadata, contentHash, context)
         {
             this.createStreamCallback = createStreamCallback;
         }
 
-        internal GitFileDocument(string path, Blob blob, GeneratorContext context, MetadataContainer? metadata) : base(path, metadata, blob.Sha, context)
+        internal GitFileDocument(string path, Blob blob, IGeneratorContext context, MetadataContainer? metadata) : base(path, metadata, blob.Sha, context)
         {
             this.createStreamCallback = () => blob.GetContentStream();
         }

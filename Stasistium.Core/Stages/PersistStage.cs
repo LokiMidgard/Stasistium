@@ -16,14 +16,20 @@ namespace Stasistium.Stages
         private readonly GenerationOptions generatorOptions;
         private readonly StagePerformHandler<Stream, TPreviousItemCache, TPreviousCache> inputList;
         private readonly DirectoryInfo output;
-        private readonly GeneratorContext context;
 
-        public PersistStage(StagePerformHandler<System.IO.Stream, TPreviousItemCache, TPreviousCache> inputList, DirectoryInfo output, GenerationOptions generatorOptions, GeneratorContext context)
+        public string Name { get; }
+
+        private readonly IGeneratorContext context;
+
+        public PersistStage(StagePerformHandler<System.IO.Stream, TPreviousItemCache, TPreviousCache> inputList, DirectoryInfo output, GenerationOptions generatorOptions, IGeneratorContext context, string? name = null)
         {
+            if (context is null)
+                throw new ArgumentNullException(nameof(context));
             this.generatorOptions = generatorOptions;
             this.inputList = inputList;
             this.output = output;
-            this.context = context;
+            this.Name = name ?? this.GetType().GetGenericTypeDefinition().Name + Guid.NewGuid().ToString();
+            this.context = context.ForName(this.Name);
         }
 
         public async Task UpdateFiles()
@@ -58,7 +64,7 @@ namespace Stasistium.Stages
                 var (files, newCache) = await result.Perform;
 
                 // find all files that no longer exist and delete those
-                var allFiles = new HashSet<string>(result.Ids.Select(x => Path.Combine(this.output.FullName, x).Replace('\\','/')));
+                var allFiles = new HashSet<string>(result.Ids.Select(x => Path.Combine(this.output.FullName, x).Replace('\\', '/')));
                 var directoryQueue = new Queue<DirectoryInfo>();
                 var directoryStack = new Stack<DirectoryInfo>();
                 directoryQueue.Enqueue(this.output);
@@ -67,7 +73,7 @@ namespace Stasistium.Stages
                 {
                     if (!current.Exists)
                         continue;
-                    
+
                     directoryStack.Push(current);
 
                     var subDirectorys = current.GetDirectories();

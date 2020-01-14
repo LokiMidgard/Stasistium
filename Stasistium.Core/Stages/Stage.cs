@@ -16,47 +16,49 @@ namespace Stasistium
     {
 
 
-        public static FileStage<T> File<T>(this StageBase<string, T> input)
+        public static FileStage<T> File<T>(this StageBase<string, T> input, string? name = null)
             where T : class
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
-            return new FileStage<T>(input.DoIt, input.Context);
+            return new FileStage<T>(input.DoIt, input.Context, name);
         }
 
         public class JsonHelper<TInCache>
             where TInCache : class
         {
             private readonly StageBase<Stream, TInCache> input;
+            private readonly string? name;
 
-            internal JsonHelper(StageBase<Stream, TInCache> input)
+            internal JsonHelper(StageBase<Stream, TInCache> input, string? name)
             {
                 this.input = input;
+                this.name = name;
             }
 
             public JsonStage<TInCache, TOut> For<TOut>()
             {
-                return new JsonStage<TInCache, TOut>(this.input.DoIt, this.input.Context);
+                return new JsonStage<TInCache, TOut>(this.input.DoIt, this.input.Context, this.name);
             }
         }
-        public static JsonHelper<TInCache> Json<TInCache>(this StageBase<Stream, TInCache> input)
+        public static JsonHelper<TInCache> Json<TInCache>(this StageBase<Stream, TInCache> input, string? name = null)
             where TInCache : class
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
-            return new JsonHelper<TInCache>(input);
+            return new JsonHelper<TInCache>(input, name);
         }
 
 
-        public static FileSystemStage<T> FileSystem<T>(this StageBase<string, T> input)
+        public static FileSystemStage<T> FileSystem<T>(this StageBase<string, T> input, string? name = null)
             where T : class
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
-            return new FileSystemStage<T>(input.DoIt, input.Context);
+            return new FileSystemStage<T>(input.DoIt, input.Context, name);
         }
 
-        public static PersistStage<TItemCache, TCache> Persist<TItemCache, TCache>(this MultiStageBase<Stream, TItemCache, TCache> stage, DirectoryInfo output, GenerationOptions generatorOptions)
+        public static PersistStage<TItemCache, TCache> Persist<TItemCache, TCache>(this MultiStageBase<Stream, TItemCache, TCache> stage, DirectoryInfo output, GenerationOptions generatorOptions, string? name = null)
             where TCache : class
             where TItemCache : class
         {
@@ -66,10 +68,10 @@ namespace Stasistium
                 throw new ArgumentNullException(nameof(output));
             if (generatorOptions is null)
                 throw new ArgumentNullException(nameof(generatorOptions));
-            return new PersistStage<TItemCache, TCache>(stage.DoIt, output, generatorOptions, stage.Context);
+            return new PersistStage<TItemCache, TCache>(stage.DoIt, output, generatorOptions, stage.Context, name);
         }
 
-        public static WhereStage<TCheck, TPreviousItemCache, TPreviousCache> Where<TCheck, TPreviousItemCache, TPreviousCache>(this MultiStageBase<TCheck, TPreviousItemCache, TPreviousCache> input, Func<IDocument<TCheck>, Task<bool>> predicate)
+        public static WhereStage<TCheck, TPreviousItemCache, TPreviousCache> Where<TCheck, TPreviousItemCache, TPreviousCache>(this MultiStageBase<TCheck, TPreviousItemCache, TPreviousCache> input, Func<IDocument<TCheck>, Task<bool>> predicate, string? name = null)
             where TPreviousCache : class
             where TPreviousItemCache : class
         {
@@ -77,9 +79,9 @@ namespace Stasistium
                 throw new ArgumentNullException(nameof(input));
             if (predicate is null)
                 throw new ArgumentNullException(nameof(predicate));
-            return new WhereStage<TCheck, TPreviousItemCache, TPreviousCache>(input.DoIt, predicate, input.Context);
+            return new WhereStage<TCheck, TPreviousItemCache, TPreviousCache>(input.DoIt, predicate, input.Context, name);
         }
-        public static WhereStage<TCheck, TPreviousItemCache, TPreviousCache> Where<TCheck, TPreviousItemCache, TPreviousCache>(this MultiStageBase<TCheck, TPreviousItemCache, TPreviousCache> input, Func<IDocument<TCheck>, bool> predicate)
+        public static WhereStage<TCheck, TPreviousItemCache, TPreviousCache> Where<TCheck, TPreviousItemCache, TPreviousCache>(this MultiStageBase<TCheck, TPreviousItemCache, TPreviousCache> input, Func<IDocument<TCheck>, bool> predicate, string? name = null)
             where TPreviousCache : class
             where TPreviousItemCache : class
         {
@@ -87,17 +89,17 @@ namespace Stasistium
                 throw new ArgumentNullException(nameof(input));
             if (predicate is null)
                 throw new ArgumentNullException(nameof(predicate));
-            return new WhereStage<TCheck, TPreviousItemCache, TPreviousCache>(input.DoIt, x => Task.FromResult(predicate(x)), input.Context);
+            return new WhereStage<TCheck, TPreviousItemCache, TPreviousCache>(input.DoIt, x => Task.FromResult(predicate(x)), input.Context, name);
         }
-        public static SingleStage<TCheck, TPreviousItemCache, TPreviousCache> SingleEntry<TCheck, TPreviousItemCache, TPreviousCache>(this MultiStageBase<TCheck, TPreviousItemCache, TPreviousCache> input)
+        public static SingleStage<TCheck, TPreviousItemCache, TPreviousCache> SingleEntry<TCheck, TPreviousItemCache, TPreviousCache>(this MultiStageBase<TCheck, TPreviousItemCache, TPreviousCache> input, string? name = null)
             where TPreviousCache : class
             where TPreviousItemCache : class
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
-            return new SingleStage<TCheck, TPreviousItemCache, TPreviousCache>(input.DoIt, input.Context);
+            return new SingleStage<TCheck, TPreviousItemCache, TPreviousCache>(input.DoIt, input.Context, name);
         }
-        public static TransformStage<TIn, TInITemCache, TInCache, TOut> Transform<TIn, TInITemCache, TInCache, TOut>(this MultiStageBase<TIn, TInITemCache, TInCache> input, Func<IDocument<TIn>, Task<IDocument<TOut>>> predicate)
+        public static TransformStage<TIn, TInITemCache, TInCache, TOut> Transform<TIn, TInITemCache, TInCache, TOut>(this MultiStageBase<TIn, TInITemCache, TInCache> input, Func<IDocument<TIn>, Task<IDocument<TOut>>> predicate, string? name = null)
             where TInCache : class
             where TInITemCache : class
         {
@@ -105,9 +107,9 @@ namespace Stasistium
                 throw new ArgumentNullException(nameof(input));
             if (predicate is null)
                 throw new ArgumentNullException(nameof(predicate));
-            return new TransformStage<TIn, TInITemCache, TInCache, TOut>(input.DoIt, predicate, input.Context);
+            return new TransformStage<TIn, TInITemCache, TInCache, TOut>(input.DoIt, predicate, input.Context, name);
         }
-        public static TransformStage<TIn, TInITemCache, TInCache, TOut> Transform<TIn, TInITemCache, TInCache, TOut>(this MultiStageBase<TIn, TInITemCache, TInCache> input, Func<IDocument<TIn>, IDocument<TOut>> predicate)
+        public static TransformStage<TIn, TInITemCache, TInCache, TOut> Transform<TIn, TInITemCache, TInCache, TOut>(this MultiStageBase<TIn, TInITemCache, TInCache> input, Func<IDocument<TIn>, IDocument<TOut>> predicate, string? name = null)
             where TInCache : class
             where TInITemCache : class
         {
@@ -115,40 +117,40 @@ namespace Stasistium
                 throw new ArgumentNullException(nameof(input));
             if (predicate is null)
                 throw new ArgumentNullException(nameof(predicate));
-            return new TransformStage<TIn, TInITemCache, TInCache, TOut>(input.DoIt, x => Task.FromResult(predicate(x)), input.Context);
+            return new TransformStage<TIn, TInITemCache, TInCache, TOut>(input.DoIt, x => Task.FromResult(predicate(x)), input.Context, name);
         }
 
-        public static TransformStage<TIn, TInCache, TOut> Transform<TIn, TInCache, TOut>(this StageBase<TIn, TInCache> input, Func<IDocument<TIn>, Task<IDocument<TOut>>> predicate)
+        public static TransformStage<TIn, TInCache, TOut> Transform<TIn, TInCache, TOut>(this StageBase<TIn, TInCache> input, Func<IDocument<TIn>, Task<IDocument<TOut>>> predicate, string? name = null)
     where TInCache : class
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
             if (predicate is null)
                 throw new ArgumentNullException(nameof(predicate));
-            return new TransformStage<TIn, TInCache, TOut>(input.DoIt, predicate, input.Context);
+            return new TransformStage<TIn, TInCache, TOut>(input.DoIt, predicate, input.Context, name);
         }
 
-        public static TransformStage<TIn, TInCache, TOut> Transform<TIn, TInCache, TOut>(this StageBase<TIn, TInCache> input, Func<IDocument<TIn>, IDocument<TOut>> predicate)
+        public static TransformStage<TIn, TInCache, TOut> Transform<TIn, TInCache, TOut>(this StageBase<TIn, TInCache> input, Func<IDocument<TIn>, IDocument<TOut>> predicate, string? name = null)
             where TInCache : class
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
             if (predicate is null)
                 throw new ArgumentNullException(nameof(predicate));
-            return new TransformStage<TIn, TInCache, TOut>(input.DoIt, x => Task.FromResult(predicate(x)), input.Context);
+            return new TransformStage<TIn, TInCache, TOut>(input.DoIt, x => Task.FromResult(predicate(x)), input.Context, name);
         }
 
-        public static SelectStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache> Select<TInput, TInputItemCache, TInputCache, TResult, TItemCache>(this MultiStageBase<TInput, TInputItemCache, TInputCache> input, Func<StageBase<TInput, Stages.GeneratedHelper.CacheId<string>>, StageBase<TResult, TItemCache>> createPipline)
+        public static SelectStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache> Select<TInput, TInputItemCache, TInputCache, TResult, TItemCache>(this MultiStageBase<TInput, TInputItemCache, TInputCache> input, Func<StageBase<TInput, Stages.GeneratedHelper.CacheId<string>>, StageBase<TResult, TItemCache>> createPipline, string? name = null)
             where TInputCache : class
             where TInputItemCache : class
             where TItemCache : class
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
-            return new SelectStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache>(input.DoIt, createPipline, input.Context);
+            return new SelectStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache>(input.DoIt, createPipline, input.Context, name);
         }
 
-        public static SelectManyStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache> SelectMany<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache>(this MultiStageBase<TInput, TInputItemCache, TInputCache> input, Func<StageBase<TInput, Stages.GeneratedHelper.CacheId<string>>, MultiStageBase<TResult, TItemCache, TCache>> createPipline)
+        public static SelectManyStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache> SelectMany<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache>(this MultiStageBase<TInput, TInputItemCache, TInputCache> input, Func<StageBase<TInput, Stages.GeneratedHelper.CacheId<string>>, MultiStageBase<TResult, TItemCache, TCache>> createPipline, string? name = null)
             where TCache : class
             where TInputCache : class
             where TInputItemCache : class
@@ -156,15 +158,15 @@ namespace Stasistium
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
-            return new SelectManyStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache>(input.DoIt, createPipline, input.Context);
+            return new SelectManyStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache>(input.DoIt, createPipline, input.Context, name);
         }
 
-        public static TextToStreamStage<T> TextToStream<T>(this StageBase<string, T> input)
+        public static TextToStreamStage<T> TextToStream<T>(this StageBase<string, T> input, string? name = null)
             where T : class
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
-            return new TextToStreamStage<T>(input.DoIt, input.Context);
+            return new TextToStreamStage<T>(input.DoIt, input.Context, name);
         }
 
     }

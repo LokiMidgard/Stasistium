@@ -22,7 +22,7 @@ namespace Stasistium.Stages
         private readonly Func<IDocument<TIn1>, IDocument<TIn2>, IDocument<TOut>> mergeFunction;
 
 
-        public MergeStage(StagePerformHandler<TIn1, TInputItemCache, TInputCache1> input1, StagePerformHandler<TIn2, TInputCache2> input2, Func<IDocument<TIn1>, IDocument<TIn2>, IDocument<TOut>> mergeFunction, GeneratorContext context) : base(context)
+        public MergeStage(StagePerformHandler<TIn1, TInputItemCache, TInputCache1> input1, StagePerformHandler<TIn2, TInputCache2> input2, Func<IDocument<TIn1>, IDocument<TIn2>, IDocument<TOut>> mergeFunction, IGeneratorContext context, string? name = null) : base(context, name)
         {
             this.input1 = input1 ?? throw new ArgumentNullException(nameof(input1));
             this.input2 = input2 ?? throw new ArgumentNullException(nameof(input2));

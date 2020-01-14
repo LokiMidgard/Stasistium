@@ -17,7 +17,7 @@ namespace Stasistium.Stages
         private readonly StagePerformHandler<TOut, TInItemCache, TInCache> input;
         private readonly Func<IDocument<TOut>, Task<bool>> predicate;
 
-        public WhereStage(StagePerformHandler<TOut, TInItemCache, TInCache> input, Func<IDocument<TOut>, Task<bool>> predicate, GeneratorContext context) : base(context)
+        public WhereStage(StagePerformHandler<TOut, TInItemCache, TInCache> input, Func<IDocument<TOut>, Task<bool>> predicate, IGeneratorContext context, string? name = null) : base(context, name)
         {
             this.input = input;
             this.predicate = predicate;

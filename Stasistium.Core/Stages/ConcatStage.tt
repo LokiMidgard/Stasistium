@@ -40,7 +40,7 @@ for (int i = 1; i <= numberOfElements; i++)
     public class ConcatStage<T, <#=classGenerics#>> : GeneratedHelper.Multiple.Simple.OutputMultiSimpleInputSingle<#=i#>List0StageBase<<#=baseGenerics#>, T>
         <#=whereStatements#>
     {
-        public ConcatStage(<#=constructorArguments#>, GeneratorContext context) : base(<#=baseArguments #>, context)
+        public ConcatStage(<#=constructorArguments#>, IGeneratorContext context, string? name) : base(<#=baseArguments #>, context, name)
         {
         }
 
@@ -85,7 +85,7 @@ for (int j = 1; j <= i; j++)
 <#
 }
 #>
-        public ConcatManyStage(<#=constructorArguments#>, GeneratorContext context) : base(context)
+        public ConcatManyStage(<#=constructorArguments#>, IGeneratorContext context, string? name = null) : base(context, name)
         {
 <#
 for (int j = 1; j <= i; j++)
@@ -311,11 +311,11 @@ for (int i = 1; i <= numberOfElements; i++)
     string notNull = string.Join("\n            ", Enumerable.Range(1,i).Select(x=> "if(input"+x+" is null)\n                 throw new ArgumentNullException(nameof(input"+x+"));") );
 
 #>
-        public static ConcatStage<T, <#=classGenerics#>> Concat<T, <#=generics #>>(this <#=argumentList#>)
+        public static ConcatStage<T, <#=classGenerics#>> Concat<T, <#=generics #>>(this <#=argumentList#>, string? name = null)
             <#=whereStatements#>
         {
             <#=notNull#>
-            return new ConcatStage<T, <#=classGenerics#>>(<#=argumentList2 #>, input1.Context);
+            return new ConcatStage<T, <#=classGenerics#>>(<#=argumentList2 #>, input1.Context, name);
         }
 <#
              }
@@ -334,11 +334,11 @@ for (int i = 1; i <= numberOfElements; i++)
     string notNull = string.Join("\n            ", Enumerable.Range(1,i).Select(x=> "if(input"+x+" is null)\n                 throw new ArgumentNullException(nameof(input"+x+"));") );
 
 #>
-        public static ConcatManyStage<T, <#=classGenerics#>> Concat<T, <#=generics #>>(this <#=argumentList#>)
+        public static ConcatManyStage<T, <#=classGenerics#>> Concat<T, <#=generics #>>(this <#=argumentList#>, string? name = null)
             <#=whereStatements#>
         {
             <#=notNull#>
-            return new ConcatManyStage<T, <#=classGenerics#>>(<#=argumentList2 #>, input1.Context);
+            return new ConcatManyStage<T, <#=classGenerics#>>(<#=argumentList2 #>, input1.Context, name);
         }
 <#
              }

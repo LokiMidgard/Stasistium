@@ -17,7 +17,7 @@ namespace Stasistium.Stages
         private readonly string id;
         private readonly string? viewStartId;
 
-        public RazorProviderStage(StagePerformHandler<IFileProvider, TInputItemCache, TInputCache> inputList0, string contentId, string? id, string? viewStartId, GeneratorContext context) : base(inputList0, context)
+        public RazorProviderStage(StagePerformHandler<IFileProvider, TInputItemCache, TInputCache> inputList0, string contentId, string? id, string? viewStartId, IGeneratorContext context, string? name) : base(inputList0, context, name)
         {
             this.ContentId = contentId;
             this.id = id ?? Guid.NewGuid().ToString();
@@ -43,7 +43,7 @@ namespace Stasistium.Stages
         private readonly StagePerformHandler<T, TDocumentCache> inputDocument;
         private readonly StagePerformHandler<RazorProvider, TRendererCache> inputRazor;
 
-        public RazorStage(StagePerformHandler<T, TDocumentCache> inputDocument, StagePerformHandler<RazorProvider, TRendererCache> inputRazor, GeneratorContext context) : base(inputDocument, inputRazor, context)
+        public RazorStage(StagePerformHandler<T, TDocumentCache> inputDocument, StagePerformHandler<RazorProvider, TRendererCache> inputRazor, IGeneratorContext context, string? name) : base(inputDocument, inputRazor, context, name)
         {
             this.inputDocument = inputDocument;
             this.inputRazor = inputRazor;
@@ -63,9 +63,9 @@ namespace Stasistium.Stages
             return output;
         }
 
-        public RazorStage<T, TModel, TDocumentCache, TRendererCache> WithModel<TModel>()
+        public RazorStage<T, TModel, TDocumentCache, TRendererCache> WithModel<TModel>(string? name = null)
             where TModel : class
-            => new RazorStage<T, TModel, TDocumentCache, TRendererCache>(this.inputDocument, this.inputRazor, this.Context);
+            => new RazorStage<T, TModel, TDocumentCache, TRendererCache>(this.inputDocument, this.inputRazor, this.Context,name);
     }
     public class RazorStage<T, TModel, TDocumentCache, TRendererCache> : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple2List0StageBase<T, TDocumentCache, RazorProvider, TRendererCache, string>
         where TDocumentCache : class
@@ -73,7 +73,7 @@ namespace Stasistium.Stages
         where TModel : class
     {
 
-        public RazorStage(StagePerformHandler<T, TDocumentCache> inputDocument, StagePerformHandler<RazorProvider, TRendererCache> inputRazor, GeneratorContext context) : base(inputDocument, inputRazor, context)
+        public RazorStage(StagePerformHandler<T, TDocumentCache> inputDocument, StagePerformHandler<RazorProvider, TRendererCache> inputRazor, IGeneratorContext context, string? name) : base(inputDocument, inputRazor, context, name)
         {
         }
 

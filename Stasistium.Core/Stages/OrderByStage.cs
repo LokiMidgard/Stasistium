@@ -15,7 +15,7 @@ namespace Stasistium.Stages
     {
         private readonly Func<IDocument<T>, TKey> keySelector;
 
-        public OrderByStage(StagePerformHandler<T, TItemCache, TPreviousCache> inputList0, Func<IDocument<T>, TKey> keySelector, GeneratorContext context) : base(inputList0, context)
+        public OrderByStage(StagePerformHandler<T, TItemCache, TPreviousCache> inputList0, Func<IDocument<T>, TKey> keySelector, IGeneratorContext context, string? name) : base(inputList0, context, name)
         {
             this.keySelector = keySelector;
         }
@@ -28,7 +28,7 @@ namespace Stasistium
 {
     public static partial class StageExtensions
     {
-        public static OrderByStage<T, TItemCache, TPreviousCache, TKey> OrderBy<T, TItemCache, TPreviousCache, TKey>(this MultiStageBase<T, TItemCache, TPreviousCache> input, Func<IDocument<T>, TKey> keySelector)
+        public static OrderByStage<T, TItemCache, TPreviousCache, TKey> OrderBy<T, TItemCache, TPreviousCache, TKey>(this MultiStageBase<T, TItemCache, TPreviousCache> input, Func<IDocument<T>, TKey> keySelector, string? name = null)
         where TItemCache : class
         where TPreviousCache : class
         {
@@ -36,7 +36,7 @@ namespace Stasistium
                 throw new ArgumentNullException(nameof(input));
             if (keySelector is null)
                 throw new ArgumentNullException(nameof(keySelector));
-            return new OrderByStage<T, TItemCache, TPreviousCache, TKey>(input.DoIt, keySelector, input.Context);
+            return new OrderByStage<T, TItemCache, TPreviousCache, TKey>(input.DoIt, keySelector, input.Context, name);
         }
     }
 }

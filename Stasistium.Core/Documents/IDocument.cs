@@ -12,7 +12,7 @@ namespace Stasistium.Documents
         string Hash { get; }
         string Id { get; }
         MetadataContainer Metadata { get; }
-        GeneratorContext Context { get; }
+        IGeneratorContext Context { get; }
 
         IDocument With(MetadataContainer metadata);
         IDocument WithId(string id);

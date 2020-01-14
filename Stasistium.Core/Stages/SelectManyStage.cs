@@ -22,7 +22,7 @@ where TInputCache : class
 
         private readonly StagePerformHandler<TInput, TInputItemCache, TInputCache> input;
 
-        public SelectManyStage(StagePerformHandler<TInput, TInputItemCache, TInputCache> input, Func<StageBase<TInput, GeneratedHelper.CacheId<string>>, MultiStageBase<TResult, TItemCache, TCache>> createPipline, GeneratorContext context) : base(context)
+        public SelectManyStage(StagePerformHandler<TInput, TInputItemCache, TInputCache> input, Func<StageBase<TInput, GeneratedHelper.CacheId<string>>, MultiStageBase<TResult, TItemCache, TCache>> createPipline, IGeneratorContext context, string? name = null) : base(context, name)
         {
             this.input = input ?? throw new ArgumentNullException(nameof(input));
             this.createPipline = createPipline ?? throw new ArgumentNullException(nameof(createPipline));
@@ -143,7 +143,7 @@ where TInputCache : class
             private string? lastHash;
             private StageResult<TInput, TInputItemCache> @in;
 
-            public Start(StageResult<TInput, TInputItemCache> initial, GeneratorContext context) : base(context)
+            public Start(StageResult<TInput, TInputItemCache> initial, IGeneratorContext context, string? name = null) : base(context, name)
             {
                 this.@in = initial;
             }

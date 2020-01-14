@@ -14,7 +14,7 @@ namespace Stasistium.Stages
     {
         private readonly StagePerformHandler<string, TInCache> input;
 
-        public FileStage(StagePerformHandler<string, TInCache> input, GeneratorContext context) : base(context)
+        public FileStage(StagePerformHandler<string, TInCache> input, IGeneratorContext context, string? name = null) : base(context, name)
         {
             this.input = input;
         }

@@ -11,7 +11,7 @@ namespace Stasistium.Stages
     public class FileSystemStage<T> : GeneratedHelper.Multiple.Simple.OutputMultiSimpleInputSingle1List0StageBase<string, T, Stream>
         where T : class
     {
-        public FileSystemStage(StagePerformHandler<string, T> inputSingle0, GeneratorContext context) : base(inputSingle0, context)
+        public FileSystemStage(StagePerformHandler<string, T> inputSingle0, IGeneratorContext context, string? name) : base(inputSingle0, context, name)
         {
         }
 
@@ -47,13 +47,13 @@ namespace Stasistium.Stages
 
     internal class FileDocument : DocumentBase, IDocument<Stream>
     {
-        public FileDocument(FileInfo fileInfo, DirectoryInfo root, MetadataContainer? metadata, GeneratorContext context) : base(Path.GetRelativePath(root.FullName, fileInfo.FullName), metadata, GetHash(fileInfo, context), context)
+        public FileDocument(FileInfo fileInfo, DirectoryInfo root, MetadataContainer? metadata, IGeneratorContext context) : base(Path.GetRelativePath(root.FullName, fileInfo.FullName), metadata, GetHash(fileInfo, context), context)
         {
             this.FileInfo = fileInfo;
             this.Root = root;
         }
 
-        private static string GetHash(FileInfo fileInfo, GeneratorContext context)
+        private static string GetHash(FileInfo fileInfo, IGeneratorContext context)
         {
             using var stream = fileInfo.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
             return context.GetHashForStream(stream);

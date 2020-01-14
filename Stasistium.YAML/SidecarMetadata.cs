@@ -16,7 +16,7 @@ namespace Stasistium.Stages
         private readonly StagePerformHandler<Stream, TInItemCache, TInCache> input;
         private readonly MetadataUpdate<TMetadata>? update;
 
-        public SidecarMetadata(StagePerformHandler<Stream, TInItemCache, TInCache> input, string sidecarExtension, MetadataUpdate<TMetadata>? update, GeneratorContext context) : base(context)
+        public SidecarMetadata(StagePerformHandler<Stream, TInItemCache, TInCache> input, string sidecarExtension, MetadataUpdate<TMetadata>? update, IGeneratorContext context, string? name = null) : base(context, name)
         {
             if (sidecarExtension is null)
                 throw new ArgumentNullException(nameof(sidecarExtension));

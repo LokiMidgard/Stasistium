@@ -23,7 +23,7 @@ namespace Stasistium.Stages
 
 
         private readonly bool hasHeader;
-        public ExcelToMarkdownTextStage(StagePerformHandler<Stream, TInCache> inputSingle0, bool hasHeader, GeneratorContext context) : base(inputSingle0, context)
+        public ExcelToMarkdownTextStage(StagePerformHandler<Stream, TInCache> inputSingle0, bool hasHeader, IGeneratorContext context, string? name) : base(inputSingle0, context, name)
         {
             this.hasHeader = hasHeader;
         }
@@ -160,12 +160,12 @@ namespace Stasistium
 {
     public static class OfficeStageExtension
     {
-        public static ExcelToMarkdownTextStage<T> ExcelToMarkdownText<T>(this StageBase<Stream, T> input, bool hasHeader = true)
+        public static ExcelToMarkdownTextStage<T> ExcelToMarkdownText<T>(this StageBase<Stream, T> input, bool hasHeader = true, string? name = null)
         where T : class
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
-            return new ExcelToMarkdownTextStage<T>(input.DoIt, hasHeader, input.Context);
+            return new ExcelToMarkdownTextStage<T>(input.DoIt, hasHeader, input.Context, name);
         }
     }
 }

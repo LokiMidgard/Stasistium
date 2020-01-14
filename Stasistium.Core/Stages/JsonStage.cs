@@ -10,7 +10,7 @@ namespace Stasistium.Stages
     public class JsonStage<TInCache, TOut> : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple1List0StageBase<Stream, TInCache, TOut>
         where TInCache : class
     {
-        public JsonStage(StagePerformHandler<Stream, TInCache> input, GeneratorContext context) : base(input, context)
+        public JsonStage(StagePerformHandler<Stream, TInCache> input, IGeneratorContext context, string? name = null) : base(input, context, name)
         {
         }
 

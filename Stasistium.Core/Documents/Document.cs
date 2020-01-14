@@ -12,13 +12,13 @@ namespace Stasistium.Documents
         public string Id { get; }
 
         public MetadataContainer Metadata { get; }
-        public GeneratorContext Context { get; }
+        public IGeneratorContext Context { get; }
 
         public string Hash { get; }
 
         public string ContentHash { get; }
 
-        protected DocumentBase(string id, MetadataContainer? metadata, string contetnHash, GeneratorContext context)
+        protected DocumentBase(string id, MetadataContainer? metadata, string contetnHash, IGeneratorContext context)
         {
             this.Id = id ?? throw new ArgumentNullException(nameof(id));
             this.ContentHash = contetnHash ?? throw new ArgumentNullException(nameof(contetnHash));
@@ -34,7 +34,7 @@ namespace Stasistium.Documents
     public class DocumentLazy<T> : DocumentBase, IDocument<T>
     {
         private readonly Func<T> valueCallback;
-        public DocumentLazy(Func<T> valueCallback, string contentHash, string id, MetadataContainer? metadata, GeneratorContext context) : base(id, metadata, contentHash, context)
+        public DocumentLazy(Func<T> valueCallback, string contentHash, string id, MetadataContainer? metadata, IGeneratorContext context) : base(id, metadata, contentHash, context)
         {
             this.valueCallback = valueCallback;
         }
@@ -51,7 +51,7 @@ namespace Stasistium.Documents
 
     public class Document<T> : DocumentBase, IDocument<T>
     {
-        public Document(T value, string contentHash, string id, MetadataContainer? metadata, GeneratorContext context) : base(id, metadata, contentHash, context)
+        public Document(T value, string contentHash, string id, MetadataContainer? metadata, IGeneratorContext context) : base(id, metadata, contentHash, context)
         {
             this.Value = value;
         }

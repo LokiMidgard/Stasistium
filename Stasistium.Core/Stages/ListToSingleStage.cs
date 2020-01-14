@@ -13,7 +13,7 @@ namespace Stasistium.Stages
     {
         private readonly Func<ImmutableList<IDocument<TIn>>, IDocument<TOut>> transform;
 
-        public ListToSingleStage(StagePerformHandler<TIn, TInItemCache, TInCache> inputList0, Func<ImmutableList<IDocument<TIn>>, IDocument<TOut>> transform, GeneratorContext context) : base(inputList0, context)
+        public ListToSingleStage(StagePerformHandler<TIn, TInItemCache, TInCache> inputList0, Func<ImmutableList<IDocument<TIn>>, IDocument<TOut>> transform, IGeneratorContext context, string? name) : base(inputList0, context, name)
         {
             this.transform = transform ?? throw new ArgumentNullException(nameof(transform));
         }
@@ -29,7 +29,7 @@ namespace Stasistium
 {
     public static partial class StageExtensions
     {
-        public static ListToSingleStage<TIn, TInItemCache, TInCache, TOut> ListToSingle<TIn, TInItemCache, TInCache, TOut>(this MultiStageBase<TIn, TInItemCache, TInCache> input, Func<ImmutableList<IDocument<TIn>>, IDocument<TOut>> transform)
+        public static ListToSingleStage<TIn, TInItemCache, TInCache, TOut> ListToSingle<TIn, TInItemCache, TInCache, TOut>(this MultiStageBase<TIn, TInItemCache, TInCache> input, Func<ImmutableList<IDocument<TIn>>, IDocument<TOut>> transform, string? name = null)
             where TInItemCache : class
             where TInCache : class
         {
@@ -37,7 +37,7 @@ namespace Stasistium
                 throw new ArgumentNullException(nameof(input));
             if (transform is null)
                 throw new ArgumentNullException(nameof(transform));
-            return new ListToSingleStage<TIn, TInItemCache, TInCache, TOut>(input.DoIt, transform, input.Context);
+            return new ListToSingleStage<TIn, TInItemCache, TInCache, TOut>(input.DoIt, transform, input.Context, name);
         }
     }
 }
