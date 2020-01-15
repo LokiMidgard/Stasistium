@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Stasistium.Documents
 {
-    public interface IGeneratorContext : IDisposable
+    public interface IGeneratorContext : IAsyncDisposable
     {
         DirectoryInfo CacheFolder { get; }
         MetadataContainer EmptyMetadata { get; }
@@ -13,6 +13,8 @@ namespace Stasistium.Documents
 
         DirectoryInfo ChachDir();
         IDocument<T> Create<T>(T value, string contentHash, string id, MetadataContainer? metadata = null);
+        void DisposeOnDispose(IDisposable disposable);
+        void DisposeOnDispose(IAsyncDisposable disposable);
         Exception Exception(string message);
         string GetHashForObject(object? value);
         string GetHashForStream(Stream toHash);

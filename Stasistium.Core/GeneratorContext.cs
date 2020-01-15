@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Stasistium.Documents
 {
@@ -38,11 +39,6 @@ namespace Stasistium.Documents
         public IDocument<T> Create<T>(T value, string contentHash, string id, MetadataContainer? metadata = null)
         {
             return this.BaseContext.Create(value, contentHash, id, metadata);
-        }
-
-        public void Dispose()
-        {
-            this.BaseContext.Dispose();
         }
 
         public Exception Exception(string message)
@@ -79,14 +75,32 @@ namespace Stasistium.Documents
         {
             return this.BaseContext.GetHashForObject(value);
         }
+
+        public void DisposeOnDispose(IDisposable disposable)
+        {
+            this.BaseContext.DisposeOnDispose(disposable);
+        }
+
+        public void DisposeOnDispose(IAsyncDisposable disposable)
+        {
+            this.BaseContext.DisposeOnDispose(disposable);
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            return this.BaseContext.DisposeAsync();
+        }
     }
     public sealed class GeneratorContext : IGeneratorContext
     {
         private readonly HashAlgorithm algorithm = SHA256.Create();
         private readonly Func<object, string?>? objectToStingRepresentation;
 
-        public ILogger Logger { get; }
+        private readonly System.Collections.Concurrent.ConcurrentBag<IDisposable> disposables = new System.Collections.Concurrent.ConcurrentBag<IDisposable>();
+        private readonly System.Collections.Concurrent.ConcurrentBag<IAsyncDisposable> asyncDisposables = new System.Collections.Concurrent.ConcurrentBag<IAsyncDisposable>();
 
+        public ILogger Logger => this.logger;
+        private readonly Logger logger;
         public DirectoryInfo CacheFolder { get; }
         public DirectoryInfo TempFolder { get; }
 
@@ -98,7 +112,20 @@ namespace Stasistium.Documents
             this.TempFolder = tempFolder ?? new DirectoryInfo("Temp");
             this.EmptyMetadata = MetadataContainer.EmptyFromContext(this);
             this.objectToStingRepresentation = objectToStingRepresentation;
-            this.Logger = new Logger(logger ?? Console.Out);
+            this.logger = new Logger(logger ?? Console.Out);
+        }
+
+        public void DisposeOnDispose(IDisposable disposable)
+        {
+            if (disposable is null)
+                throw new ArgumentNullException(nameof(disposable));
+            this.disposables.Add(disposable);
+        }
+        public void DisposeOnDispose(IAsyncDisposable disposable)
+        {
+            if (disposable is null)
+                throw new ArgumentNullException(nameof(disposable));
+            this.asyncDisposables.Add(disposable);
         }
 
         public string GetHashForString(string toHash)
@@ -229,12 +256,20 @@ namespace Stasistium.Documents
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
 
-        public void Dispose()
+        public async ValueTask DisposeAsync()
         {
             if (!this.disposedValue)
             {
+                while (this.disposables.TryTake(out var disposable))
+                    disposable.Dispose();
+
+                while (this.asyncDisposables.TryTake(out var disposable))
+                    await disposable.DisposeAsync();
+
                 this.algorithm.Dispose();
 
+                this.TempFolder.Delete(true);
+                await this.logger.DisposeAsync();
                 this.disposedValue = true;
             }
         }
@@ -245,6 +280,7 @@ namespace Stasistium.Documents
 
             throw new NotImplementedException(message);
         }
+
     }
 
     internal class LoggerWrapper : ILogger
@@ -268,7 +304,7 @@ namespace Stasistium.Documents
             ((ILogger)this.BaseLogger).Info($"{this.Name}: {text}");
         }
     }
-    internal class Logger : ILogger
+    internal class Logger : ILogger, IAsyncDisposable
     {
         private readonly System.CodeDom.Compiler.IndentedTextWriter logger;
 
@@ -286,6 +322,11 @@ namespace Stasistium.Documents
         {
             this.logger.Indent++;
             return new IndentWrapper(this);
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            return this.logger.DisposeAsync();
         }
 
         private sealed class IndentWrapper : IDisposable

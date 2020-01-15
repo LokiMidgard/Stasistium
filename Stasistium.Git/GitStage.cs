@@ -41,6 +41,7 @@ namespace Stasistium.Stages
                 this.workingDir = this.Context.TempDir();
                 this.previousSource = source.Value;
                 this.repo = await Task.Run(() => new Repository(Repository.Clone(source.Value, this.workingDir.FullName, new CloneOptions() { IsBare = true }))).ConfigureAwait(false);
+                this.Context.DisposeOnDispose(this.repo);
             }
             else if (options.Refresh)
             {
