@@ -9,7 +9,7 @@ namespace Stasistium.Sample
     {
         static async Task Main(string[] args)
         {
-            using var context = new GeneratorContext();
+            await using var context = new GeneratorContext();
 
             var configFile = context.StageFromResult("config.json", x => x)
                 .File()
