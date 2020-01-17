@@ -4,7 +4,7 @@ using System.IO;
 
 namespace Stasistium.Documents
 {
-    public interface IGeneratorContext : IAsyncDisposable
+    public interface IGeneratorContext : IAsyncDisposable, IEquatable<IGeneratorContext>
     {
         DirectoryInfo CacheFolder { get; }
         MetadataContainer EmptyMetadata { get; }

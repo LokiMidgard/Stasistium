@@ -90,6 +90,11 @@ namespace Stasistium.Documents
         {
             return this.BaseContext.DisposeAsync();
         }
+
+        public bool Equals(IGeneratorContext other)
+        {
+            return this.BaseContext.Equals(other);
+        }
     }
     public sealed class GeneratorContext : IGeneratorContext
     {
@@ -308,6 +313,25 @@ namespace Stasistium.Documents
             throw new NotImplementedException(message);
         }
 
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is IGeneratorContext other)
+                return this.Equals(other);
+            return false;
+        }
+        public bool Equals(IGeneratorContext other)
+        {
+            if (other is GeneratorContextWrapper wrapper)
+                return this.Equals(wrapper.BaseContext);
+            else if (other is GeneratorContext context)
+                return ReferenceEquals(this, context);
+            return false;
+        }
     }
 
     internal class LoggerWrapper : ILogger

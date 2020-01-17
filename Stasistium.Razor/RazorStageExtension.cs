@@ -30,7 +30,7 @@ namespace Stasistium
             if (renderer is null)
                 throw new ArgumentNullException(nameof(renderer));
 
-            if (!ReferenceEquals(input.Context, renderer.Context))
+            if (!input.Context.Equals(renderer.Context))
                 throw new ArgumentException("Both inputs must use the same Context");
 
             return new RazorStage<T, TDocumentCache, TRenderCache>(input.DoIt, renderer.DoIt, input.Context, name);
