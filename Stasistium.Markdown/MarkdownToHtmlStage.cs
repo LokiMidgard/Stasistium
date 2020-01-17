@@ -12,21 +12,33 @@ namespace Stasistium.Stages
     public class MarkdownToHtmlStage<TInputCache> : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple1List0StageBase<MarkdownDocument, TInputCache, string>
         where TInputCache : class
     {
-        public MarkdownToHtmlStage(StagePerformHandler<MarkdownDocument, TInputCache> inputSingle0, IGeneratorContext context, string? name) : base(inputSingle0, context,name )
+        public MarkdownRenderer Renderer { get; }
+
+        public MarkdownToHtmlStage(StagePerformHandler<MarkdownDocument, TInputCache> inputSingle0, MarkdownRenderer renderer, IGeneratorContext context, string? name) : base(inputSingle0, context, name)
         {
+            this.Renderer = renderer ?? new MarkdownRenderer();
         }
 
         protected override Task<IDocument<string>> Work(IDocument<MarkdownDocument> input, OptionToken options)
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
-
-            var builder = new StringBuilder();
-            this.Render(builder, input.Value.Blocks);
-
-            var text = builder.ToString();
-
+            var text = this.Renderer.Render(input.Value);
             return Task.FromResult(input.With(text, this.Context.GetHashForString(text)));
+        }
+    }
+
+    public class MarkdownRenderer
+    {
+
+        public string Render(MarkdownDocument document)
+        {
+            if (document is null)
+                throw new ArgumentNullException(nameof(document));
+            var builder = new StringBuilder();
+            this.Render(builder, document.Blocks);
+            var text = builder.ToString();
+            return text;
         }
 
         protected void Render(StringBuilder builder, IEnumerable<Blocks.MarkdownBlock> blocks)
@@ -111,8 +123,7 @@ namespace Stasistium.Stages
                     break;
 
                 default:
-                    this.Context.Warning($"Unsuported MarkdownBlock {block.GetType()}");
-                    break;
+                    throw new NotSupportedException($"Unsuported MarkdownBlock {block.GetType()}");
             }
 
 
@@ -211,10 +222,10 @@ namespace Stasistium.Stages
                     break;
 
                 default:
-                    this.Context.Warning($"Unsuported MarkdownInline {inline.GetType()}");
-                    break;
+                    throw new NotSupportedException($"Unsuported MarkdownInline {inline.GetType()}");
             }
         }
+
     }
 
 }
