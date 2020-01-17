@@ -61,9 +61,8 @@ namespace Single.Simple {
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -73,8 +72,7 @@ namespace Single.Simple {
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -149,9 +147,8 @@ namespace Multiple.Simple {
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -160,8 +157,6 @@ namespace Multiple.Simple {
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
@@ -372,9 +367,8 @@ namespace Single.Simple {
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -384,8 +378,7 @@ namespace Single.Simple {
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -478,9 +471,8 @@ namespace Multiple.Simple {
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -489,8 +481,6 @@ namespace Multiple.Simple {
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
@@ -740,9 +730,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -752,8 +741,7 @@ await Task.WhenAll(
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -878,9 +866,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -889,8 +876,6 @@ await Task.WhenAll(
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
@@ -1168,9 +1153,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -1180,8 +1164,7 @@ await Task.WhenAll(
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -1327,9 +1310,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -1338,8 +1320,6 @@ await Task.WhenAll(
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
@@ -1645,9 +1625,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -1657,8 +1636,7 @@ await Task.WhenAll(
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -1825,9 +1803,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -1836,8 +1813,6 @@ await Task.WhenAll(
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
@@ -2074,9 +2049,8 @@ namespace Single.Simple {
                 this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -2086,8 +2060,7 @@ namespace Single.Simple {
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -2174,9 +2147,8 @@ namespace Multiple.Simple {
                 this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -2185,8 +2157,6 @@ namespace Multiple.Simple {
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
@@ -2426,9 +2396,8 @@ namespace Single.Simple {
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -2438,8 +2407,7 @@ namespace Single.Simple {
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -2554,9 +2522,8 @@ namespace Multiple.Simple {
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -2565,8 +2532,6 @@ namespace Multiple.Simple {
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
@@ -2837,9 +2802,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -2849,8 +2813,7 @@ await Task.WhenAll(
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -2989,9 +2952,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -3000,8 +2962,6 @@ await Task.WhenAll(
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
@@ -3300,9 +3260,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -3312,8 +3271,7 @@ await Task.WhenAll(
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -3473,9 +3431,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -3484,8 +3441,6 @@ await Task.WhenAll(
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
@@ -3812,9 +3767,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -3824,8 +3778,7 @@ await Task.WhenAll(
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -4006,9 +3959,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -4017,8 +3969,6 @@ await Task.WhenAll(
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
@@ -4284,9 +4234,8 @@ namespace Single.Simple {
                 this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -4296,8 +4245,7 @@ namespace Single.Simple {
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -4406,9 +4354,8 @@ namespace Multiple.Simple {
                 this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -4417,8 +4364,6 @@ namespace Multiple.Simple {
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
@@ -4679,9 +4624,8 @@ namespace Single.Simple {
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -4691,8 +4635,7 @@ namespace Single.Simple {
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -4821,9 +4764,8 @@ namespace Multiple.Simple {
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -4832,8 +4774,6 @@ namespace Multiple.Simple {
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
@@ -5125,9 +5065,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -5137,8 +5076,7 @@ await Task.WhenAll(
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -5291,9 +5229,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -5302,8 +5239,6 @@ await Task.WhenAll(
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
@@ -5623,9 +5558,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -5635,8 +5569,7 @@ await Task.WhenAll(
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -5810,9 +5743,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -5821,8 +5753,6 @@ await Task.WhenAll(
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
@@ -6170,9 +6100,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -6182,8 +6111,7 @@ await Task.WhenAll(
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -6378,9 +6306,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -6389,8 +6316,6 @@ await Task.WhenAll(
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
@@ -6677,9 +6602,8 @@ namespace Single.Simple {
                 this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -6689,8 +6613,7 @@ namespace Single.Simple {
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -6813,9 +6736,8 @@ namespace Multiple.Simple {
                 this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -6824,8 +6746,6 @@ namespace Multiple.Simple {
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
@@ -7107,9 +7027,8 @@ namespace Single.Simple {
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -7119,8 +7038,7 @@ namespace Single.Simple {
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -7263,9 +7181,8 @@ namespace Multiple.Simple {
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -7274,8 +7191,6 @@ namespace Multiple.Simple {
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
@@ -7588,9 +7503,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -7600,8 +7514,7 @@ await Task.WhenAll(
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -7768,9 +7681,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -7779,8 +7691,6 @@ await Task.WhenAll(
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
@@ -8121,9 +8031,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -8133,8 +8042,7 @@ await Task.WhenAll(
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -8322,9 +8230,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -8333,8 +8240,6 @@ await Task.WhenAll(
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
@@ -8703,9 +8608,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -8715,8 +8619,7 @@ await Task.WhenAll(
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -8925,9 +8828,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -8936,8 +8838,6 @@ await Task.WhenAll(
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
@@ -9245,9 +9145,8 @@ namespace Single.Simple {
                 this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle3Result.Id}");
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -9257,8 +9156,7 @@ namespace Single.Simple {
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -9395,9 +9293,8 @@ namespace Multiple.Simple {
                 this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle3Result.Id}");
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -9406,8 +9303,6 @@ namespace Multiple.Simple {
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
@@ -9710,9 +9605,8 @@ namespace Single.Simple {
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -9722,8 +9616,7 @@ namespace Single.Simple {
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -9880,9 +9773,8 @@ namespace Multiple.Simple {
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -9891,8 +9783,6 @@ namespace Multiple.Simple {
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
@@ -10226,9 +10116,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -10238,8 +10127,7 @@ await Task.WhenAll(
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -10420,9 +10308,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -10431,8 +10318,6 @@ await Task.WhenAll(
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
@@ -10794,9 +10679,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -10806,8 +10690,7 @@ await Task.WhenAll(
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -11009,9 +10892,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -11020,8 +10902,6 @@ await Task.WhenAll(
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
@@ -11411,9 +11291,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -11423,8 +11302,7 @@ await Task.WhenAll(
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -11647,9 +11525,8 @@ await Task.WhenAll(
 
 ;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -11658,8 +11535,6 @@ await Task.WhenAll(
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }

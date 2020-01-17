@@ -203,9 +203,8 @@ for(int j = 0; j< list; j++){
 
 <#}#>;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -215,8 +214,7 @@ for(int j = 0; j< list; j++){
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
             }
 
-            // if cache is null, hasChanges must be true and so id will be set.
-            return StageResult.Create(task, hasChanges, id!);
+            return StageResult.Create(task, hasChanges, id);
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -444,9 +442,8 @@ var parameter = new StringBuilder();
 
 <#}#>;
 
-            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -455,8 +452,6 @@ var parameter = new StringBuilder();
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
             }
-
-            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
         }
