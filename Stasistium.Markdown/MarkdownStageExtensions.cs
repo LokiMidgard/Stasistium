@@ -22,12 +22,12 @@ namespace Stasistium
             return new MarkdownStringStage<T>(input.DoIt, generateDocuement, input.Context, name);
         }
 
-        public static MarkdownToHtmlStage<T> MarkdownToHtml<T>(this StageBase<MarkdownDocument, T> input, string? name = null)
+        public static MarkdownToHtmlStage<T> MarkdownToHtml<T>(this StageBase<MarkdownDocument, T> input, MarkdownRenderer? renderer = null, string? name = null)
             where T : class
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
-            return new MarkdownToHtmlStage<T>(input.DoIt, input.Context, name);
+            return new MarkdownToHtmlStage<T>(input.DoIt, renderer, input.Context, name);
         }
 
     }
