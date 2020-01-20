@@ -14,12 +14,20 @@ namespace Stasistium.Documents
 
     internal sealed class GeneratorContextWrapper : IGeneratorContext
     {
-        public IGeneratorContext BaseContext { get; }
+        public GeneratorContext BaseContext { get; }
         public string Name { get; }
 
         public GeneratorContextWrapper(IGeneratorContext baseContext, string name)
         {
-            this.BaseContext = baseContext ?? throw new ArgumentNullException(nameof(baseContext));
+            if (baseContext is GeneratorContextWrapper wrapper)
+                this.BaseContext = wrapper.BaseContext;
+            else if (baseContext is GeneratorContext context)
+                this.BaseContext = context;
+            else if (baseContext is null)
+                throw new ArgumentNullException(nameof(baseContext));
+            else
+                throw new NotSupportedException($"Implementation {baseContext.GetType()} is not supported");
+
             this.Name = name;
         }
 
