@@ -59,7 +59,7 @@ where TInputCache : class
                     var pipeDone = await pipe.@out.DoIt(lastCache, options).ConfigureAwait(false);
 
                     var list = new List<(StageResult<TResult, TItemCache> result, string lastItemHash)>();
-                    if (pipeDone.HasChanges)
+                    if (pipeDone.HasChanges || cache is null)
                     {
                         var (itemResult, itemCache) = await pipeDone.Perform;
                         foreach (var singleResult in itemResult)
@@ -75,9 +75,6 @@ where TInputCache : class
                     }
                     else
                     {
-                        if (cache is null)
-                            throw this.Context.Exception("Should not happen");
-
                         for (int i = 0; i < resultIds.Length; i++)
                         {
                             var currentIndex = i; // need to assing this because of lambda
