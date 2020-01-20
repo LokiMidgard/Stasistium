@@ -19,13 +19,13 @@ namespace Stasistium.Stages
 
         private readonly Dictionary<TKey, (Start @in, MultiStageBase<TResult, TItemCache, TCache> @out)> startLookup = new Dictionary<TKey, (Start @in, MultiStageBase<TResult, TItemCache, TCache> @out)>();
 
-        private readonly Func<MultiStageBase<TInput, TInputItemCache, StartCache<TInputCache, TKey>>, MultiStageBase<TResult, TItemCache, TCache>> createPipline;
+        private readonly Func<MultiStageBase<TInput, TInputItemCache, StartCache<TInputCache, TKey>>, TKey, MultiStageBase<TResult, TItemCache, TCache>> createPipline;
 
         private readonly Func<IDocument<TInput>, TKey> keySelector;
 
         private readonly StagePerformHandler<TInput, TInputItemCache, TInputCache> input;
 
-        public GroupByStage(StagePerformHandler<TInput, TInputItemCache, TInputCache> input, Func<IDocument<TInput>, TKey> keySelector, Func<MultiStageBase<TInput, TInputItemCache, StartCache<TInputCache, TKey>>, MultiStageBase<TResult, TItemCache, TCache>> createPipline, IGeneratorContext context, string? name = null) : base(context, name)
+        public GroupByStage(StagePerformHandler<TInput, TInputItemCache, TInputCache> input, Func<IDocument<TInput>, TKey> keySelector, Func<MultiStageBase<TInput, TInputItemCache, StartCache<TInputCache, TKey>>, TKey, MultiStageBase<TResult, TItemCache, TCache>> createPipline, IGeneratorContext context, string? name = null) : base(context, name)
         {
             this.input = input ?? throw new ArgumentNullException(nameof(input));
             this.createPipline = createPipline ?? throw new ArgumentNullException(nameof(createPipline));
@@ -57,14 +57,10 @@ namespace Stasistium.Stages
 
                 var resultList = await Task.WhenAll(keyValues.GroupBy(x => x.Key).Select(async x =>
                     {
-                        if (this.startLookup.TryGetValue(x.Key, out var pipe))
-                        {
-
-                        }
-                        else
+                        if (!this.startLookup.TryGetValue(x.Key, out var pipe))
                         {
                             var start = new Start(this, x.Key, this.Context);
-                            var end = this.createPipline(start);
+                            var end = this.createPipline(start, x.Key);
                             pipe = (start, end);
                             this.startLookup.Add(x.Key, pipe);
                         }
@@ -267,7 +263,7 @@ namespace Stasistium
         public static GroupByStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache, TKey> GroupBy<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache, TKey>(
             this MultiStageBase<TInput, TInputItemCache, TInputCache> input,
             Func<IDocument<TInput>, TKey> keySelector,
-            Func<MultiStageBase<TInput, TInputItemCache, StartCache<TInputCache, TKey>>, MultiStageBase<TResult, TItemCache, TCache>> createPipline, string? name = null)
+            Func<MultiStageBase<TInput, TInputItemCache, StartCache<TInputCache, TKey>>, TKey, MultiStageBase<TResult, TItemCache, TCache>> createPipline, string? name = null)
             where TItemCache : class
     where TCache : class
     where TInputItemCache : class
