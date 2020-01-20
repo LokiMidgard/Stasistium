@@ -25,7 +25,7 @@ namespace Stasistium.Stages
 
         private readonly StagePerformHandler<TInput, TInputItemCache, TInputCache> input;
 
-        public GroupByStage(StagePerformHandler<TInput, TInputItemCache, TInputCache> input, Func<MultiStageBase<TInput, TInputItemCache, StartCache>, MultiStageBase<TResult, TItemCache, TCache>> createPipline, Func<IDocument<TInput>, TKey> keySelector, IGeneratorContext context, string? name = null) : base(context, name)
+        public GroupByStage(StagePerformHandler<TInput, TInputItemCache, TInputCache> input, Func<IDocument<TInput>, TKey> keySelector, Func<MultiStageBase<TInput, TInputItemCache, StartCache>, MultiStageBase<TResult, TItemCache, TCache>> createPipline, IGeneratorContext context, string? name = null) : base(context, name)
         {
             this.input = input ?? throw new ArgumentNullException(nameof(input));
             this.createPipline = createPipline ?? throw new ArgumentNullException(nameof(createPipline));
@@ -262,13 +262,13 @@ namespace Stasistium
 {
     public static partial class StageExtensions
     {
-        public static GroupByStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache, TKey> GroupBy<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache, TKey>(this MultiStageBase<TInput,TInputItemCache,TInputCache> input, Func<MultiStageBase<TInput, TInputItemCache, Stasistium.Stages.GroupByStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache, TKey>.StartCache>, MultiStageBase<TResult, TItemCache, TCache>> createPipline, Func<IDocument<TInput>, TKey> keySelector, string? name=null)
+        public static GroupByStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache, TKey> GroupBy<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache, TKey>(this MultiStageBase<TInput,TInputItemCache,TInputCache> input, Func<IDocument<TInput>, TKey> keySelector,Func<MultiStageBase<TInput, TInputItemCache, Stasistium.Stages.GroupByStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache, TKey>.StartCache>, MultiStageBase<TResult, TItemCache, TCache>> createPipline, string? name=null)
             where TItemCache : class
     where TCache : class
     where TInputItemCache : class
     where TInputCache : class
         {
-            return new GroupByStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache, TKey>(input.DoIt, createPipline, keySelector, input.Context, name);
+            return new GroupByStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache, TKey>(input.DoIt, keySelector, createPipline, input.Context, name);
         }
     }
 }
