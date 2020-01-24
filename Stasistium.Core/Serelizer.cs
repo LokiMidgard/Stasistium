@@ -46,14 +46,12 @@ namespace Stasistium.Serelizer
             {
 
                 var type = current.GetType();
-                var typeName = type.FullName;
-                var assemblyName = type.Assembly.FullName;
+                var typeName = type.AssemblyQualifiedName;
 
                 var implementedInterfaces = new HashSet<Type>(type.GetInterfaces().Where(x => x.IsGenericType).Select(x => x.GetGenericTypeDefinition()).Concat(type.GetInterfaces().Where(x => !x.IsGenericType)));
 
                 var currentJObject = new JObject();
                 currentJObject.Add("type", typeName);
-                //currentJObject.Add("assembly", assemblyName);
                 result.Add(currentJObject);
 
                 if (type.IsArray)
