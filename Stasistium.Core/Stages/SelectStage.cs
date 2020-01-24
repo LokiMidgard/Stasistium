@@ -15,13 +15,13 @@ namespace Stasistium.Stages
     where TInputCache : class
     {
 
-        private readonly Dictionary<string, (Start @in, StageBase<TResult, TItemCache> @out)> startLookup = new Dictionary<string, (Start @in, StageBase<TResult, TItemCache> @out)>();
+        private readonly System.Collections.Concurrent.ConcurrentDictionary<string, (Start @in, StageBase<TResult, TItemCache> @out)> startLookup = new System.Collections.Concurrent.ConcurrentDictionary<string, (Start @in, StageBase<TResult, TItemCache> @out)>();
 
-        private readonly Func<StageBase<TInput, GeneratedHelper.CacheId<string>>, StageBase<TResult, TItemCache>> createPipline;
+        private readonly Func<StageBase<TInput, StartCache<TInputCache>>, StageBase<TResult, TItemCache>> createPipline;
 
         private readonly StagePerformHandler<TInput, TInputItemCache, TInputCache> input;
 
-        public SelectStage(StagePerformHandler<TInput, TInputItemCache, TInputCache> input, Func<StageBase<TInput, GeneratedHelper.CacheId<string>>, StageBase<TResult, TItemCache>> createPipline, IGeneratorContext context, string? name = null) : base(context, name)
+        public SelectStage(StagePerformHandler<TInput, TInputItemCache, TInputCache> input, Func<StageBase<TInput, StartCache<TInputCache>>, StageBase<TResult, TItemCache>> createPipline, IGeneratorContext context, string? name = null) : base(context, name)
         {
             this.input = input ?? throw new ArgumentNullException(nameof(input));
             this.createPipline = createPipline ?? throw new ArgumentNullException(nameof(createPipline));
@@ -38,17 +38,12 @@ namespace Stasistium.Stages
                 var resultList = await Task.WhenAll(inputResult.Select(async item =>
                {
 
-                   if (this.startLookup.TryGetValue(item.Id, out var pipe))
+                   var pipe = this.startLookup.GetOrAdd(item.Id, id =>
                    {
-                       pipe.@in.In = item;
-                   }
-                   else
-                   {
-                       var start = new SelectStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache>.Start(item, this.Context);
+                       var start = new Start(this, id, this.Context);
                        var end = this.createPipline(start);
-                       pipe = (start, end);
-                       this.startLookup.Add(item.Id, pipe);
-                   }
+                       return (start, end);
+                   });
 
                    if (cache == null || !cache.InputItemCacheLookup.TryGetValue(item.Id, out TItemCache? lastCache) || !cache.InputItemHashLookup.TryGetValue(item.Id, out string? lastHash) || !cache.InputItemOutputIdLookup.TryGetValue(item.Id, out string? lastOutputId))
                    {
@@ -110,42 +105,76 @@ namespace Stasistium.Stages
 
 
 
-        private class Start : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple0List0StageBase<TInput>
+        private class Start : StageBase<TInput, StartCache<TInputCache>>
         {
-            private string? lastHash;
-            private StageResult<TInput, TInputItemCache> @in;
+            private readonly SelectStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache> parent;
 
-            public Start(StageResult<TInput, TInputItemCache> initial, IGeneratorContext context, string? name = null) : base(context, name)
+            private readonly string key;
+
+            public Start(SelectStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache> parent, string key, IGeneratorContext context, string? name = null) : base(context, name)
             {
-                this.@in = initial;
+                this.parent = parent ?? throw new ArgumentNullException(nameof(parent));
+                this.key = key;
             }
 
-            public StageResult<TInput, TInputItemCache> In
+
+            protected override async Task<StageResult<TInput, StartCache<TInputCache>>> DoInternal([AllowNull] StartCache<TInputCache>? cache, OptionToken options)
             {
-                get => this.@in; set
+                var input = await this.parent.input(cache?.PreviousCache, options).ConfigureAwait(false);
+
+                var task = LazyTask.Create(async () =>
                 {
-                    this.@in = value;
-                    this.lastHash = null;
+                    var (inputResult, inputCache) = await input.Perform;
+                    var current = inputResult.Single(x => x.Id == this.key);
+                    var subResult = await current.Perform;
+
+                    var newCache = new StartCache<TInputCache>()
+                    {
+                        PreviousCache = inputCache,
+                        Id = subResult.result.Id,
+                        Hash = subResult.result.Hash
+                    };
+                    return (subResult.result, newCache);
+                });
+
+                string id;
+
+                bool hasChanges = input.HasChanges;
+                if (hasChanges || cache is null)
+                {
+                    var list = await input.Perform;
+                    var current = list.result.Single(x => x.Id == this.key);
+                    if (current.HasChanges || cache is null)
+                    {
+                        var (result, newCache) = await task;
+                        id = result.Id;
+                        hasChanges = cache is null || result.Hash != cache.Hash;
+                    }
+                    else
+                    {
+                        id = cache.Id;
+                    }
+
+
+
+
                 }
+                else
+                {
+                    id = cache.Id;
+                }
+                return StageResult.Create(task, hasChanges, id);
             }
 
 
-
-            protected override Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options)
-            {
-                return Task.FromResult<bool?>(this.In.Id != id || this.lastHash != hash || hash is null);
-            }
-
-
-            protected override async Task<IDocument<TInput>> Work(OptionToken options)
-            {
-                var result = await this.In.Perform;
-
-                return result.result;
-            }
         }
     }
 
 
-
+    public class StartCache<TInputCache>
+    {
+        public TInputCache PreviousCache { get; set; }
+        public string Id { get; set; }
+        public string Hash { get; set; }
+    }
 }
