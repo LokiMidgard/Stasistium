@@ -71,15 +71,24 @@ namespace Stasistium.Stages
         {
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
+            using var indent = this.Context.Logger.Indent();
+            this.Context.Logger.Info($"BEGIN");
+            var stopWatch = System.Diagnostics.Stopwatch.StartNew();
+            try
+            {
+                var lastRun = this.lastRun;
+                if (lastRun.lastId == options.GenerationId)
+                    return lastRun.result;
 
-
-            var lastRun = this.lastRun;
-            if (lastRun.lastId == options.GenerationId)
-                return lastRun.result;
-
-            var result = this.DoInternal(cache, options);
-            this.lastRun = (options.GenerationId, result);
-            return result;
+                var result = this.DoInternal(cache, options);
+                this.lastRun = (options.GenerationId, result);
+                return result;
+            }
+            finally
+            {
+                stopWatch.Stop();
+                this.Context.Logger.Info($"END Took {stopWatch.Elapsed}");
+            }
         }
 
         public IGeneratorContext Context { get; }
