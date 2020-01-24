@@ -363,7 +363,7 @@ namespace Single.Simple {
 ;
 
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
 ;
 
@@ -467,7 +467,7 @@ namespace Multiple.Simple {
 ;
 
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
 ;
 
@@ -723,10 +723,10 @@ await Task.WhenAll(
 ;
 
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
 ;
 
@@ -859,10 +859,10 @@ await Task.WhenAll(
 ;
 
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
 ;
 
@@ -1143,13 +1143,13 @@ await Task.WhenAll(
 ;
 
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
             if(inputList2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
 
 ;
 
@@ -1300,13 +1300,13 @@ await Task.WhenAll(
 ;
 
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
             if(inputList2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
 
 ;
 
@@ -1612,16 +1612,16 @@ await Task.WhenAll(
 ;
 
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
             if(inputList2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
 
             if(inputList3Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
 
 ;
 
@@ -1790,16 +1790,16 @@ await Task.WhenAll(
 ;
 
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
             if(inputList2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
 
             if(inputList3Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
 
 ;
 
@@ -2046,7 +2046,7 @@ namespace Single.Simple {
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
 ;
 
             var id = cache?.Id;
@@ -2144,7 +2144,7 @@ namespace Multiple.Simple {
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
 ;
 
             var ids = cache?.Ids;
@@ -2390,9 +2390,9 @@ namespace Single.Simple {
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
 ;
 
@@ -2516,9 +2516,9 @@ namespace Multiple.Simple {
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
 ;
 
@@ -2793,12 +2793,12 @@ await Task.WhenAll(
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
 ;
 
@@ -2943,12 +2943,12 @@ await Task.WhenAll(
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
 ;
 
@@ -3248,15 +3248,15 @@ await Task.WhenAll(
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
             if(inputList2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
 
 ;
 
@@ -3419,15 +3419,15 @@ await Task.WhenAll(
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
             if(inputList2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
 
 ;
 
@@ -3752,18 +3752,18 @@ await Task.WhenAll(
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
             if(inputList2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
 
             if(inputList3Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
 
 ;
 
@@ -3944,18 +3944,18 @@ await Task.WhenAll(
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
             if(inputList2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
 
             if(inputList3Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
 
 ;
 
@@ -4229,9 +4229,9 @@ namespace Single.Simple {
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
 ;
 
             var id = cache?.Id;
@@ -4349,9 +4349,9 @@ namespace Multiple.Simple {
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
 ;
 
             var ids = cache?.Ids;
@@ -4616,11 +4616,11 @@ namespace Single.Simple {
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
 ;
 
@@ -4756,11 +4756,11 @@ namespace Multiple.Simple {
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
 ;
 
@@ -5054,14 +5054,14 @@ await Task.WhenAll(
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
 ;
 
@@ -5218,14 +5218,14 @@ await Task.WhenAll(
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
 ;
 
@@ -5544,17 +5544,17 @@ await Task.WhenAll(
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
             if(inputList2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
 
 ;
 
@@ -5729,17 +5729,17 @@ await Task.WhenAll(
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
             if(inputList2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
 
 ;
 
@@ -6083,20 +6083,20 @@ await Task.WhenAll(
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
             if(inputList2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
 
             if(inputList3Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
 
 ;
 
@@ -6289,20 +6289,20 @@ await Task.WhenAll(
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
             if(inputList2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
 
             if(inputList3Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
 
 ;
 
@@ -6595,11 +6595,11 @@ namespace Single.Simple {
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputSingle2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle2Result.Id}");
 ;
 
             var id = cache?.Id;
@@ -6729,11 +6729,11 @@ namespace Multiple.Simple {
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputSingle2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle2Result.Id}");
 ;
 
             var ids = cache?.Ids;
@@ -7017,13 +7017,13 @@ namespace Single.Simple {
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputSingle2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle2Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
 ;
 
@@ -7171,13 +7171,13 @@ namespace Multiple.Simple {
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputSingle2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle2Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
 ;
 
@@ -7490,16 +7490,16 @@ await Task.WhenAll(
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputSingle2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle2Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
 ;
 
@@ -7668,16 +7668,16 @@ await Task.WhenAll(
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputSingle2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle2Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
 ;
 
@@ -8015,19 +8015,19 @@ await Task.WhenAll(
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputSingle2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle2Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
             if(inputList2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
 
 ;
 
@@ -8214,19 +8214,19 @@ await Task.WhenAll(
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputSingle2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle2Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
             if(inputList2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
 
 ;
 
@@ -8589,22 +8589,22 @@ await Task.WhenAll(
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputSingle2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle2Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
             if(inputList2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
 
             if(inputList3Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
 
 ;
 
@@ -8809,22 +8809,22 @@ await Task.WhenAll(
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputSingle2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle2Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
             if(inputList2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
 
             if(inputList3Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
 
 ;
 
@@ -9136,13 +9136,13 @@ namespace Single.Simple {
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputSingle2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle2Result.Id}");
             if(inputSingle3Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle3Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle3Result.Id}");
 ;
 
             var id = cache?.Id;
@@ -9284,13 +9284,13 @@ namespace Multiple.Simple {
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputSingle2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle2Result.Id}");
             if(inputSingle3Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle3Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle3Result.Id}");
 ;
 
             var ids = cache?.Ids;
@@ -9593,15 +9593,15 @@ namespace Single.Simple {
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputSingle2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle2Result.Id}");
             if(inputSingle3Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle3Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle3Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
 ;
 
@@ -9761,15 +9761,15 @@ namespace Multiple.Simple {
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputSingle2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle2Result.Id}");
             if(inputSingle3Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle3Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle3Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
 ;
 
@@ -10101,18 +10101,18 @@ await Task.WhenAll(
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputSingle2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle2Result.Id}");
             if(inputSingle3Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle3Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle3Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
 ;
 
@@ -10293,18 +10293,18 @@ await Task.WhenAll(
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputSingle2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle2Result.Id}");
             if(inputSingle3Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle3Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle3Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
 ;
 
@@ -10661,21 +10661,21 @@ await Task.WhenAll(
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputSingle2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle2Result.Id}");
             if(inputSingle3Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle3Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle3Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
             if(inputList2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
 
 ;
 
@@ -10874,21 +10874,21 @@ await Task.WhenAll(
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputSingle2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle2Result.Id}");
             if(inputSingle3Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle3Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle3Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
             if(inputList2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
 
 ;
 
@@ -11270,24 +11270,24 @@ await Task.WhenAll(
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputSingle2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle2Result.Id}");
             if(inputSingle3Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle3Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle3Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
             if(inputList2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
 
             if(inputList3Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
 
 ;
 
@@ -11504,24 +11504,24 @@ await Task.WhenAll(
 ;
 
             if(inputSingle0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle0Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
             if(inputSingle1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle1Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
             if(inputSingle2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle2Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle2Result.Id}");
             if(inputSingle3Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle3Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle3Result.Id}");
             if(inputList0Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList0Result.Ids)}");
 
             if(inputList1Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList1Result.Ids)}");
 
             if(inputList2Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList2Result.Ids)}");
 
             if(inputList3Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList3Result.Ids)}");
 
 ;
 

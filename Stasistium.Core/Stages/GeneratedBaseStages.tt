@@ -195,11 +195,11 @@ for(int j = 0; j< list; j++){
 
 <#for(int j = 0; j< single; j++){#>
             if(inputSingle<#= j #>Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle<#= j #>Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle<#= j #>Result.Id}");
 <#}#>
 <#for(int j = 0; j< list; j++){#>
             if(inputList<#= j #>Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList<#= j #>Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList<#= j #>Result.Ids)}");
 
 <#}#>;
 
@@ -434,11 +434,11 @@ var parameter = new StringBuilder();
 
 <#for(int j = 0; j< single; j++){#>
             if(inputSingle<#= j #>Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for input with id: {inputSingle<#= j #>Result.Id}");
+                this.Context.Logger.Info($"Found Changes for input with id: {inputSingle<#= j #>Result.Id}");
 <#}#>
 <#for(int j = 0; j< list; j++){#>
             if(inputList<#= j #>Result.HasChanges)
-                this.Context.Logger.Info($"{this.GetType()} found Changes for list with ids: {string.Join(", ", inputList<#= j #>Result.Ids)}");
+                this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList<#= j #>Result.Ids)}");
 
 <#}#>;
 

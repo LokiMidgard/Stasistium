@@ -25,7 +25,7 @@ namespace Stasistium.Stages
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
             using var indent = this.Context.Logger.Indent();
-            this.Context.Logger.Info($"BEGIN {this.GetType().Name}");
+            this.Context.Logger.Info($"BEGIN");
             var stopWatch = System.Diagnostics.Stopwatch.StartNew();
             try
             {
