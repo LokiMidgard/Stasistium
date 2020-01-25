@@ -70,6 +70,10 @@ namespace Single.Simple {
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -156,6 +160,9 @@ namespace Multiple.Simple {
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
@@ -376,6 +383,10 @@ namespace Single.Simple {
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -480,6 +491,9 @@ namespace Multiple.Simple {
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
@@ -739,6 +753,10 @@ await Task.WhenAll(
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -875,6 +893,9 @@ await Task.WhenAll(
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
@@ -1162,6 +1183,10 @@ await Task.WhenAll(
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -1319,6 +1344,9 @@ await Task.WhenAll(
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
@@ -1634,6 +1662,10 @@ await Task.WhenAll(
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -1812,6 +1844,9 @@ await Task.WhenAll(
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
@@ -2058,6 +2093,10 @@ namespace Single.Simple {
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -2147,18 +2186,21 @@ namespace Multiple.Simple {
                 this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
 ;
 
-            var ids = cache?.Ids;
+            var idsHashs = cache?.Ids;
             if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
 
                 var result = await task;
-                ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
+                idsHashs = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
-            return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
+            return StageResultList.Create(task, hasChanges, idsHashs.Select(x=>x.id).ToImmutableList());
         }
 
         protected virtual Task<bool?> ForceUpdate((string id, string hash)[]? ids, OptionToken options) => Task.FromResult<bool?>(null);
@@ -2405,6 +2447,10 @@ namespace Single.Simple {
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -2531,6 +2577,9 @@ namespace Multiple.Simple {
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
@@ -2811,6 +2860,10 @@ await Task.WhenAll(
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -2961,6 +3014,9 @@ await Task.WhenAll(
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
@@ -3269,6 +3325,10 @@ await Task.WhenAll(
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -3440,6 +3500,9 @@ await Task.WhenAll(
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
@@ -3776,6 +3839,10 @@ await Task.WhenAll(
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -3968,6 +4035,9 @@ await Task.WhenAll(
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
@@ -4243,6 +4313,10 @@ namespace Single.Simple {
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -4363,6 +4437,9 @@ namespace Multiple.Simple {
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
@@ -4633,6 +4710,10 @@ namespace Single.Simple {
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -4773,6 +4854,9 @@ namespace Multiple.Simple {
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
@@ -5074,6 +5158,10 @@ await Task.WhenAll(
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -5238,6 +5326,9 @@ await Task.WhenAll(
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
@@ -5567,6 +5658,10 @@ await Task.WhenAll(
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -5752,6 +5847,9 @@ await Task.WhenAll(
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
@@ -6109,6 +6207,10 @@ await Task.WhenAll(
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -6315,6 +6417,9 @@ await Task.WhenAll(
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
@@ -6611,6 +6716,10 @@ namespace Single.Simple {
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -6745,6 +6854,9 @@ namespace Multiple.Simple {
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
@@ -7036,6 +7148,10 @@ namespace Single.Simple {
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -7190,6 +7306,9 @@ namespace Multiple.Simple {
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
@@ -7512,6 +7631,10 @@ await Task.WhenAll(
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -7690,6 +7813,9 @@ await Task.WhenAll(
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
@@ -8040,6 +8166,10 @@ await Task.WhenAll(
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -8239,6 +8369,9 @@ await Task.WhenAll(
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
@@ -8617,6 +8750,10 @@ await Task.WhenAll(
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -8837,6 +8974,9 @@ await Task.WhenAll(
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
@@ -9154,6 +9294,10 @@ namespace Single.Simple {
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -9302,6 +9446,9 @@ namespace Multiple.Simple {
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
@@ -9614,6 +9761,10 @@ namespace Single.Simple {
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -9782,6 +9933,9 @@ namespace Multiple.Simple {
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
@@ -10125,6 +10279,10 @@ await Task.WhenAll(
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -10317,6 +10475,9 @@ await Task.WhenAll(
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
@@ -10688,6 +10849,10 @@ await Task.WhenAll(
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -10901,6 +11066,9 @@ await Task.WhenAll(
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
@@ -11300,6 +11468,10 @@ await Task.WhenAll(
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -11534,6 +11706,9 @@ await Task.WhenAll(
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());

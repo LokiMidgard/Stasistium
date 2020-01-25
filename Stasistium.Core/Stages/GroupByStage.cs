@@ -101,6 +101,10 @@ namespace Stasistium.Stages
                 return (finishedList, newCache);
             });
 
+            if (input.HasChanges)
+                this.Context.Logger.Info($"Input had Changes");
+
+
             bool hasChanges;
             ImmutableList<string> ids;
             if (input.HasChanges || cache is null)
@@ -115,6 +119,8 @@ namespace Stasistium.Stages
                 }
                 else
                     hasChanges = false;
+                if (!hasChanges)
+                    this.Context.Logger.Info($"No longer has Changes");
             }
             else
             {
@@ -163,8 +169,6 @@ namespace Stasistium.Stages
                        })).ConfigureAwait(false);
                     var item = itemToKey.Where<(TKey Key, StageResult<TInput, TInputItemCache> Document)>(x => Equals(x.Key, this.key)).Select(x => x.Document);
 
-
-
                     var resultList = await Task.WhenAll<StageResult<TInput, TInputItemCache>>(item.Select(async input =>
                     {
                         if (input.HasChanges || cache is null)
@@ -176,11 +180,6 @@ namespace Stasistium.Stages
                             return StageResult.Create(input.Perform, input.HasChanges, input.Id);
                     })).ConfigureAwait(false);
 
-
-
-
-
-
                     var newCache = new StartCache<TInputCache, TKey>()
                     {
                         PreviousCache = inputCache,
@@ -191,7 +190,8 @@ namespace Stasistium.Stages
                 });
 
                 ImmutableList<string> ids;
-
+                if (input.HasChanges)
+                    this.Context.Logger.Info($"Input had Changes for Key {this.key}");
                 bool hasChanges = input.HasChanges;
                 if (hasChanges || cache is null)
                 {
@@ -201,6 +201,9 @@ namespace Stasistium.Stages
                     if (cache != null)
                         hasChanges = !cache.Ids.SequenceEqual(newCache.Ids)
                                 || result.Any(x => x.HasChanges);
+
+                    if (!hasChanges)
+                        this.Context.Logger.Info($"No longer has changes for Key {this.key}");
 
 
                 }

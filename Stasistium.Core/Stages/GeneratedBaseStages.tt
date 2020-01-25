@@ -212,6 +212,10 @@ for(int j = 0; j< list; j++){
                 var result = await task;
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
+
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResult.Create(task, hasChanges, id);
@@ -451,6 +455,9 @@ var parameter = new StringBuilder();
                 var result = await task;
                 ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
+                if(!hasChanges)
+                    this.Context.Logger.Info($"Output will not have changes.");
+
             }
 
             return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
