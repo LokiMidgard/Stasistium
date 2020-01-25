@@ -58,7 +58,7 @@ namespace Stasistium.Stages
             {
                 var result = await task;
                 id = result.result.Id;
-                hasChanges = result.result.Id != cache?.LastHash;
+                hasChanges = result.result.Hash != cache?.LastHash;
             }
             else
                 id = Path.GetFileName(cache.Path);
