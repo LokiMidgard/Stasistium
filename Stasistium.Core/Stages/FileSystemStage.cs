@@ -65,7 +65,7 @@ namespace Stasistium.Stages
                     if (hasChanges || cache is null)
                     {
                         // check if we actually have changes.
-                        var document = new FileDocument(file, root, null, this.Context);
+                        var document = new FileDocument(file, root, performed.Metadata, this.Context);
                         if (cache is null || !cache.PathToHash.TryGetValue(id, out string? lastHash))
                             lastHash = null;
 
@@ -80,7 +80,7 @@ namespace Stasistium.Stages
 
                         var subTask = LazyTask.Create(() =>
                         {
-                            var document = new FileDocument(file, root, null, this.Context);
+                            var document = new FileDocument(file, root, performed.Metadata, this.Context);
                             return (document as IDocument<Stream>, document.Hash);
                         });
 
