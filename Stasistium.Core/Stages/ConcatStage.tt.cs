@@ -151,11 +151,11 @@ await Task.WhenAll(
                         throw this.Context.Exception("Should Not Happen");
                     for (int i = 0; i < cache.Ids1.Length; i++)
                     {
-
+                        var currentIndex = i;
                         var childTask = LazyTask.Create(async () =>
                         {
                             var performed = await result1.Perform;
-                            var chiledIndex = performed.result[i];
+                            var chiledIndex = performed.result[currentIndex];
                             var childPerform = await chiledIndex.Perform;
                             // We are in the no changes part. So ther must be no changes.
                             System.Diagnostics.Debug.Assert(!chiledIndex.HasChanges);
@@ -297,11 +297,11 @@ await Task.WhenAll(
                         throw this.Context.Exception("Should Not Happen");
                     for (int i = 0; i < cache.Ids1.Length; i++)
                     {
-
+                        var currentIndex = i;
                         var childTask = LazyTask.Create(async () =>
                         {
                             var performed = await result1.Perform;
-                            var chiledIndex = performed.result[i];
+                            var chiledIndex = performed.result[currentIndex];
                             var childPerform = await chiledIndex.Perform;
                             // We are in the no changes part. So ther must be no changes.
                             System.Diagnostics.Debug.Assert(!chiledIndex.HasChanges);
@@ -368,11 +368,11 @@ await Task.WhenAll(
                         throw this.Context.Exception("Should Not Happen");
                     for (int i = 0; i < cache.Ids2.Length; i++)
                     {
-
+                        var currentIndex = i;
                         var childTask = LazyTask.Create(async () =>
                         {
                             var performed = await result2.Perform;
-                            var chiledIndex = performed.result[i];
+                            var chiledIndex = performed.result[currentIndex];
                             var childPerform = await chiledIndex.Perform;
                             // We are in the no changes part. So ther must be no changes.
                             System.Diagnostics.Debug.Assert(!chiledIndex.HasChanges);
@@ -529,11 +529,11 @@ await Task.WhenAll(
                         throw this.Context.Exception("Should Not Happen");
                     for (int i = 0; i < cache.Ids1.Length; i++)
                     {
-
+                        var currentIndex = i;
                         var childTask = LazyTask.Create(async () =>
                         {
                             var performed = await result1.Perform;
-                            var chiledIndex = performed.result[i];
+                            var chiledIndex = performed.result[currentIndex];
                             var childPerform = await chiledIndex.Perform;
                             // We are in the no changes part. So ther must be no changes.
                             System.Diagnostics.Debug.Assert(!chiledIndex.HasChanges);
@@ -600,11 +600,11 @@ await Task.WhenAll(
                         throw this.Context.Exception("Should Not Happen");
                     for (int i = 0; i < cache.Ids2.Length; i++)
                     {
-
+                        var currentIndex = i;
                         var childTask = LazyTask.Create(async () =>
                         {
                             var performed = await result2.Perform;
-                            var chiledIndex = performed.result[i];
+                            var chiledIndex = performed.result[currentIndex];
                             var childPerform = await chiledIndex.Perform;
                             // We are in the no changes part. So ther must be no changes.
                             System.Diagnostics.Debug.Assert(!chiledIndex.HasChanges);
@@ -671,11 +671,11 @@ await Task.WhenAll(
                         throw this.Context.Exception("Should Not Happen");
                     for (int i = 0; i < cache.Ids3.Length; i++)
                     {
-
+                        var currentIndex = i;
                         var childTask = LazyTask.Create(async () =>
                         {
                             var performed = await result3.Perform;
-                            var chiledIndex = performed.result[i];
+                            var chiledIndex = performed.result[currentIndex];
                             var childPerform = await chiledIndex.Perform;
                             // We are in the no changes part. So ther must be no changes.
                             System.Diagnostics.Debug.Assert(!chiledIndex.HasChanges);
@@ -847,11 +847,11 @@ await Task.WhenAll(
                         throw this.Context.Exception("Should Not Happen");
                     for (int i = 0; i < cache.Ids1.Length; i++)
                     {
-
+                        var currentIndex = i;
                         var childTask = LazyTask.Create(async () =>
                         {
                             var performed = await result1.Perform;
-                            var chiledIndex = performed.result[i];
+                            var chiledIndex = performed.result[currentIndex];
                             var childPerform = await chiledIndex.Perform;
                             // We are in the no changes part. So ther must be no changes.
                             System.Diagnostics.Debug.Assert(!chiledIndex.HasChanges);
@@ -918,11 +918,11 @@ await Task.WhenAll(
                         throw this.Context.Exception("Should Not Happen");
                     for (int i = 0; i < cache.Ids2.Length; i++)
                     {
-
+                        var currentIndex = i;
                         var childTask = LazyTask.Create(async () =>
                         {
                             var performed = await result2.Perform;
-                            var chiledIndex = performed.result[i];
+                            var chiledIndex = performed.result[currentIndex];
                             var childPerform = await chiledIndex.Perform;
                             // We are in the no changes part. So ther must be no changes.
                             System.Diagnostics.Debug.Assert(!chiledIndex.HasChanges);
@@ -989,11 +989,11 @@ await Task.WhenAll(
                         throw this.Context.Exception("Should Not Happen");
                     for (int i = 0; i < cache.Ids3.Length; i++)
                     {
-
+                        var currentIndex = i;
                         var childTask = LazyTask.Create(async () =>
                         {
                             var performed = await result3.Perform;
-                            var chiledIndex = performed.result[i];
+                            var chiledIndex = performed.result[currentIndex];
                             var childPerform = await chiledIndex.Perform;
                             // We are in the no changes part. So ther must be no changes.
                             System.Diagnostics.Debug.Assert(!chiledIndex.HasChanges);
@@ -1060,11 +1060,11 @@ await Task.WhenAll(
                         throw this.Context.Exception("Should Not Happen");
                     for (int i = 0; i < cache.Ids4.Length; i++)
                     {
-
+                        var currentIndex = i;
                         var childTask = LazyTask.Create(async () =>
                         {
                             var performed = await result4.Perform;
-                            var chiledIndex = performed.result[i];
+                            var chiledIndex = performed.result[currentIndex];
                             var childPerform = await chiledIndex.Perform;
                             // We are in the no changes part. So ther must be no changes.
                             System.Diagnostics.Debug.Assert(!chiledIndex.HasChanges);
