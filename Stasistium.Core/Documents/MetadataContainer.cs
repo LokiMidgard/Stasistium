@@ -77,6 +77,25 @@ namespace Stasistium.Documents
             return new MetadataContainer(this.values.SetItem(typeof(T), newValue), this.Context);
         }
 
+        public MetadataContainer Add(MetadataContainer container)
+        {
+            if (container is null)
+                throw new ArgumentNullException(nameof(container));
+            var current = this;
+            foreach (var item in container.values)
+                current = current.Add(item.Key, item.Value);
+            return current;
+        }
+        public MetadataContainer AddOrUpdate(MetadataContainer container)
+        {
+            if (container is null)
+                throw new ArgumentNullException(nameof(container));
+            var current = this;
+            foreach (var item in container.values)
+                current = current.AddOrUpdate(item.Key, item.Value);
+            return current;
+        }
+
         public MetadataContainer Add<T>(T value)
             where T : class => new MetadataContainer(this.values.Add(typeof(T), value), this.Context);
 
