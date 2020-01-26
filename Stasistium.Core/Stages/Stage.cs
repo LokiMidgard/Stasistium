@@ -140,15 +140,6 @@ namespace Stasistium
             return new TransformStage<TIn, TInCache, TOut>(input.DoIt, x => Task.FromResult(predicate(x)), input.Context, name);
         }
 
-        public static SelectStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache> Select<TInput, TInputItemCache, TInputCache, TResult, TItemCache>(this MultiStageBase<TInput, TInputItemCache, TInputCache> input, Func<StageBase<TInput, StartCache<TInputCache>>, StageBase<TResult, TItemCache>> createPipline, string? name = null)
-            where TInputCache : class
-            where TInputItemCache : class
-            where TItemCache : class
-        {
-            if (input is null)
-                throw new ArgumentNullException(nameof(input));
-            return new SelectStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache>(input.DoIt, createPipline, input.Context, name);
-        }
 
         public static SelectManyStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache> SelectMany<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache>(this MultiStageBase<TInput, TInputItemCache, TInputCache> input, Func<StageBase<TInput, Stages.GeneratedHelper.CacheId<string>>, MultiStageBase<TResult, TItemCache, TCache>> createPipline, string? name = null)
             where TCache : class
