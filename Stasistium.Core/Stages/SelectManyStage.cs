@@ -124,7 +124,7 @@ where TInputCache : class
 
                 if (cache != null)
                 {
-                    hasChanges = newCache.OutputIdOrder.SequenceEqual(cache.OutputIdOrder) || work.Any(x => x.HasChanges);
+                    hasChanges = !newCache.OutputIdOrder.SequenceEqual(cache.OutputIdOrder) || work.Any(x => x.HasChanges);
                 }
 
             }
