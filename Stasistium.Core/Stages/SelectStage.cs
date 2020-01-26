@@ -250,7 +250,7 @@ where TInputCache2 : class
                 return (resultList.Select(x => x.result).ToImmutableList(), newCache);
             });
 
-            var hasChanges = input.HasChanges;
+            var hasChanges = input.HasChanges || input2.HasChanges;
             var ids = cache?.OutputIdOrder;
             if (hasChanges || ids is null)
             {

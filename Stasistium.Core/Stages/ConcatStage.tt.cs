@@ -162,7 +162,7 @@ await Task.WhenAll(
 
                             return (childPerform.result, childPerform.result.Hash);
                         });
-                        list.Add(StageResult.Create(childTask, false, cache.Ids1[i]));
+                        list.Add(StageResult.Create(childTask, false, cache.Ids1[currentIndex]));
                     }
                     newCache.PreviouseCache1 = cache.PreviouseCache1;
                     newCache.Ids1 = cache.Ids1;
@@ -308,7 +308,7 @@ await Task.WhenAll(
 
                             return (childPerform.result, childPerform.result.Hash);
                         });
-                        list.Add(StageResult.Create(childTask, false, cache.Ids1[i]));
+                        list.Add(StageResult.Create(childTask, false, cache.Ids1[currentIndex]));
                     }
                     newCache.PreviouseCache1 = cache.PreviouseCache1;
                     newCache.Ids1 = cache.Ids1;
@@ -379,7 +379,7 @@ await Task.WhenAll(
 
                             return (childPerform.result, childPerform.result.Hash);
                         });
-                        list.Add(StageResult.Create(childTask, false, cache.Ids2[i]));
+                        list.Add(StageResult.Create(childTask, false, cache.Ids2[currentIndex]));
                     }
                     newCache.PreviouseCache2 = cache.PreviouseCache2;
                     newCache.Ids2 = cache.Ids2;
@@ -540,7 +540,7 @@ await Task.WhenAll(
 
                             return (childPerform.result, childPerform.result.Hash);
                         });
-                        list.Add(StageResult.Create(childTask, false, cache.Ids1[i]));
+                        list.Add(StageResult.Create(childTask, false, cache.Ids1[currentIndex]));
                     }
                     newCache.PreviouseCache1 = cache.PreviouseCache1;
                     newCache.Ids1 = cache.Ids1;
@@ -611,7 +611,7 @@ await Task.WhenAll(
 
                             return (childPerform.result, childPerform.result.Hash);
                         });
-                        list.Add(StageResult.Create(childTask, false, cache.Ids2[i]));
+                        list.Add(StageResult.Create(childTask, false, cache.Ids2[currentIndex]));
                     }
                     newCache.PreviouseCache2 = cache.PreviouseCache2;
                     newCache.Ids2 = cache.Ids2;
@@ -682,7 +682,7 @@ await Task.WhenAll(
 
                             return (childPerform.result, childPerform.result.Hash);
                         });
-                        list.Add(StageResult.Create(childTask, false, cache.Ids3[i]));
+                        list.Add(StageResult.Create(childTask, false, cache.Ids3[currentIndex]));
                     }
                     newCache.PreviouseCache3 = cache.PreviouseCache3;
                     newCache.Ids3 = cache.Ids3;
@@ -858,7 +858,7 @@ await Task.WhenAll(
 
                             return (childPerform.result, childPerform.result.Hash);
                         });
-                        list.Add(StageResult.Create(childTask, false, cache.Ids1[i]));
+                        list.Add(StageResult.Create(childTask, false, cache.Ids1[currentIndex]));
                     }
                     newCache.PreviouseCache1 = cache.PreviouseCache1;
                     newCache.Ids1 = cache.Ids1;
@@ -929,7 +929,7 @@ await Task.WhenAll(
 
                             return (childPerform.result, childPerform.result.Hash);
                         });
-                        list.Add(StageResult.Create(childTask, false, cache.Ids2[i]));
+                        list.Add(StageResult.Create(childTask, false, cache.Ids2[currentIndex]));
                     }
                     newCache.PreviouseCache2 = cache.PreviouseCache2;
                     newCache.Ids2 = cache.Ids2;
@@ -1000,7 +1000,7 @@ await Task.WhenAll(
 
                             return (childPerform.result, childPerform.result.Hash);
                         });
-                        list.Add(StageResult.Create(childTask, false, cache.Ids3[i]));
+                        list.Add(StageResult.Create(childTask, false, cache.Ids3[currentIndex]));
                     }
                     newCache.PreviouseCache3 = cache.PreviouseCache3;
                     newCache.Ids3 = cache.Ids3;
@@ -1071,7 +1071,7 @@ await Task.WhenAll(
 
                             return (childPerform.result, childPerform.result.Hash);
                         });
-                        list.Add(StageResult.Create(childTask, false, cache.Ids4[i]));
+                        list.Add(StageResult.Create(childTask, false, cache.Ids4[currentIndex]));
                     }
                     newCache.PreviouseCache4 = cache.PreviouseCache4;
                     newCache.Ids4 = cache.Ids4;
