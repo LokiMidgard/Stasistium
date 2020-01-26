@@ -34,7 +34,7 @@ namespace Stasistium.Stages
                 baseName = $"{type.Name}.{baseName}";
             }
 
-            return baseName + Guid.NewGuid().ToString();
+            return $"{baseName}-{Guid.NewGuid()}";
         }
     }
     public abstract class StageBase<TResult, TCache> : StageBase
