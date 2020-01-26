@@ -181,6 +181,8 @@ namespace Stasistium.Documents
                 ulong l => l.ToString(c),
                 byte b => b.ToString(c),
                 bool b => b.ToString(c),
+                System.IO.FileInfo fileInfo => fileInfo.FullName,
+                System.IO.DirectoryInfo direcoryInfo => direcoryInfo.FullName,
                 DateTime date => date.ToString(System.Globalization.CultureInfo.InvariantCulture),
                 DateTimeOffset date => date.ToString(System.Globalization.CultureInfo.InvariantCulture),
                 null => "",
