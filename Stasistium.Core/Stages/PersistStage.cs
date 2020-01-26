@@ -88,7 +88,10 @@ namespace Stasistium.Stages
 
                     foreach (var subFile in currentDirectory.GetFiles())
                         if (!allFiles.Contains(subFile.FullName.Replace('\\', '/')))
+                        {
+                            this.context.Logger.Info($"Deleting {subFile}");
                             subFile.Delete();
+                        }
 
                     if (currentDirectory.GetFiles().Length == 0 && currentDirectory.GetDirectories().Length == 0)
                         currentDirectory.Delete(false);
@@ -102,6 +105,7 @@ namespace Stasistium.Stages
                     fileInfo.Directory.Create();
                     using var outStream = fileInfo.Open(FileMode.Create, FileAccess.Write, FileShare.None);
                     using var inStream = file.Value;
+                    this.context.Logger.Info($"Writing {file.Id}");
 
                     await inStream.CopyToAsync(outStream).ConfigureAwait(false);
                 });
