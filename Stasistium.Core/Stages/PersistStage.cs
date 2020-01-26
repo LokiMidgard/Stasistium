@@ -58,7 +58,7 @@ namespace Stasistium.Stages
                 cache = null;
 
             var result = await this.inputList(cache, this.generatorOptions.Token).ConfigureAwait(false);
-            this.context.Logger.Info($"Cache is {(result.HasChanges ? "valid" : "INVALID")}");
+            this.context.Logger.Info($"Cache is {(result.HasChanges ? "INVALID" : "valid")}");
             if (result.HasChanges)
             {
                 var (files, newCache) = await result.Perform;
