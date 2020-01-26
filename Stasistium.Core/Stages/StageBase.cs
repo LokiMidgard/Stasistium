@@ -9,7 +9,7 @@ namespace Stasistium.Stages
     {
         internal StageBase(IGeneratorContext context, string? name)
         {
-            this.Name = name ?? GenerateName();
+            this.Name = name ?? this.GenerateName();
             this.Context = context?.ForName(this.Name) ?? throw new ArgumentNullException(nameof(context));
         }
 
@@ -19,10 +19,20 @@ namespace Stasistium.Stages
         {
             var type = this.GetType();
             string baseName;
+
             if (type.IsGenericType)
-                baseName = type.GetGenericTypeDefinition().Name;
-            else
-                baseName = type.Name;
+                type = type.GetGenericTypeDefinition();
+
+            baseName = type.Name;
+
+            while (type.IsNested)
+            {
+                type = type.DeclaringType;
+                if (type.IsGenericType)
+                    type = type.GetGenericTypeDefinition();
+
+                baseName = $"{type.Name}.{baseName}";
+            }
 
             return baseName + Guid.NewGuid().ToString();
         }
