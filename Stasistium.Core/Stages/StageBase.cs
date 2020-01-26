@@ -5,17 +5,36 @@ using System.Threading.Tasks;
 
 namespace Stasistium.Stages
 {
+    public class StageBase
+    {
+        internal StageBase(IGeneratorContext context, string? name)
+        {
+            this.Name = name ?? GenerateName();
+            this.Context = context?.ForName(this.Name) ?? throw new ArgumentNullException(nameof(context));
+        }
 
-    public abstract class StageBase<TResult, TCache>
+        public IGeneratorContext Context { get; }
+        public string Name { get; }
+        private string GenerateName()
+        {
+            var type = this.GetType();
+            string baseName;
+            if (type.IsGenericType)
+                baseName = type.GetGenericTypeDefinition().Name;
+            else
+                baseName = type.Name;
+
+            return baseName + Guid.NewGuid().ToString();
+        }
+    }
+    public abstract class StageBase<TResult, TCache> : StageBase
         where TCache : class
     {
 
         private (Guid lastId, Task<StageResult<TResult, TCache>> result) lastRun;
 
-        protected StageBase(IGeneratorContext context, string? name)
+        protected StageBase(IGeneratorContext context, string? name) : base(context, name)
         {
-            this.Name = name ?? this.GetType().GetGenericTypeDefinition().Name + Guid.NewGuid().ToString();
-            this.Context = context?.ForName(this.Name) ?? throw new ArgumentNullException(nameof(context));
         }
 
         protected abstract Task<StageResult<TResult, TCache>> DoInternal([AllowNull]TCache? cache, OptionToken options);
@@ -46,24 +65,21 @@ namespace Stasistium.Stages
             }
         }
 
-        public IGeneratorContext Context { get; }
-        public string Name { get; }
 
     }
 
-    public abstract class MultiStageBase<TResult, TCacheResult, TCache>
+    public abstract class MultiStageBase<TResult, TCacheResult, TCache> : StageBase
      where TCache : class
      where TCacheResult : class
     {
-        public string Name { get; }
 
         private (Guid lastId, Task<StageResultList<TResult, TCacheResult, TCache>> result) lastRun;
 
-        protected MultiStageBase(IGeneratorContext context, string? name = null)
+        protected MultiStageBase(IGeneratorContext context, string? name = null) : base(context, name)
         {
-            this.Name = name ?? this.GetType().GetGenericTypeDefinition().Name + Guid.NewGuid().ToString();
-            this.Context = context?.ForName(this.Name) ?? throw new ArgumentNullException(nameof(context));
         }
+
+
 
         protected abstract Task<StageResultList<TResult, TCacheResult, TCache>> DoInternal([AllowNull]TCache? cache, OptionToken options);
 
@@ -91,7 +107,6 @@ namespace Stasistium.Stages
             }
         }
 
-        public IGeneratorContext Context { get; }
     }
 
     public class OptionToken : IEquatable<OptionToken>

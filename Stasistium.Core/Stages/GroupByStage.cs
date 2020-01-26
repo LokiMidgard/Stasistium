@@ -118,7 +118,7 @@ namespace Stasistium.Stages
                     hasChanges = !newCache.OutputIdOrder.SequenceEqual(cache.OutputIdOrder) || work.Any(x => x.HasChanges);
                 }
                 else
-                    hasChanges = false;
+                    hasChanges = true;
                 if (!hasChanges)
                     this.Context.Logger.Info($"No longer has Changes");
             }
