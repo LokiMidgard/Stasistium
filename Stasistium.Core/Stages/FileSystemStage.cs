@@ -97,8 +97,8 @@ namespace Stasistium.Stages
                     IdOrder = callculated.Select(x => x.id).ToArray()
 
                 };
-                var resultList = ImmutableList<StageResult<Stream, string>>.Empty.ToBuilder();
-                return (result: resultList.ToImmutable(), newCache);
+                var resultList = callculated.Select(X => X.result).ToImmutableList();
+                return (result: resultList, newCache);
             });
 
             var r = await task;
