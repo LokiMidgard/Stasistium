@@ -58,23 +58,25 @@ namespace Stasistium.Stages
                 throw new ArgumentNullException(nameof(rendererDocument));
 
             var renderer = rendererDocument.Value.Renderer;
-            var result = await renderer.RenderViewToStringAsync(input.Id, input.Metadata).ConfigureAwait(false);
+            var result = await renderer.RenderViewToStringAsync(input.Id, input).ConfigureAwait(false);
             var output = input.With(result, this.Context.GetHashForString(result));
             return output;
         }
 
-        public RazorStage<T, TModel, TDocumentCache, TRendererCache> WithModel<TModel>(string? name = null)
+        public RazorStage<T, TModel, TDocumentCache, TRendererCache> WithModel<TModel>(Func<IDocument<T>, TModel> selector, string? name = null)
             where TModel : class
-            => new RazorStage<T, TModel, TDocumentCache, TRendererCache>(this.inputDocument, this.inputRazor, this.Context,name);
+            => new RazorStage<T, TModel, TDocumentCache, TRendererCache>(this.inputDocument, this.inputRazor, selector, this.Context, name);
     }
     public class RazorStage<T, TModel, TDocumentCache, TRendererCache> : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple2List0StageBase<T, TDocumentCache, RazorProvider, TRendererCache, string>
         where TDocumentCache : class
         where TRendererCache : class
         where TModel : class
     {
+        private readonly Func<IDocument<T>, TModel> selector;
 
-        public RazorStage(StagePerformHandler<T, TDocumentCache> inputDocument, StagePerformHandler<RazorProvider, TRendererCache> inputRazor, IGeneratorContext context, string? name) : base(inputDocument, inputRazor, context, name)
+        public RazorStage(StagePerformHandler<T, TDocumentCache> inputDocument, StagePerformHandler<RazorProvider, TRendererCache> inputRazor, Func<IDocument<T>, TModel> selector, IGeneratorContext context, string? name) : base(inputDocument, inputRazor, context, name)
         {
+            this.selector = selector;
         }
 
 
@@ -86,7 +88,7 @@ namespace Stasistium.Stages
                 throw new ArgumentNullException(nameof(rendererDocument));
 
             var renderer = rendererDocument.Value.Renderer;
-            var result = await renderer.RenderViewToStringAsync(input.Id, input.Metadata.GetValue<TModel>()).ConfigureAwait(false);
+            var result = await renderer.RenderViewToStringAsync(input.Id, selector(input)).ConfigureAwait(false);
             var output = input.With(result, this.Context.GetHashForString(result));
             return output;
         }
