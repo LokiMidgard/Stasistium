@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
@@ -7,7 +7,7 @@
   <Import Project="$(SolutionDir)Common.targets" />
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Toolkit.Parsers" Version="6.0.0-build.106.ga81b8d9fc7" />
+    <PackageReference Include="Microsoft.Toolkit.Parsers" Version="6.0.0-build.107.g1ca227c20e" />
   </ItemGroup>
 
   <ItemGroup>
