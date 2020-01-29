@@ -62,7 +62,6 @@ namespace Stasistium.Stages
             if (result.HasChanges)
             {
                 var files = await result.Perform;
-                var newCache = result.Cache;
                 // find all files that no longer exist and delete those
                 var allFiles = new HashSet<string>(result.Ids.Select(x => Path.Combine(this.output.FullName, x).Replace('\\', '/')));
                 var directoryQueue = new Queue<DirectoryInfo>();
@@ -111,11 +110,13 @@ namespace Stasistium.Stages
                 });
                 await Task.WhenAll(tasks).ConfigureAwait(false);
 
-                // Write new cache
-                using (var stream = cacehFile.Open(FileMode.Create, FileAccess.Write, FileShare.None))
+            }
+            
+            var newCache = result.Cache;
+            // Write new cache
+            using (var stream = cacehFile.Open(FileMode.Create, FileAccess.Write, FileShare.None))
                 using (var compressed = this.generatorOptions.CompressCache ? new System.IO.Compression.GZipStream(stream, System.IO.Compression.CompressionLevel.Fastest) as Stream : stream)
                     await JsonSerelizer.Write(newCache, compressed, !this.generatorOptions.CompressCache).ConfigureAwait(false);
-            }
 
         }
 
