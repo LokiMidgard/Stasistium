@@ -34,8 +34,8 @@ namespace Stasistium.Stages
 
             var task = LazyTask.Create(async () =>
             {
-                var (inputResult, inputCache) = await input.Perform;
-
+                var inputResult = await input.Perform;
+                var inputCache = input.Cache;
                 var resultList = await Task.WhenAll(inputResult.Select(async item =>
                 {
 
@@ -56,16 +56,16 @@ namespace Stasistium.Stages
 
                     if (pipeDone.HasChanges)
                     {
-                        var (itemResult, itemCache) = await pipeDone.Perform;
-
-                        return (result: StageResult.Create(itemResult, itemCache, itemResult.Hash != lastHash, itemResult.Id), lastCache: itemCache, lastHash: itemResult.Hash, inputId: item.Id);
+                        var itemResult = await pipeDone.Perform;
+                        var itemCache = pipeDone.Cache;
+                        return (result: StageResult.Create(itemResult, itemResult.Hash != lastHash, itemResult.Id, itemCache), lastCache: itemCache, lastHash: itemResult.Hash, inputId: item.Id);
                     }
                     else
                     {
                         if (lastOutputId is null)
                             throw new InvalidOperationException("This should not happen.");
 
-                        return (result: StageResult.Create(pipeDone.Perform, false, lastOutputId), lastCache: lastCache, lastHash: lastHash, inputId: item.Id);
+                        return (result: StageResult.Create(pipeDone.Perform, false, lastOutputId, pipeDone.Cache), lastCache: lastCache, lastHash: lastHash, inputId: item.Id);
 
                     }
                 })).ConfigureAwait(false);
@@ -98,9 +98,18 @@ namespace Stasistium.Stages
                     hasChanges = !newCache.OutputIdOrder.SequenceEqual(cache.OutputIdOrder) || work.Any(x => x.HasChanges);
                 }
 
+                return StageResultList.Create(work, hasChanges, ids.ToImmutableList(), newCache);
             }
+            else
+            {
+                var actualTask = LazyTask.Create(async () =>
+                {
+                    var temp = await task;
+                    return temp.Item1;
+                });
 
-            return StageResultList.Create(task, hasChanges, ids.ToImmutableList());
+                return StageResultList.Create(actualTask, hasChanges, ids.ToImmutableList(), cache);
+            }
         }
 
         private class Start : StageBase<TInput, StartCache<TInputCache>>
@@ -122,17 +131,18 @@ namespace Stasistium.Stages
 
                 var task = LazyTask.Create(async () =>
                 {
-                    var (inputResult, inputCache) = await input.Perform;
+                    var inputResult = await input.Perform;
+                    var inputCache = input.Cache;
                     var current = inputResult.Single(x => x.Id == this.key);
                     var subResult = await current.Perform;
 
                     var newCache = new StartCache<TInputCache>()
                     {
                         PreviousCache = inputCache,
-                        Id = subResult.result.Id,
-                        Hash = subResult.result.Hash
+                        Id = subResult.Id,
+                        Hash = subResult.Hash
                     };
-                    return (subResult.result, newCache);
+                    return (result: subResult, newCache);
                 });
 
                 string id;
@@ -141,12 +151,13 @@ namespace Stasistium.Stages
                 if (hasChanges || cache is null)
                 {
                     var list = await input.Perform;
-                    var current = list.result.Single(x => x.Id == this.key);
+                    var current = list.Single(x => x.Id == this.key);
                     if (current.HasChanges || cache is null)
                     {
-                        var (result, newCache) = await task;
-                        id = result.Id;
-                        hasChanges = cache is null || result.Hash != cache.Hash;
+                        var result = await task;
+                        id = result.result.Id;
+                        hasChanges = cache is null || result.result.Hash != cache.Hash;
+                        return StageResult.Create(result.result, hasChanges, id, result.newCache);
                     }
                     else
                     {
@@ -161,7 +172,14 @@ namespace Stasistium.Stages
                 {
                     id = cache.Id;
                 }
-                return StageResult.Create(task, hasChanges, id);
+
+                var actualTask = LazyTask.Create(async () =>
+                {
+                    var tmep = await task;
+                    return tmep.result;
+                });
+
+                return StageResult.Create(actualTask, hasChanges, id, cache);
             }
 
 
@@ -197,8 +215,10 @@ where TInputCache2 : class
 
             var task = LazyTask.Create(async () =>
             {
-                var (inputResult, inputCache) = await input.Perform;
-                var (inputResult2, inputCache2) = await input2.Perform;
+                var inputResult = await input.Perform;
+                var inputResult2 = await input2.Perform;
+                var inputCache = input.Cache;
+                var inputCache2 = input2.Cache;
 
                 var resultList = await Task.WhenAll(inputResult.Select(async item =>
                 {
@@ -220,16 +240,16 @@ where TInputCache2 : class
 
                     if (pipeDone.HasChanges)
                     {
-                        var (itemResult, itemCache) = await pipeDone.Perform;
-
-                        return (result: StageResult.Create(itemResult, itemCache, itemResult.Hash != lastHash, itemResult.Id), lastCache: itemCache, lastHash: itemResult.Hash, inputId: item.Id);
+                        var itemResult = await pipeDone.Perform;
+                        var itemCache = pipeDone.Cache;
+                        return (result: StageResult.Create(itemResult, itemResult.Hash != lastHash, itemResult.Id, itemCache), lastCache: itemCache, lastHash: itemResult.Hash, inputId: item.Id);
                     }
                     else
                     {
                         if (lastOutputId is null)
                             throw new InvalidOperationException("This should not happen.");
 
-                        return (result: StageResult.Create(pipeDone.Perform, false, lastOutputId), lastCache: lastCache, lastHash: lastHash, inputId: item.Id);
+                        return (result: StageResult.Create(pipeDone.Perform, false, lastOutputId, pipeDone.Cache), lastCache: lastCache, lastHash: lastHash, inputId: item.Id);
 
                     }
                 })).ConfigureAwait(false);
@@ -252,7 +272,7 @@ where TInputCache2 : class
 
             var hasChanges = input.HasChanges || input2.HasChanges;
             var ids = cache?.OutputIdOrder;
-            if (hasChanges || ids is null)
+            if (hasChanges || ids is null || cache is null)
             {
                 var (work, newCache) = await task;
 
@@ -263,9 +283,14 @@ where TInputCache2 : class
                     hasChanges = !newCache.OutputIdOrder.SequenceEqual(cache.OutputIdOrder) || work.Any(x => x.HasChanges);
                 }
 
+                return StageResultList.Create(work, hasChanges, ids.ToImmutableList(), newCache);
             }
-
-            return StageResultList.Create(task, hasChanges, ids.ToImmutableList());
+            var actualTask = LazyTask.Create(async () =>
+            {
+                var temp = await task;
+                return temp.Item1;
+            });
+            return StageResultList.Create(actualTask, hasChanges, ids.ToImmutableList(), cache);
         }
 
 
@@ -291,17 +316,18 @@ where TInputCache2 : class
 
                 var task = LazyTask.Create(async () =>
                 {
-                    var (inputResult, inputCache) = await input.Perform;
+                    var inputResult = await input.Perform;
+                    var inputCache = input.Cache;
                     var current = inputResult.Single(x => x.Id == this.key);
                     var subResult = await current.Perform;
 
                     var newCache = new StartCache<TInputCache1>()
                     {
                         PreviousCache = inputCache,
-                        Id = subResult.result.Id,
-                        Hash = subResult.result.Hash
+                        Id = subResult.Id,
+                        Hash = subResult.Hash
                     };
-                    return (subResult.result, newCache);
+                    return (result: subResult, newCache);
                 });
 
                 string id;
@@ -310,12 +336,15 @@ where TInputCache2 : class
                 if (hasChanges || cache is null)
                 {
                     var list = await input.Perform;
-                    var current = list.result.Single(x => x.Id == this.key);
+                    var current = list.Single(x => x.Id == this.key);
                     if (current.HasChanges || cache is null)
                     {
-                        var (result, newCache) = await task;
-                        id = result.Id;
-                        hasChanges = cache is null || result.Hash != cache.Hash;
+                        var result = await task;
+                        var newCache = current.Cache;
+                        id = result.result.Id;
+                        hasChanges = cache is null || result.result.Hash != cache.Hash;
+                        return StageResult.Create(result.result, hasChanges, id, result.newCache);
+
                     }
                     else
                     {
@@ -330,7 +359,12 @@ where TInputCache2 : class
                 {
                     id = cache.Id;
                 }
-                return StageResult.Create(task, hasChanges, id);
+                var actualTask = LazyTask.Create(async () =>
+                {
+                    var temp = await task;
+                    return temp.result;
+                });
+                return StageResult.Create(actualTask, hasChanges, id, cache);
             }
 
 
@@ -359,7 +393,7 @@ namespace Stasistium
                 throw new ArgumentNullException(nameof(input));
             return new SelectStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache>(input.DoIt, createPipline, input.Context, name);
         }
-        public static SelectStage<TInput, TInputItemCache, TInputCache, TInput2,  TInputCache2, TResult, TItemCache> Select<TInput, TInputItemCache, TInputCache, TInput2, TInputCache2, TResult, TItemCache>(this MultiStageBase<TInput, TInputItemCache, TInputCache> input, StageBase<TInput2,  TInputCache2> input2, Func<StageBase<TInput, StartCache<TInputCache>>, StageBase<TInput2, TInputCache2>, StageBase<TResult, TItemCache>> createPipline, string? name = null)
+        public static SelectStage<TInput, TInputItemCache, TInputCache, TInput2, TInputCache2, TResult, TItemCache> Select<TInput, TInputItemCache, TInputCache, TInput2, TInputCache2, TResult, TItemCache>(this MultiStageBase<TInput, TInputItemCache, TInputCache> input, StageBase<TInput2, TInputCache2> input2, Func<StageBase<TInput, StartCache<TInputCache>>, StageBase<TInput2, TInputCache2>, StageBase<TResult, TItemCache>> createPipline, string? name = null)
     where TInputCache : class
     where TInputCache2 : class
     where TInputItemCache : class
@@ -367,7 +401,7 @@ namespace Stasistium
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
-            return new SelectStage<TInput, TInputItemCache, TInputCache, TInput2, TInputCache2, TResult, TItemCache>(input.DoIt, input2,createPipline, input.Context, name);
+            return new SelectStage<TInput, TInputItemCache, TInputCache, TInput2, TInputCache2, TResult, TItemCache>(input.DoIt, input2, createPipline, input.Context, name);
         }
 
     }

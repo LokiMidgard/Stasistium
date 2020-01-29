@@ -36,14 +36,15 @@ namespace Stasistium.Stages
 
             var task = LazyTask.Create(async () =>
             {
-                var (inputList, inputListCache) = await inputReadyToPerform.Perform;
-
+                var inputList = await inputReadyToPerform.Perform;
+                var inputListCache = inputReadyToPerform.Cache;
                 var results = await Task.WhenAll(inputList.Select(async currentItem =>
                 {
                     var currentTask = LazyTask.Create(async () =>
                     {
-                        var (currentItemPerformed, currentCache) = await currentItem.Perform;
-                        var (currentSinglePerformed, _) = await inputSingle.Perform;
+                        var currentItemPerformed = await currentItem.Perform;
+                        var currentCache = currentItem.Cache;
+                        var currentSinglePerformed = await inputSingle.Perform;
                         var result = this.mergeFunction(currentItemPerformed, currentSinglePerformed);
 
                         return (result: result, hash: result.Hash);
@@ -52,7 +53,6 @@ namespace Stasistium.Stages
 
                     if (cache == null || cache.InputIdToOutputId.TryGetValue(currentItem.Id, out string? currentId))
                         currentId = null;
-                    string itemHash;
                     if (currentItem.HasChanges || inputSingle.HasChanges || currentId is null || cache is null)
                     {
                         var (performing, newItemCache) = await currentTask;
@@ -61,22 +61,27 @@ namespace Stasistium.Stages
                         if (cache == null || cache.OutputIdToHash.TryGetValue(currentId, out string? oldHash))
                             oldHash = null;
                         currentItemHashChanges = oldHash != newItemCache;
-                        itemHash = newItemCache;
+                        return (result: StageResult.Create(performing, currentItemHashChanges, currentId, newItemCache), inputId: currentItem.Id, hash: newItemCache);
                     }
                     else
                     {
                         currentItemHashChanges = false;
-                        itemHash = cache.OutputIdToHash[currentId];
+                        var itemHash = cache.OutputIdToHash[currentId];
+                        var actualCurrentTask = LazyTask.Create(async () =>
+                        {
+                            var temp = await currentTask;
+                            return temp.result;
+                        });
+                        return (result: StageResult.Create(actualCurrentTask, currentItemHashChanges, currentId, itemHash), inputId: currentItem.Id, hash: itemHash);
                     }
 
-                    return (result: StageResult.Create(currentTask, currentItemHashChanges, currentId), inputId: currentItem.Id, hash: itemHash);
 
                 })).ConfigureAwait(false);
 
                 TInputCache2 singleCache;
                 if (inputSingle.HasChanges || cache is null)
                 {
-                    var (_, newSingleCache) = await inputSingle.Perform;
+                    var newSingleCache = inputSingle.Cache;
                     singleCache = newSingleCache;
                 }
                 else
@@ -108,13 +113,20 @@ namespace Stasistium.Stages
                     hasChanges = perform.Item1.Any(x => x.HasChanges)
                         || cache.DocumentIds.SequenceEqual(documentIds);
                 }
+                return StageResultList.Create(perform.Item1, hasChanges, documentIds, perform.newCache);
             }
             else
             {
                 documentIds = cache.DocumentIds.ToImmutableList();
+                var actualTask = LazyTask.Create(async () =>
+                {
+                    var temp = await task;
+                    return temp.Item1;
+                });
+
+                return StageResultList.Create(actualTask, hasChanges, documentIds, cache);
             }
 
-            return StageResultList.Create(task, hasChanges, documentIds);
         }
     }
 

@@ -35,13 +35,14 @@ namespace Stasistium.Stages
                 var inputList = await input.Perform;
 
 
-                var list = (await Task.WhenAll(inputList.result.Select(async subInput =>
+                var list = (await Task.WhenAll(inputList.Select(async subInput =>
                 {
                     bool pass;
 
                     if (subInput.HasChanges)
                     {
-                        var (result, itemCache) = await subInput.Perform;
+                        var result = await subInput.Perform;
+                        var itemCache = subInput.Cache;
                         pass = await this.predicate(result).ConfigureAwait(false);
                     }
                     else
@@ -64,18 +65,16 @@ namespace Stasistium.Stages
                 var newCache = new WhereStageCache<TInCache>()
                 {
                     OutputIdOrder = list.Select(x => x.Id).ToArray(),
-                    ParentCache = inputList.cache
+                    ParentCache = input.Cache
                 };
                 return (result: list.ToImmutableList(), cache: newCache);
             });
 
             bool hasChanges = input.HasChanges;
-            var newCache = cache;
-            if (input.HasChanges || newCache == null)
+            if (input.HasChanges || cache == null)
             {
 
                 var (list, c) = await task;
-                newCache = c;
 
                 hasChanges = false;
                 if (!hasChanges && list.Count != cache?.OutputIdOrder.Length)
@@ -91,9 +90,15 @@ namespace Stasistium.Stages
                             hasChanges = true;
                     }
                 }
-            }
+                return StageResultList.Create(list, hasChanges, c.OutputIdOrder.ToImmutableList(), c);
 
-            return StageResultList.Create(task, hasChanges, newCache.OutputIdOrder.ToImmutableList());
+            }
+            var actualTask = LazyTask.Create(async () =>
+            {
+                var temp = await task;
+                return temp.result;
+            });
+            return StageResultList.Create(actualTask, hasChanges, cache.OutputIdOrder.ToImmutableList(), cache);
         }
 
 

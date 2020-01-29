@@ -14,7 +14,8 @@ namespace Stasistium.Stages
         ///// </summary>
         //public Dictionary<string, TItemCache> InputItemCacheLookup { get; set; }
 
-            public string[] OutputIdOrder { get; set; }
+        public string[] OutputIdOrder { get; set; }
+        public Dictionary<string, TItemCache[]> InputItemToResultItemCacheLookup { get; set; }
 
         /// <summary>
         /// InputId to cache

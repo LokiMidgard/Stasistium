@@ -37,14 +37,14 @@ namespace Stasistium.Test
 
             var inputHadChanges = r.HasChanges;
             var inputIds = r.Ids;
-            var (result, newInputCache) = await r.Perform;
-
+            var result = await r.Perform;
+            var newInputCache = r.Cache;
             var subs = await Task.WhenAll(result.Select(async x =>
             {
                 var subHasChanges = x.HasChanges;
                 var subId = x.Id;
-                var (subResult, subCache) = await x.Perform;
-
+                var subResult = await x.Perform;
+                var subCache = x.Cache;
                 return (subHasChanges, subId, subResult, subResult.Value, subResult.Id, subResult.Hash, subCache);
             }));
 
@@ -55,9 +55,9 @@ namespace Stasistium.Test
                 Entrys = subs
             });
 
-            var list = subs.Select(x => StageResult.Create(x.subResult, x.subCache, x.subHasChanges, x.Id)).ToImmutableList();
+            var list = subs.Select(x => StageResult.Create(x.subResult, x.subHasChanges, x.Id, x.subCache)).ToImmutableList();
 
-            return StageResultList.Create(list, new Cache() { PreviousCache = newInputCache }, inputHadChanges || list.Any(x => x.HasChanges), list.Select(x => x.Id).ToImmutableList());
+            return StageResultList.Create(list, inputHadChanges || list.Any(x => x.HasChanges), list.Select(x => x.Id).ToImmutableList(), new Cache() { PreviousCache = newInputCache });
         }
 
 

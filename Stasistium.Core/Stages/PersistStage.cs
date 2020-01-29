@@ -61,8 +61,8 @@ namespace Stasistium.Stages
             this.context.Logger.Info($"Cache is {(result.HasChanges ? "INVALID" : "valid")}");
             if (result.HasChanges)
             {
-                var (files, newCache) = await result.Perform;
-
+                var files = await result.Perform;
+                var newCache = result.Cache;
                 // find all files that no longer exist and delete those
                 var allFiles = new HashSet<string>(result.Ids.Select(x => Path.Combine(this.output.FullName, x).Replace('\\', '/')));
                 var directoryQueue = new Queue<DirectoryInfo>();
@@ -99,7 +99,7 @@ namespace Stasistium.Stages
 
                 // Get all changed files and persit those
                 var fileResults = await Task.WhenAll(files.Where(x => x.HasChanges).Select(async x => await x.Perform)).ConfigureAwait(false);
-                var tasks = fileResults.Select(x => x.result).Select(async file =>
+                var tasks = fileResults.Select(x => x).Select(async file =>
                 {
                     var fileInfo = new FileInfo(Path.Combine(this.output.FullName, file.Id));
                     fileInfo.Directory.Create();

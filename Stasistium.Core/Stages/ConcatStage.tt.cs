@@ -107,24 +107,24 @@ await Task.WhenAll(
                 if (result1.HasChanges)
                 {
                     var performed = await result1.Perform;
-                    newCache.Ids1 = new string[performed.result.Count];
-                    newCache.PreviouseCache1 = performed.cache;
+                    newCache.Ids1 = new string[performed.Count];
+                    newCache.PreviouseCache1 = result1.Cache;
 
-                    for (int i = 0; i < performed.result.Count; i++)
+                    for (int i = 0; i < performed.Count; i++)
                     {
-                        var child = performed.result[i];
+                        var child = performed[i];
 
                         if (child.HasChanges)
                         {
                             var childPerformed = await child.Perform;
 
                             
-                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.Id, out string? oldHash))
                                 oldHash = null;
-                            var childHashChanges = oldHash != childPerformed.result.Hash;
+                            var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(StageResult.Create(childPerformed.result, childPerformed.result.Hash, childHashChanges, childPerformed.result.Id));
-                            newCache.IdToHash.Add(child.Id, childPerformed.result.Id);
+                            list.Add(StageResult.Create(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
+                            newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
                         else
@@ -133,11 +133,11 @@ await Task.WhenAll(
                             var childTask = LazyTask.Create(async () =>
                             {
                                 var childPerform = await child.Perform;
-                                return (childPerform.result, childPerform.result.Hash);
+                                return childPerform;
                             });
-                            list.Add(StageResult.Create(childTask, false, child.Id));
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
+                            list.Add(StageResult.Create(childTask, false, child.Id, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
@@ -155,14 +155,17 @@ await Task.WhenAll(
                         var childTask = LazyTask.Create(async () =>
                         {
                             var performed = await result1.Perform;
-                            var chiledIndex = performed.result[currentIndex];
+                            var chiledIndex = performed[currentIndex];
                             var childPerform = await chiledIndex.Perform;
                             // We are in the no changes part. So ther must be no changes.
                             System.Diagnostics.Debug.Assert(!chiledIndex.HasChanges);
 
-                            return (childPerform.result, childPerform.result.Hash);
+                            return childPerform;
                         });
-                        list.Add(StageResult.Create(childTask, false, cache.Ids1[currentIndex]));
+                        if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids1[currentIndex], out var oldHash))
+                            throw this.Context.Exception("Should Not Happen");
+
+                        list.Add(StageResult.Create(childTask, false, cache.Ids1[currentIndex], oldHash));
                     }
                     newCache.PreviouseCache1 = cache.PreviouseCache1;
                     newCache.Ids1 = cache.Ids1;
@@ -190,13 +193,17 @@ await Task.WhenAll(
                 if (!hasChanges && cache != null)
                     hasChanges = !performed.cache.Ids1.SequenceEqual(cache.Ids1);
                 ids.AddRange(performed.cache.Ids1);
+                return StageResultList.Create(performed.result, hasChanges, ids.ToImmutable(), performed.cache);
             }
             else
             {
                 ids.AddRange(cache.Ids1);
+                var actualTask = LazyTask.Create(async ()=>{
+                    var temp = await task;
+                return temp.result;
+            });
+            return StageResultList.Create(actualTask, hasChanges, ids.ToImmutable(), cache);
             }
-
-            return StageResultList.Create(task, hasChanges, ids.ToImmutable());
         }
     }
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
@@ -253,24 +260,24 @@ await Task.WhenAll(
                 if (result1.HasChanges)
                 {
                     var performed = await result1.Perform;
-                    newCache.Ids1 = new string[performed.result.Count];
-                    newCache.PreviouseCache1 = performed.cache;
+                    newCache.Ids1 = new string[performed.Count];
+                    newCache.PreviouseCache1 = result1.Cache;
 
-                    for (int i = 0; i < performed.result.Count; i++)
+                    for (int i = 0; i < performed.Count; i++)
                     {
-                        var child = performed.result[i];
+                        var child = performed[i];
 
                         if (child.HasChanges)
                         {
                             var childPerformed = await child.Perform;
 
                             
-                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.Id, out string? oldHash))
                                 oldHash = null;
-                            var childHashChanges = oldHash != childPerformed.result.Hash;
+                            var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(StageResult.Create(childPerformed.result, childPerformed.result.Hash, childHashChanges, childPerformed.result.Id));
-                            newCache.IdToHash.Add(child.Id, childPerformed.result.Id);
+                            list.Add(StageResult.Create(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
+                            newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
                         else
@@ -279,11 +286,11 @@ await Task.WhenAll(
                             var childTask = LazyTask.Create(async () =>
                             {
                                 var childPerform = await child.Perform;
-                                return (childPerform.result, childPerform.result.Hash);
+                                return childPerform;
                             });
-                            list.Add(StageResult.Create(childTask, false, child.Id));
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
+                            list.Add(StageResult.Create(childTask, false, child.Id, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
@@ -301,14 +308,17 @@ await Task.WhenAll(
                         var childTask = LazyTask.Create(async () =>
                         {
                             var performed = await result1.Perform;
-                            var chiledIndex = performed.result[currentIndex];
+                            var chiledIndex = performed[currentIndex];
                             var childPerform = await chiledIndex.Perform;
                             // We are in the no changes part. So ther must be no changes.
                             System.Diagnostics.Debug.Assert(!chiledIndex.HasChanges);
 
-                            return (childPerform.result, childPerform.result.Hash);
+                            return childPerform;
                         });
-                        list.Add(StageResult.Create(childTask, false, cache.Ids1[currentIndex]));
+                        if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids1[currentIndex], out var oldHash))
+                            throw this.Context.Exception("Should Not Happen");
+
+                        list.Add(StageResult.Create(childTask, false, cache.Ids1[currentIndex], oldHash));
                     }
                     newCache.PreviouseCache1 = cache.PreviouseCache1;
                     newCache.Ids1 = cache.Ids1;
@@ -324,24 +334,24 @@ await Task.WhenAll(
                 if (result2.HasChanges)
                 {
                     var performed = await result2.Perform;
-                    newCache.Ids2 = new string[performed.result.Count];
-                    newCache.PreviouseCache2 = performed.cache;
+                    newCache.Ids2 = new string[performed.Count];
+                    newCache.PreviouseCache2 = result2.Cache;
 
-                    for (int i = 0; i < performed.result.Count; i++)
+                    for (int i = 0; i < performed.Count; i++)
                     {
-                        var child = performed.result[i];
+                        var child = performed[i];
 
                         if (child.HasChanges)
                         {
                             var childPerformed = await child.Perform;
 
                             
-                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.Id, out string? oldHash))
                                 oldHash = null;
-                            var childHashChanges = oldHash != childPerformed.result.Hash;
+                            var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(StageResult.Create(childPerformed.result, childPerformed.result.Hash, childHashChanges, childPerformed.result.Id));
-                            newCache.IdToHash.Add(child.Id, childPerformed.result.Id);
+                            list.Add(StageResult.Create(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
+                            newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
                         else
@@ -350,11 +360,11 @@ await Task.WhenAll(
                             var childTask = LazyTask.Create(async () =>
                             {
                                 var childPerform = await child.Perform;
-                                return (childPerform.result, childPerform.result.Hash);
+                                return childPerform;
                             });
-                            list.Add(StageResult.Create(childTask, false, child.Id));
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
+                            list.Add(StageResult.Create(childTask, false, child.Id, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
@@ -372,14 +382,17 @@ await Task.WhenAll(
                         var childTask = LazyTask.Create(async () =>
                         {
                             var performed = await result2.Perform;
-                            var chiledIndex = performed.result[currentIndex];
+                            var chiledIndex = performed[currentIndex];
                             var childPerform = await chiledIndex.Perform;
                             // We are in the no changes part. So ther must be no changes.
                             System.Diagnostics.Debug.Assert(!chiledIndex.HasChanges);
 
-                            return (childPerform.result, childPerform.result.Hash);
+                            return childPerform;
                         });
-                        list.Add(StageResult.Create(childTask, false, cache.Ids2[currentIndex]));
+                        if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids2[currentIndex], out var oldHash))
+                            throw this.Context.Exception("Should Not Happen");
+
+                        list.Add(StageResult.Create(childTask, false, cache.Ids2[currentIndex], oldHash));
                     }
                     newCache.PreviouseCache2 = cache.PreviouseCache2;
                     newCache.Ids2 = cache.Ids2;
@@ -411,14 +424,18 @@ await Task.WhenAll(
                     hasChanges = !performed.cache.Ids2.SequenceEqual(cache.Ids2);
                 ids.AddRange(performed.cache.Ids1);
                 ids.AddRange(performed.cache.Ids2);
+                return StageResultList.Create(performed.result, hasChanges, ids.ToImmutable(), performed.cache);
             }
             else
             {
                 ids.AddRange(cache.Ids1);
                 ids.AddRange(cache.Ids2);
+                var actualTask = LazyTask.Create(async ()=>{
+                    var temp = await task;
+                return temp.result;
+            });
+            return StageResultList.Create(actualTask, hasChanges, ids.ToImmutable(), cache);
             }
-
-            return StageResultList.Create(task, hasChanges, ids.ToImmutable());
         }
     }
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
@@ -485,24 +502,24 @@ await Task.WhenAll(
                 if (result1.HasChanges)
                 {
                     var performed = await result1.Perform;
-                    newCache.Ids1 = new string[performed.result.Count];
-                    newCache.PreviouseCache1 = performed.cache;
+                    newCache.Ids1 = new string[performed.Count];
+                    newCache.PreviouseCache1 = result1.Cache;
 
-                    for (int i = 0; i < performed.result.Count; i++)
+                    for (int i = 0; i < performed.Count; i++)
                     {
-                        var child = performed.result[i];
+                        var child = performed[i];
 
                         if (child.HasChanges)
                         {
                             var childPerformed = await child.Perform;
 
                             
-                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.Id, out string? oldHash))
                                 oldHash = null;
-                            var childHashChanges = oldHash != childPerformed.result.Hash;
+                            var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(StageResult.Create(childPerformed.result, childPerformed.result.Hash, childHashChanges, childPerformed.result.Id));
-                            newCache.IdToHash.Add(child.Id, childPerformed.result.Id);
+                            list.Add(StageResult.Create(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
+                            newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
                         else
@@ -511,11 +528,11 @@ await Task.WhenAll(
                             var childTask = LazyTask.Create(async () =>
                             {
                                 var childPerform = await child.Perform;
-                                return (childPerform.result, childPerform.result.Hash);
+                                return childPerform;
                             });
-                            list.Add(StageResult.Create(childTask, false, child.Id));
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
+                            list.Add(StageResult.Create(childTask, false, child.Id, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
@@ -533,14 +550,17 @@ await Task.WhenAll(
                         var childTask = LazyTask.Create(async () =>
                         {
                             var performed = await result1.Perform;
-                            var chiledIndex = performed.result[currentIndex];
+                            var chiledIndex = performed[currentIndex];
                             var childPerform = await chiledIndex.Perform;
                             // We are in the no changes part. So ther must be no changes.
                             System.Diagnostics.Debug.Assert(!chiledIndex.HasChanges);
 
-                            return (childPerform.result, childPerform.result.Hash);
+                            return childPerform;
                         });
-                        list.Add(StageResult.Create(childTask, false, cache.Ids1[currentIndex]));
+                        if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids1[currentIndex], out var oldHash))
+                            throw this.Context.Exception("Should Not Happen");
+
+                        list.Add(StageResult.Create(childTask, false, cache.Ids1[currentIndex], oldHash));
                     }
                     newCache.PreviouseCache1 = cache.PreviouseCache1;
                     newCache.Ids1 = cache.Ids1;
@@ -556,24 +576,24 @@ await Task.WhenAll(
                 if (result2.HasChanges)
                 {
                     var performed = await result2.Perform;
-                    newCache.Ids2 = new string[performed.result.Count];
-                    newCache.PreviouseCache2 = performed.cache;
+                    newCache.Ids2 = new string[performed.Count];
+                    newCache.PreviouseCache2 = result2.Cache;
 
-                    for (int i = 0; i < performed.result.Count; i++)
+                    for (int i = 0; i < performed.Count; i++)
                     {
-                        var child = performed.result[i];
+                        var child = performed[i];
 
                         if (child.HasChanges)
                         {
                             var childPerformed = await child.Perform;
 
                             
-                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.Id, out string? oldHash))
                                 oldHash = null;
-                            var childHashChanges = oldHash != childPerformed.result.Hash;
+                            var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(StageResult.Create(childPerformed.result, childPerformed.result.Hash, childHashChanges, childPerformed.result.Id));
-                            newCache.IdToHash.Add(child.Id, childPerformed.result.Id);
+                            list.Add(StageResult.Create(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
+                            newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
                         else
@@ -582,11 +602,11 @@ await Task.WhenAll(
                             var childTask = LazyTask.Create(async () =>
                             {
                                 var childPerform = await child.Perform;
-                                return (childPerform.result, childPerform.result.Hash);
+                                return childPerform;
                             });
-                            list.Add(StageResult.Create(childTask, false, child.Id));
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
+                            list.Add(StageResult.Create(childTask, false, child.Id, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
@@ -604,14 +624,17 @@ await Task.WhenAll(
                         var childTask = LazyTask.Create(async () =>
                         {
                             var performed = await result2.Perform;
-                            var chiledIndex = performed.result[currentIndex];
+                            var chiledIndex = performed[currentIndex];
                             var childPerform = await chiledIndex.Perform;
                             // We are in the no changes part. So ther must be no changes.
                             System.Diagnostics.Debug.Assert(!chiledIndex.HasChanges);
 
-                            return (childPerform.result, childPerform.result.Hash);
+                            return childPerform;
                         });
-                        list.Add(StageResult.Create(childTask, false, cache.Ids2[currentIndex]));
+                        if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids2[currentIndex], out var oldHash))
+                            throw this.Context.Exception("Should Not Happen");
+
+                        list.Add(StageResult.Create(childTask, false, cache.Ids2[currentIndex], oldHash));
                     }
                     newCache.PreviouseCache2 = cache.PreviouseCache2;
                     newCache.Ids2 = cache.Ids2;
@@ -627,24 +650,24 @@ await Task.WhenAll(
                 if (result3.HasChanges)
                 {
                     var performed = await result3.Perform;
-                    newCache.Ids3 = new string[performed.result.Count];
-                    newCache.PreviouseCache3 = performed.cache;
+                    newCache.Ids3 = new string[performed.Count];
+                    newCache.PreviouseCache3 = result3.Cache;
 
-                    for (int i = 0; i < performed.result.Count; i++)
+                    for (int i = 0; i < performed.Count; i++)
                     {
-                        var child = performed.result[i];
+                        var child = performed[i];
 
                         if (child.HasChanges)
                         {
                             var childPerformed = await child.Perform;
 
                             
-                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.Id, out string? oldHash))
                                 oldHash = null;
-                            var childHashChanges = oldHash != childPerformed.result.Hash;
+                            var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(StageResult.Create(childPerformed.result, childPerformed.result.Hash, childHashChanges, childPerformed.result.Id));
-                            newCache.IdToHash.Add(child.Id, childPerformed.result.Id);
+                            list.Add(StageResult.Create(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
+                            newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
                         else
@@ -653,11 +676,11 @@ await Task.WhenAll(
                             var childTask = LazyTask.Create(async () =>
                             {
                                 var childPerform = await child.Perform;
-                                return (childPerform.result, childPerform.result.Hash);
+                                return childPerform;
                             });
-                            list.Add(StageResult.Create(childTask, false, child.Id));
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
+                            list.Add(StageResult.Create(childTask, false, child.Id, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
@@ -675,14 +698,17 @@ await Task.WhenAll(
                         var childTask = LazyTask.Create(async () =>
                         {
                             var performed = await result3.Perform;
-                            var chiledIndex = performed.result[currentIndex];
+                            var chiledIndex = performed[currentIndex];
                             var childPerform = await chiledIndex.Perform;
                             // We are in the no changes part. So ther must be no changes.
                             System.Diagnostics.Debug.Assert(!chiledIndex.HasChanges);
 
-                            return (childPerform.result, childPerform.result.Hash);
+                            return childPerform;
                         });
-                        list.Add(StageResult.Create(childTask, false, cache.Ids3[currentIndex]));
+                        if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids3[currentIndex], out var oldHash))
+                            throw this.Context.Exception("Should Not Happen");
+
+                        list.Add(StageResult.Create(childTask, false, cache.Ids3[currentIndex], oldHash));
                     }
                     newCache.PreviouseCache3 = cache.PreviouseCache3;
                     newCache.Ids3 = cache.Ids3;
@@ -718,15 +744,19 @@ await Task.WhenAll(
                 ids.AddRange(performed.cache.Ids1);
                 ids.AddRange(performed.cache.Ids2);
                 ids.AddRange(performed.cache.Ids3);
+                return StageResultList.Create(performed.result, hasChanges, ids.ToImmutable(), performed.cache);
             }
             else
             {
                 ids.AddRange(cache.Ids1);
                 ids.AddRange(cache.Ids2);
                 ids.AddRange(cache.Ids3);
+                var actualTask = LazyTask.Create(async ()=>{
+                    var temp = await task;
+                return temp.result;
+            });
+            return StageResultList.Create(actualTask, hasChanges, ids.ToImmutable(), cache);
             }
-
-            return StageResultList.Create(task, hasChanges, ids.ToImmutable());
         }
     }
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
@@ -803,24 +833,24 @@ await Task.WhenAll(
                 if (result1.HasChanges)
                 {
                     var performed = await result1.Perform;
-                    newCache.Ids1 = new string[performed.result.Count];
-                    newCache.PreviouseCache1 = performed.cache;
+                    newCache.Ids1 = new string[performed.Count];
+                    newCache.PreviouseCache1 = result1.Cache;
 
-                    for (int i = 0; i < performed.result.Count; i++)
+                    for (int i = 0; i < performed.Count; i++)
                     {
-                        var child = performed.result[i];
+                        var child = performed[i];
 
                         if (child.HasChanges)
                         {
                             var childPerformed = await child.Perform;
 
                             
-                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.Id, out string? oldHash))
                                 oldHash = null;
-                            var childHashChanges = oldHash != childPerformed.result.Hash;
+                            var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(StageResult.Create(childPerformed.result, childPerformed.result.Hash, childHashChanges, childPerformed.result.Id));
-                            newCache.IdToHash.Add(child.Id, childPerformed.result.Id);
+                            list.Add(StageResult.Create(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
+                            newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
                         else
@@ -829,11 +859,11 @@ await Task.WhenAll(
                             var childTask = LazyTask.Create(async () =>
                             {
                                 var childPerform = await child.Perform;
-                                return (childPerform.result, childPerform.result.Hash);
+                                return childPerform;
                             });
-                            list.Add(StageResult.Create(childTask, false, child.Id));
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
+                            list.Add(StageResult.Create(childTask, false, child.Id, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
@@ -851,14 +881,17 @@ await Task.WhenAll(
                         var childTask = LazyTask.Create(async () =>
                         {
                             var performed = await result1.Perform;
-                            var chiledIndex = performed.result[currentIndex];
+                            var chiledIndex = performed[currentIndex];
                             var childPerform = await chiledIndex.Perform;
                             // We are in the no changes part. So ther must be no changes.
                             System.Diagnostics.Debug.Assert(!chiledIndex.HasChanges);
 
-                            return (childPerform.result, childPerform.result.Hash);
+                            return childPerform;
                         });
-                        list.Add(StageResult.Create(childTask, false, cache.Ids1[currentIndex]));
+                        if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids1[currentIndex], out var oldHash))
+                            throw this.Context.Exception("Should Not Happen");
+
+                        list.Add(StageResult.Create(childTask, false, cache.Ids1[currentIndex], oldHash));
                     }
                     newCache.PreviouseCache1 = cache.PreviouseCache1;
                     newCache.Ids1 = cache.Ids1;
@@ -874,24 +907,24 @@ await Task.WhenAll(
                 if (result2.HasChanges)
                 {
                     var performed = await result2.Perform;
-                    newCache.Ids2 = new string[performed.result.Count];
-                    newCache.PreviouseCache2 = performed.cache;
+                    newCache.Ids2 = new string[performed.Count];
+                    newCache.PreviouseCache2 = result2.Cache;
 
-                    for (int i = 0; i < performed.result.Count; i++)
+                    for (int i = 0; i < performed.Count; i++)
                     {
-                        var child = performed.result[i];
+                        var child = performed[i];
 
                         if (child.HasChanges)
                         {
                             var childPerformed = await child.Perform;
 
                             
-                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.Id, out string? oldHash))
                                 oldHash = null;
-                            var childHashChanges = oldHash != childPerformed.result.Hash;
+                            var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(StageResult.Create(childPerformed.result, childPerformed.result.Hash, childHashChanges, childPerformed.result.Id));
-                            newCache.IdToHash.Add(child.Id, childPerformed.result.Id);
+                            list.Add(StageResult.Create(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
+                            newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
                         else
@@ -900,11 +933,11 @@ await Task.WhenAll(
                             var childTask = LazyTask.Create(async () =>
                             {
                                 var childPerform = await child.Perform;
-                                return (childPerform.result, childPerform.result.Hash);
+                                return childPerform;
                             });
-                            list.Add(StageResult.Create(childTask, false, child.Id));
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
+                            list.Add(StageResult.Create(childTask, false, child.Id, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
@@ -922,14 +955,17 @@ await Task.WhenAll(
                         var childTask = LazyTask.Create(async () =>
                         {
                             var performed = await result2.Perform;
-                            var chiledIndex = performed.result[currentIndex];
+                            var chiledIndex = performed[currentIndex];
                             var childPerform = await chiledIndex.Perform;
                             // We are in the no changes part. So ther must be no changes.
                             System.Diagnostics.Debug.Assert(!chiledIndex.HasChanges);
 
-                            return (childPerform.result, childPerform.result.Hash);
+                            return childPerform;
                         });
-                        list.Add(StageResult.Create(childTask, false, cache.Ids2[currentIndex]));
+                        if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids2[currentIndex], out var oldHash))
+                            throw this.Context.Exception("Should Not Happen");
+
+                        list.Add(StageResult.Create(childTask, false, cache.Ids2[currentIndex], oldHash));
                     }
                     newCache.PreviouseCache2 = cache.PreviouseCache2;
                     newCache.Ids2 = cache.Ids2;
@@ -945,24 +981,24 @@ await Task.WhenAll(
                 if (result3.HasChanges)
                 {
                     var performed = await result3.Perform;
-                    newCache.Ids3 = new string[performed.result.Count];
-                    newCache.PreviouseCache3 = performed.cache;
+                    newCache.Ids3 = new string[performed.Count];
+                    newCache.PreviouseCache3 = result3.Cache;
 
-                    for (int i = 0; i < performed.result.Count; i++)
+                    for (int i = 0; i < performed.Count; i++)
                     {
-                        var child = performed.result[i];
+                        var child = performed[i];
 
                         if (child.HasChanges)
                         {
                             var childPerformed = await child.Perform;
 
                             
-                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.Id, out string? oldHash))
                                 oldHash = null;
-                            var childHashChanges = oldHash != childPerformed.result.Hash;
+                            var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(StageResult.Create(childPerformed.result, childPerformed.result.Hash, childHashChanges, childPerformed.result.Id));
-                            newCache.IdToHash.Add(child.Id, childPerformed.result.Id);
+                            list.Add(StageResult.Create(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
+                            newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
                         else
@@ -971,11 +1007,11 @@ await Task.WhenAll(
                             var childTask = LazyTask.Create(async () =>
                             {
                                 var childPerform = await child.Perform;
-                                return (childPerform.result, childPerform.result.Hash);
+                                return childPerform;
                             });
-                            list.Add(StageResult.Create(childTask, false, child.Id));
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
+                            list.Add(StageResult.Create(childTask, false, child.Id, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
@@ -993,14 +1029,17 @@ await Task.WhenAll(
                         var childTask = LazyTask.Create(async () =>
                         {
                             var performed = await result3.Perform;
-                            var chiledIndex = performed.result[currentIndex];
+                            var chiledIndex = performed[currentIndex];
                             var childPerform = await chiledIndex.Perform;
                             // We are in the no changes part. So ther must be no changes.
                             System.Diagnostics.Debug.Assert(!chiledIndex.HasChanges);
 
-                            return (childPerform.result, childPerform.result.Hash);
+                            return childPerform;
                         });
-                        list.Add(StageResult.Create(childTask, false, cache.Ids3[currentIndex]));
+                        if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids3[currentIndex], out var oldHash))
+                            throw this.Context.Exception("Should Not Happen");
+
+                        list.Add(StageResult.Create(childTask, false, cache.Ids3[currentIndex], oldHash));
                     }
                     newCache.PreviouseCache3 = cache.PreviouseCache3;
                     newCache.Ids3 = cache.Ids3;
@@ -1016,24 +1055,24 @@ await Task.WhenAll(
                 if (result4.HasChanges)
                 {
                     var performed = await result4.Perform;
-                    newCache.Ids4 = new string[performed.result.Count];
-                    newCache.PreviouseCache4 = performed.cache;
+                    newCache.Ids4 = new string[performed.Count];
+                    newCache.PreviouseCache4 = result4.Cache;
 
-                    for (int i = 0; i < performed.result.Count; i++)
+                    for (int i = 0; i < performed.Count; i++)
                     {
-                        var child = performed.result[i];
+                        var child = performed[i];
 
                         if (child.HasChanges)
                         {
                             var childPerformed = await child.Perform;
 
                             
-                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.result.Id, out string? oldHash))
+                            if (cache == null || !cache.IdToHash.TryGetValue(childPerformed.Id, out string? oldHash))
                                 oldHash = null;
-                            var childHashChanges = oldHash != childPerformed.result.Hash;
+                            var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(StageResult.Create(childPerformed.result, childPerformed.result.Hash, childHashChanges, childPerformed.result.Id));
-                            newCache.IdToHash.Add(child.Id, childPerformed.result.Id);
+                            list.Add(StageResult.Create(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
+                            newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
                         else
@@ -1042,11 +1081,11 @@ await Task.WhenAll(
                             var childTask = LazyTask.Create(async () =>
                             {
                                 var childPerform = await child.Perform;
-                                return (childPerform.result, childPerform.result.Hash);
+                                return childPerform;
                             });
-                            list.Add(StageResult.Create(childTask, false, child.Id));
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
+                            list.Add(StageResult.Create(childTask, false, child.Id, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
@@ -1064,14 +1103,17 @@ await Task.WhenAll(
                         var childTask = LazyTask.Create(async () =>
                         {
                             var performed = await result4.Perform;
-                            var chiledIndex = performed.result[currentIndex];
+                            var chiledIndex = performed[currentIndex];
                             var childPerform = await chiledIndex.Perform;
                             // We are in the no changes part. So ther must be no changes.
                             System.Diagnostics.Debug.Assert(!chiledIndex.HasChanges);
 
-                            return (childPerform.result, childPerform.result.Hash);
+                            return childPerform;
                         });
-                        list.Add(StageResult.Create(childTask, false, cache.Ids4[currentIndex]));
+                        if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids4[currentIndex], out var oldHash))
+                            throw this.Context.Exception("Should Not Happen");
+
+                        list.Add(StageResult.Create(childTask, false, cache.Ids4[currentIndex], oldHash));
                     }
                     newCache.PreviouseCache4 = cache.PreviouseCache4;
                     newCache.Ids4 = cache.Ids4;
@@ -1111,6 +1153,7 @@ await Task.WhenAll(
                 ids.AddRange(performed.cache.Ids2);
                 ids.AddRange(performed.cache.Ids3);
                 ids.AddRange(performed.cache.Ids4);
+                return StageResultList.Create(performed.result, hasChanges, ids.ToImmutable(), performed.cache);
             }
             else
             {
@@ -1118,9 +1161,12 @@ await Task.WhenAll(
                 ids.AddRange(cache.Ids2);
                 ids.AddRange(cache.Ids3);
                 ids.AddRange(cache.Ids4);
+                var actualTask = LazyTask.Create(async ()=>{
+                    var temp = await task;
+                return temp.result;
+            });
+            return StageResultList.Create(actualTask, hasChanges, ids.ToImmutable(), cache);
             }
-
-            return StageResultList.Create(task, hasChanges, ids.ToImmutable());
         }
     }
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.

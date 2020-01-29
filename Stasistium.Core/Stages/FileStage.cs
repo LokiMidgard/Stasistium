@@ -29,16 +29,16 @@ namespace Stasistium.Stages
             var task = LazyTask.Create(async () =>
             {
                 var result = await input.Perform;
-                var file = new FileInfo(result.result.Value);
+                var file = new FileInfo(result.Value);
                 if (!file.Exists)
                     throw this.Context.Exception($"File \"{file.FullName}\" does not exists");
 
                 var document = new FileDocument(file, file.Directory, null, this.Context) as IDocument<Stream>;
-                document = document.With(result.result.Metadata);
+                document = document.With(result.Metadata);
                 var fileStageCache = new FileStageCache<TInCache>()
                 {
                     Path = file.FullName,
-                    PreviousCache = result.cache,
+                    PreviousCache = input.Cache,
                     LastWriteTimeUtc = file.LastWriteTimeUtc,
                     LastHash = document.Hash
                 };
@@ -59,11 +59,19 @@ namespace Stasistium.Stages
                 var result = await task;
                 id = result.result.Id;
                 hasChanges = result.result.Hash != cache?.LastHash;
+                return StageResult.Create(result.result, hasChanges, id, result.cache);
             }
             else
+            {
+                var actualTask = LazyTask.Create(async () =>
+                {
+                    var temp = await task;
+                    return temp.result;
+                });
                 id = Path.GetFileName(cache.Path);
+                return StageResult.Create(actualTask, hasChanges, id, cache);
+            }
 
-            return StageResult.Create(task, hasChanges, id);
         }
 
     }

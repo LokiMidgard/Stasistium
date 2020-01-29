@@ -37,19 +37,20 @@ namespace Stasistium.Stages
             {
                 var inputList = await input.Perform;
 
-                var sidecarLookup = inputList.result.Where(x => Path.GetExtension(x.Id) == this.SidecarExtension)
+                var sidecarLookup = inputList.Where(x => Path.GetExtension(x.Id) == this.SidecarExtension)
                     .ToDictionary(x => Path.Combine(Path.GetDirectoryName(x.Id) ?? string.Empty, Path.GetFileNameWithoutExtension(x.Id)));
 
-                var files = inputList.result.Where(x => Path.GetExtension(x.Id) != this.SidecarExtension);
+                var files = inputList.Where(x => Path.GetExtension(x.Id) != this.SidecarExtension);
 
 
                 var list = await Task.WhenAll(files.Select(async file =>
                 {
                     if (sidecarLookup.TryGetValue(file.Id, out var sidecar) && (file.HasChanges || sidecar.HasChanges))
                     {
-                        var (fileResult, fileCache) = await file.Perform;
-                        var (sidecarResult, sidecarCache) = await sidecar.Perform;
-
+                        var fileResult = await file.Perform;
+                        var fileCache = file.Cache;
+                        var sidecarResult = await sidecar.Perform;
+                        var sidecarCache = sidecar.Cache;
 
 
                         var deserializer = new YamlDotNet.Serialization.DeserializerBuilder()
@@ -84,17 +85,18 @@ namespace Stasistium.Stages
                         if (cache != null && cache.Transformed.TryGetValue(fileResult.Id, out var oldHash))
                             hasChanges = oldHash != fileResult.Hash;
 
-                        return (result: StageResult.Create<Stream, string>(fileResult, fileResult.Hash, hasChanges, fileResult.Id), inputId: file.Id, outputHash: fileResult.Hash);
+                        return (result: StageResult.Create<Stream, string>(fileResult, hasChanges, fileResult.Id, fileResult.Hash), inputId: file.Id, outputHash: fileResult.Hash);
                     }
                     else if (file.HasChanges)
                     {
-                        var (fileResult, fileCache) = await file.Perform;
+                        var fileResult = await file.Perform;
+                        var fileCache = file.Cache;
                         var hasChanges = true;
                         if (cache != null && cache.Transformed.TryGetValue(fileResult.Id, out var oldHash))
                             hasChanges = oldHash != fileResult.Hash;
                         System.Diagnostics.Debug.Assert(hasChanges); // if the original file had changes so must this have.
 
-                        return (result: StageResult.Create<Stream, string>(fileResult, fileResult.Hash, hasChanges, fileResult.Id), inputId: file.Id, outputHash: fileResult.Hash);
+                        return (result: StageResult.Create<Stream, string>(fileResult, hasChanges, fileResult.Id, fileResult.Hash), inputId: file.Id, outputHash: fileResult.Hash);
                     }
                     else
                     {
@@ -105,12 +107,12 @@ namespace Stasistium.Stages
 
                         var task = LazyTask.Create(async () =>
                         {
-                            var (fileResult, fileCache) = await file.Perform;
-
-                            return (fileResult, fileResult.Hash);
+                            var fileResult = await file.Perform;
+                            var fileCache = file.Cache;
+                            return fileResult;
                         });
 
-                        return (result: StageResult.Create(task, false, oldOutputId), inputId: file.Id, outputHash: oldOutputHash);
+                        return (result: StageResult.Create(task, false, oldOutputId, oldOutputHash), inputId: file.Id, outputHash: oldOutputHash);
                     }
                 })).ConfigureAwait(false);
 
@@ -120,19 +122,17 @@ namespace Stasistium.Stages
                 {
                     InputToOutputId = list.ToDictionary(x => x.inputId, x => x.result.Id),
                     OutputIdOrder = list.Select(x => x.result.Id).ToArray(),
-                    ParentCache = inputList.cache,
+                    ParentCache = input.Cache,
                     Transformed = list.ToDictionary(x => x.result.Id, x => x.outputHash)
                 };
                 return (result: list.Select(x => x.result).ToImmutableList(), cache: newCache);
             });
 
             bool hasChanges = input.HasChanges;
-            var newCache = cache;
-            if (input.HasChanges || newCache == null)
+            if (input.HasChanges || cache == null)
             {
 
                 var (list, c) = await task;
-                newCache = c;
 
                 hasChanges = false;
                 if (!hasChanges && list.Count != cache?.OutputIdOrder.Length)
@@ -148,9 +148,16 @@ namespace Stasistium.Stages
                             hasChanges = true;
                     }
                 }
+                return StageResultList.Create(list, hasChanges, c.OutputIdOrder.ToImmutableList(), c);
             }
 
-            return StageResultList.Create(task, hasChanges, newCache.OutputIdOrder.ToImmutableList());
+            var actiualTask = LazyTask.Create(async () =>
+            {
+                var temp = await task;
+                return temp.result;
+            });
+
+            return StageResultList.Create(actiualTask, hasChanges, cache.OutputIdOrder.ToImmutableList(), cache);
         }
 
     }

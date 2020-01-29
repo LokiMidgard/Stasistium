@@ -38,14 +38,14 @@ namespace Stasistium.Stages
 
             var task = LazyTask.Create(async () =>
             {
-                var (inputResult, inputCache) = await input.Perform;
-
+                var inputResult = await input.Perform;
+                var inputCache = input.Cache;
                 var keyValues = await Task.WhenAll(inputResult.Select(async x =>
                 {
                     if (x.HasChanges || cache is null || !cache.InputIdToKey.TryGetValue(x.Id, out var oldKey))
                     {
                         var performed = await x.Perform;
-                        var key = this.keySelector(performed.result);
+                        var key = this.keySelector(performed);
                         return (Key: key, Document: x);
                     }
                     else
@@ -73,20 +73,21 @@ namespace Stasistium.Stages
 
                         if (pipeDone.HasChanges)
                         {
-                            var (itemResult, itemCache) = await pipeDone.Perform;
+                            var itemResult = await pipeDone.Perform;
+                            var itemCache = pipeDone.Cache;
 
-                            return (result: StageResultList.Create(itemResult, itemCache, true, itemResult.Select(x => x.Id).ToImmutableList()), lastCache: itemCache, key: x.Key);
+                            return (result: StageResultList.Create(itemResult, true, itemResult.Select(x => x.Id).ToImmutableList(), itemCache), lastCache: itemCache, key: x.Key);
                         }
                         else
                         {
-                            return (result: StageResultList.Create(pipeDone.Perform, false, pipeDone.Ids), lastCache: lastCache, key: x.Key);
+                            return (result: StageResultList.Create(pipeDone.Perform, false, pipeDone.Ids, pipeDone.Cache), lastCache: lastCache, key: x.Key);
 
                         }
                     })).ConfigureAwait(false);
 
 
                 var finishedList2 = await Task.WhenAll(resultList.Select(x => x.result.Perform.AsTask())).ConfigureAwait(false);
-                var finishedList = finishedList2.SelectMany(x => x.result).ToImmutableList();
+                var finishedList = finishedList2.SelectMany(x => x).ToImmutableList();
                 var newCache = new GroupByCache()
                 {
                     InputItemCacheLookup = resultList.ToDictionary(x => x.key, x => x.lastCache),
@@ -121,14 +122,21 @@ namespace Stasistium.Stages
                     hasChanges = true;
                 if (!hasChanges)
                     this.Context.Logger.Info($"No longer has Changes");
+                return StageResultList.Create(work, hasChanges, ids, newCache);
             }
             else
             {
                 hasChanges = false;
                 ids = cache.OutputIdOrder.ToImmutableList();
-            }
 
-            return StageResultList.Create(task, hasChanges, ids);
+                var actualTask = LazyTask.Create(async () =>
+                {
+                    var temp = await task;
+                    return temp.finishedList;
+                });
+
+                return StageResultList.Create(actualTask, hasChanges, ids, cache);
+            }
         }
 
 
@@ -152,14 +160,14 @@ namespace Stasistium.Stages
 
                 var task = LazyTask.Create(async () =>
                 {
-                    var (inputResult, inputCache) = await input.Perform;
-
+                    var inputResult = await input.Perform;
+                    var inputCache = input.Cache;
                     var itemToKey = await Task.WhenAll(inputResult.Select(async x =>
                        {
                            if (x.HasChanges || cache is null || !cache.InputIdToKey.TryGetValue(x.Id, out var oldKey))
                            {
                                var performed = await x.Perform;
-                               var key = this.parent.keySelector(performed.result);
+                               var key = this.parent.keySelector(performed);
                                return (Key: key, Document: x);
                            }
                            else
@@ -173,11 +181,12 @@ namespace Stasistium.Stages
                     {
                         if (input.HasChanges || cache is null)
                         {
-                            var (currentResult, currentCache) = await input.Perform;
-                            return StageResult.Create(currentResult, currentCache, input.HasChanges, currentResult.Id);
+                            var currentResult = await input.Perform;
+                            var currentCache = input.Cache;
+                            return StageResult.Create(currentResult, input.HasChanges, currentResult.Id, currentCache);
                         }
                         else
-                            return StageResult.Create(input.Perform, input.HasChanges, input.Id);
+                            return StageResult.Create(input.Perform, input.HasChanges, input.Id, input.Cache);
                     })).ConfigureAwait(false);
 
                     var newCache = new StartCache<TInputCache, TKey>()
@@ -205,13 +214,19 @@ namespace Stasistium.Stages
                     if (!hasChanges)
                         this.Context.Logger.Info($"No longer has changes for Key {this.key}");
 
+                    return StageResultList.Create(result, hasChanges, ids, newCache);
 
                 }
                 else
                 {
                     ids = cache.Ids.ToImmutableList();
+                    var actualTask = LazyTask.Create(async () =>
+                    {
+                        var temp = await task;
+                        return temp.Item1;
+                    });
+                    return StageResultList.Create(actualTask, hasChanges, ids, cache);
                 }
-                return StageResultList.Create(task, hasChanges, ids);
             }
 
 

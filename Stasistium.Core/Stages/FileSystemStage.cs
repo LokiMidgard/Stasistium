@@ -28,9 +28,9 @@ namespace Stasistium.Stages
             var task = LazyTask.Create(async () =>
             {
 
-                var (performed, newPreviousCache) = await result.Perform;
+                var performed = await result.Perform;
 
-
+                var newPreviousCache = result.Cache;
                 var path = performed.Value;
                 var root = new DirectoryInfo(path);
 
@@ -71,7 +71,7 @@ namespace Stasistium.Stages
 
                         hasChanges = document.Hash != lastHash;
 
-                        return (result: StageResult.Create(document as IDocument<Stream>, document.Hash, hasChanges, document.Id), writeTime, hash: document.Hash, id);
+                        return (result: StageResult.Create(document as IDocument<Stream>, hasChanges, document.Id, document.Hash), writeTime, hash: document.Hash, id);
                     }
                     else
                     {
@@ -81,10 +81,10 @@ namespace Stasistium.Stages
                         var subTask = LazyTask.Create(() =>
                         {
                             var document = new FileDocument(file, root, performed.Metadata, this.Context);
-                            return (document as IDocument<Stream>, document.Hash);
+                            return document as IDocument<Stream>;
                         });
 
-                        return (result: StageResult.Create(subTask, hasChanges, id), writeTime, hash: lastHash, id);
+                        return (result: StageResult.Create(subTask, hasChanges, id, lastHash), writeTime, hash: lastHash, id);
                     }
                 }).ToArray();
 
@@ -107,7 +107,7 @@ namespace Stasistium.Stages
                                 || !cache.IdOrder.SequenceEqual(r.newCache.IdOrder);
             var ids = r.newCache.IdOrder.ToImmutableList();
 
-            return StageResultList.Create(task, hasChanges, ids);
+            return StageResultList.Create(r.result, hasChanges, ids, r.newCache);
         }
     }
 

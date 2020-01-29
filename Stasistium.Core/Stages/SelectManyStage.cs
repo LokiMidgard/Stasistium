@@ -34,7 +34,8 @@ where TInputCache : class
 
             var task = LazyTask.Create(async () =>
             {
-                var (inputResult, inputCache) = await input.Perform;
+                var inputResult = await input.Perform;
+                var inputCache = input.Cache;
 
                 var resultList = (await Task.WhenAll(inputResult.Select(async item =>
                 {
@@ -51,25 +52,27 @@ where TInputCache : class
                         this.startLookup.Add(item.Id, pipe);
                     }
 
-                    if (cache == null || !cache.InputCacheLookup.TryGetValue(item.Id, out TCache? lastCache) || !cache.InputItemToResultItemIdLookup.TryGetValue(item.Id, out var resultIds))
+                    if (cache == null || !cache.InputCacheLookup.TryGetValue(item.Id, out TCache? lastCache) || !cache.InputItemToResultItemIdLookup.TryGetValue(item.Id, out var resultIds) || !cache.InputItemToResultItemCacheLookup.TryGetValue(item.Id, out var resultOldCaches))
                     {
                         lastCache = null;
                         resultIds = Array.Empty<string>();
+                        resultOldCaches = Array.Empty<TItemCache>();
                     }
                     var pipeDone = await pipe.@out.DoIt(lastCache, options).ConfigureAwait(false);
 
                     var list = new List<(StageResult<TResult, TItemCache> result, string lastItemHash)>();
                     if (pipeDone.HasChanges || cache is null)
                     {
-                        var (itemResult, itemCache) = await pipeDone.Perform;
+                        var itemResult = await pipeDone.Perform;
+                        var itemCache = pipeDone.Cache;
                         foreach (var singleResult in itemResult)
                         {
                             if (cache == null || cache.OutputItemIdToHash.TryGetValue(singleResult.Id, out string? lastItemHash))
                                 lastItemHash = null;
 
                             var performedSingle = await singleResult.Perform;
-                            var singlePerformedResult = performedSingle.result;
-                            list.Add((StageResult.Create(singlePerformedResult, performedSingle.cache, singlePerformedResult.Hash != lastItemHash, singlePerformedResult.Id), singlePerformedResult.Hash));
+                            var singlePerformedResult = performedSingle;
+                            list.Add((StageResult.Create(singlePerformedResult, singlePerformedResult.Hash != lastItemHash, singlePerformedResult.Id, singleResult.Cache), singlePerformedResult.Hash));
                         }
                         lastCache = itemCache;
                     }
@@ -82,17 +85,17 @@ where TInputCache : class
                             {
 
                                 var performedPipe = await pipeDone.Perform;
-                                if (resultIds.Length != performedPipe.result.Count)
+                                if (resultIds.Length != performedPipe.Count)
                                     throw this.Context.Exception("Number of Elements changed but input did not.");
 
-                                var curentValue = performedPipe.result[currentIndex];
+                                var curentValue = performedPipe[currentIndex];
                                 var currentPerform = await curentValue.Perform;
                                 return currentPerform;
                             });
                             if (!cache.OutputItemIdToHash.TryGetValue(resultIds[i], out string lastItemHash))
                                 throw this.Context.Exception("Should not happen");
-
-                            list.Add((result: StageResult.Create(subTask, false, resultIds[i]), lastItemHash));
+                            var oldItemCache = resultOldCaches[i];
+                            list.Add((result: StageResult.Create(subTask, false, resultIds[i], oldItemCache), lastItemHash));
                         }
                     }
 
@@ -107,6 +110,8 @@ where TInputCache : class
                     InputItemToResultItemIdLookup = resultList.ToDictionary(x => x.Id, x => x.list.Select(x => x.result.Id).ToArray()),
                     OutputItemIdToHash = resultList.SelectMany(x => x.list).ToDictionary(x => x.result.Id, x => x.lastItemHash),
 
+                    InputItemToResultItemCacheLookup = resultList.ToDictionary(x => x.Id, x => x.list.Select(x => x.result.Cache).ToArray()),
+
                     OutputIdOrder = resultList.SelectMany(x => x.list.Select(y => y.result.Id)).ToArray(),
                     PreviousCache = inputCache
                 };
@@ -116,7 +121,7 @@ where TInputCache : class
 
             var hasChanges = input.HasChanges;
             var ids = cache?.OutputIdOrder;
-            if (hasChanges || ids is null)
+            if (hasChanges || ids is null || cache is null)
             {
                 var (work, newCache) = await task;
 
@@ -126,10 +131,19 @@ where TInputCache : class
                 {
                     hasChanges = !newCache.OutputIdOrder.SequenceEqual(cache.OutputIdOrder) || work.Any(x => x.HasChanges);
                 }
+                return StageResultList.Create(work, hasChanges, ids.ToImmutableList(), newCache);
 
             }
+            else
+            {
+                var actualTask = LazyTask.Create(async () =>
+                {
+                    var temp = await task;
+                    return temp.Item1;
+                });
+                return StageResultList.Create(actualTask, hasChanges, ids.ToImmutableList(), cache);
+            }
 
-            return StageResultList.Create(task, hasChanges, ids.ToImmutableList());
         }
 
 
@@ -166,7 +180,7 @@ where TInputCache : class
             {
                 var result = await this.In.Perform;
 
-                return result.result;
+                return result;
             }
         }
     }

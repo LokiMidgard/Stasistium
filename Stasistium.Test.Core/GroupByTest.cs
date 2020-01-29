@@ -37,12 +37,12 @@ namespace Stasistium.Test.Core
 
             };
             var stageResultList = await group.DoIt(null, options.Token);
-            var (result, cache) = await stageResultList.Perform;
-
+            var result = await stageResultList.Perform;
+            var cache = stageResultList.Cache;
 
             var stageResultList2 = await group.DoIt(cache, options.Token);
-            var (result2, cache2) = await stageResultList.Perform;
-
+            var result2 = await stageResultList.Perform;
+            var cache2 = stageResultList.Cache;
             Assert.IsTrue(stageResultList.HasChanges, "First Run");
             Assert.IsFalse(stageResultList2.HasChanges, "No Changed Data");
         }
@@ -74,7 +74,8 @@ namespace Stasistium.Test.Core
 
             };
             var stageResultList = await group.DoIt(null, options.Token);
-            var (result, cache) = await stageResultList.Perform;
+            var result = await stageResultList.Perform;
+            var cache = stageResultList.Cache;
 
             mok.Current = ImmutableList<(string id, string content)>.Empty
                 .Add(("a1", "test1"))
@@ -84,7 +85,8 @@ namespace Stasistium.Test.Core
     ;
 
             var stageResultList2 = await group.DoIt(cache, options.Token);
-            var (result2, cache2) = await stageResultList.Perform;
+            var result2 = await stageResultList.Perform;
+            var cache2 = stageResultList.Cache;
 
             Assert.IsTrue(stageResultList.HasChanges, "First Run");
             Assert.IsTrue(stageResultList2.HasChanges, "Updated Data");
@@ -117,7 +119,8 @@ namespace Stasistium.Test.Core
 
             };
             var stageResultList = await group.DoIt(null, options.Token);
-            var (result, cache) = await stageResultList.Perform;
+            var result = await stageResultList.Perform;
+            var cache = stageResultList.Cache;
 
             mok.Current = ImmutableList<(string id, string content)>.Empty
                 .Add(("a1", "test1"))
@@ -127,7 +130,8 @@ namespace Stasistium.Test.Core
     ;
 
             var stageResultList2 = await group.DoIt(cache, options.Token);
-            var (result2, cache2) = await stageResultList.Perform;
+            var result2 = await stageResultList.Perform;
+            var cache2 = stageResultList.Cache;
 
             Assert.IsTrue(stageResultList.HasChanges, "First Run");
             Assert.IsTrue(stageResultList2.HasChanges, "Updated Data");
@@ -161,7 +165,8 @@ namespace Stasistium.Test.Core
 
             };
             var stageResultList = await group.DoIt(null, options.Token);
-            var (result, cache) = await stageResultList.Perform;
+            var result = await stageResultList.Perform;
+            var cache = stageResultList.Cache;
 
             mok.Current = ImmutableList<(string id, string content)>.Empty
                 .Add(("a1", "test1"))
@@ -172,7 +177,8 @@ namespace Stasistium.Test.Core
     ;
 
             var stageResultList2 = await group.DoIt(cache, options.Token);
-            var (result2, cache2) = await stageResultList.Perform;
+            var result2 = await stageResultList.Perform;
+            var cache2 = stageResultList.Cache;
 
             Assert.IsTrue(stageResultList.HasChanges, "First Run");
             Assert.IsTrue(stageResultList2.HasChanges, "Updated Data");
@@ -207,7 +213,8 @@ namespace Stasistium.Test.Core
 
             };
             var stageResultList = await group.DoIt(null, options.Token);
-            var (result, cache) = await stageResultList.Perform;
+            var result = await stageResultList.Perform;
+            var cache = stageResultList.Cache;
 
             mok.Current = ImmutableList<(string id, string content)>.Empty
                 .Add(("a1", "test1"))
@@ -216,7 +223,8 @@ namespace Stasistium.Test.Core
     ;
 
             var stageResultList2 = await group.DoIt(cache, options.Token);
-            var (result2, cache2) = await stageResultList.Perform;
+            var result2 = await stageResultList.Perform;
+            var cache2 = stageResultList.Cache;
 
             Assert.IsTrue(stageResultList.HasChanges, "First Run");
             Assert.IsTrue(stageResultList2.HasChanges, "Updated Data");

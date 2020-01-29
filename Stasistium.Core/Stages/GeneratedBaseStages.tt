@@ -149,7 +149,7 @@ namespace Single.Simple {
 <#for(int j = 0; j< list; j++){#>
             var inputList<#= j #>Performed = await inputList<#= j #>Result.Perform;
 
-            var inputList<#= j #>PerformedListTask = Task.WhenAll(inputList<#= j #>Performed.result.Select(async x => (await x.Perform).result));
+            var inputList<#= j #>PerformedListTask = Task.WhenAll(inputList<#= j #>Performed.Select(async x => (await x.Perform)));
 <#}#>
 
 <#if(list>1){#>
@@ -168,7 +168,7 @@ await Task.WhenAll(
 
                 var work = await this.Work(
                 <#for(int j = 0; j< single; j++){#>
-            inputSingle<#= j #>Performed.result,
+            inputSingle<#= j #>Performed,
 <#}#>
 <#for(int j = 0; j< list; j++){#>
             inputList<#= j #>PerformedList.ToImmutableList(),
@@ -177,10 +177,10 @@ await Task.WhenAll(
                 options).ConfigureAwait(false);
                 
                 return (work, cache: CacheId.Create(work.Id,work.Hash<#for(int j = 0; j< single; j++){#>
-, inputSingle<#= j #>Performed.cache<#
+, inputSingle<#= j #>Result.Cache<#
 }#><#
 for(int j = 0; j< list; j++){
-#>, inputList<#= j #>Performed.cache<#
+#>, inputList<#= j #>Result.Cache<#
 }#>));
             });
 
@@ -202,7 +202,6 @@ for(int j = 0; j< list; j++){
                 this.Context.Logger.Info($"Found Changes for list with ids: {string.Join(", ", inputList<#= j #>Result.Ids)}");
 
 <#}#>;
-
             var id = cache?.Id;
             if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
             {
@@ -210,15 +209,22 @@ for(int j = 0; j< list; j++){
                 // we need to perform the network operation to ensure we have no changes
 
                 var result = await task;
+
                 id = result.work.Id;
                 hasChanges = !await this.CacheEquals(cache?.Data, result.cache.Data).ConfigureAwait(false);
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
+                return StageResult.Create(result.work, hasChanges, id, result.cache);
 
             }
-
-            return StageResult.Create(task, hasChanges, id);
+            else {
+                var actualTask = LazyTask.Create(async ()=>{
+                    var temp = await task;
+                    return temp.work;
+                });
+                return StageResult.Create(actualTask, hasChanges, id, cache);
+            }
         }
 
         protected virtual Task<bool?> ForceUpdate(string? id, string? hash, OptionToken options) => Task.FromResult<bool?>(null);
@@ -369,7 +375,7 @@ namespace Multiple.Simple {
 <#for(int j = 0; j< list; j++){#>
             var inputList<#= j #>Performed = await inputList<#= j #>Result.Perform;
 
-            var inputList<#= j #>PerformedListTask = Task.WhenAll(inputList<#= j #>Performed.result.Select(async x => (await x.Perform).result));
+            var inputList<#= j #>PerformedListTask = Task.WhenAll(inputList<#= j #>Performed.Select(async x => (await x.Perform)));
 <#}#>
 
 <#if(list>1){#>
@@ -391,7 +397,7 @@ await Task.WhenAll(
 
                 var work = await this.Work(
                 <#for(int j = 0; j< single; j++){#>
-            inputSingle<#= j #>Performed.result,
+            inputSingle<#= j #>Performed,
 <#}#>
 <#for(int j = 0; j< list; j++){#>
             inputList<#= j #>PerformedList.ToImmutableList(),
@@ -404,7 +410,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,x.Hash,hasChanges,x.Id), hash: x.Hash);
+                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -414,17 +420,17 @@ var parameter = new StringBuilder();
   {
       parameter.Append(", inputSingle");
       parameter.Append(j);
-      parameter.Append("Performed.cache");
+      parameter.Append("Result.Cache");
   }
   for (int j = 0; j < list; j++)
   {
       parameter.Append(", inputList");
       parameter.Append(j);
-      parameter.Append("Performed.cache");
+      parameter.Append("Result.Cache");
   }
 #>
 
-                return (list.Select(x=>x.result).ToImmutableList(), cache: CachelessIds.Create(list.Select(x=>(x.result.Id, x.hash)).ToArray()<#=parameter#>));// { Data = work.cache.Item, Ids = ids }, work.cache.PreviousCache, childCaches.ToImmutable()));
+                return (work: list.Select(x=>x.result).ToImmutableList(), cache: CachelessIds.Create(list.Select(x=>(x.result.Id, x.hash)).ToArray()<#=parameter#>));// { Data = work.cache.Item, Ids = ids }, work.cache.PreviousCache, childCaches.ToImmutable()));
             });
 
 
@@ -453,14 +459,20 @@ var parameter = new StringBuilder();
                 // we need to perform the network operation to ensure we have no changes
 
                 var result = await task;
-                ids = await Task.WhenAll(result.Item1.Select(async x => ((await x.Perform).result.Id, (await x.Perform).result.Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
+                ids = await Task.WhenAll(result.work.Select(async x => ((await x.Perform).Id, (await x.Perform).Hash))).ConfigureAwait(false); // we want to make sure thate there are actually changes, so we compare the caches.
                 hasChanges = !this.CacheEquals(cache?.Ids, result.cache.Ids);
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
+                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
-
-            return StageResultList.Create(task, hasChanges, ids.Select(x=>x.id).ToImmutableList());
+            else{
+                var actualTask= LazyTask.Create(async ()=>{
+                    var temp = await task;
+                    return temp.work;
+                });
+                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+            }
         }
 
         protected virtual Task<bool?> ForceUpdate((string id, string hash)[]? ids, OptionToken options) => Task.FromResult<bool?>(null);

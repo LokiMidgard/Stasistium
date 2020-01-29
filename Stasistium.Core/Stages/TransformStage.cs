@@ -32,18 +32,18 @@ namespace Stasistium.Stages
                 var inputList = await input.Perform;
 
 
-                var list = await Task.WhenAll(inputList.result.Select(async subInput =>
+                var list = await Task.WhenAll(inputList.Select(async subInput =>
                 {
 
                     if (subInput.HasChanges)
                     {
                         var subResult = await subInput.Perform;
-                        var transformed = await this.transform(subResult.result).ConfigureAwait(false);
+                        var transformed = await this.transform(subResult).ConfigureAwait(false);
                         bool hasChanges = true;
                         if (cache != null && cache.Transformed.TryGetValue(transformed.Id, out var oldHash))
                             hasChanges = oldHash != transformed.Hash;
 
-                        return (result: StageResult.Create(transformed, transformed.Hash, hasChanges, transformed.Id), inputId: subInput.Id, outputHash: transformed.Hash);
+                        return (result: StageResult.Create(transformed, hasChanges, transformed.Id, transformed.Hash), inputId: subInput.Id, outputHash: transformed.Hash);
                     }
                     else
                     {
@@ -54,10 +54,10 @@ namespace Stasistium.Stages
                         {
 
                             var newSource = await subInput.Perform;
-                            var transformed = await this.transform(newSource.result).ConfigureAwait(false);
+                            var transformed = await this.transform(newSource).ConfigureAwait(false);
 
-                            return (transformed, transformed.Hash);
-                        }), false, oldOutputId),
+                            return transformed;
+                        }), false, oldOutputId, oldOutputHash),
                         inputId: subInput.Id,
                         outputHash: oldOutputHash
                         );
@@ -69,19 +69,17 @@ namespace Stasistium.Stages
                 {
                     InputToOutputId = list.ToDictionary(x => x.inputId, x => x.result.Id),
                     OutputIdOrder = list.Select(x => x.result.Id).ToArray(),
-                    ParentCache = inputList.cache,
+                    ParentCache = input.Cache,
                     Transformed = list.ToDictionary(x => x.result.Id, x => x.outputHash)
                 };
                 return (result: list.Select(x => x.result).ToImmutableList(), cache: newCache);
             });
 
             bool hasChanges = input.HasChanges;
-            var newCache = cache;
-            if (input.HasChanges || newCache == null)
+            if (input.HasChanges || cache == null)
             {
 
                 var (list, c) = await task;
-                newCache = c;
 
 
                 if (!hasChanges && list.Count != cache?.OutputIdOrder.Length)
@@ -97,9 +95,17 @@ namespace Stasistium.Stages
                             hasChanges = true;
                     }
                 }
+                return StageResultList.Create(list, hasChanges, c.OutputIdOrder.ToImmutableList(), c);
+
             }
 
-            return StageResultList.Create(task, hasChanges, newCache.OutputIdOrder.ToImmutableList());
+            var actualTask = LazyTask.Create(async () =>
+            {
+                var temp = await task;
+                return temp.result;
+            });
+
+            return StageResultList.Create(actualTask, hasChanges, cache.OutputIdOrder.ToImmutableList(), cache);
         }
 
 
@@ -110,7 +116,7 @@ namespace Stasistium.Stages
     {
         private readonly Func<IDocument<TIn>, Task<IDocument<TOut>>> transform;
 
-        public TransformStage(StagePerformHandler<TIn, TInCache> inputSingle0, Func<IDocument<TIn>, Task<IDocument<TOut>>> selector, IGeneratorContext context, string? name = null) : base(inputSingle0, context,name)
+        public TransformStage(StagePerformHandler<TIn, TInCache> inputSingle0, Func<IDocument<TIn>, Task<IDocument<TOut>>> selector, IGeneratorContext context, string? name = null) : base(inputSingle0, context, name)
         {
             this.transform = selector;
         }

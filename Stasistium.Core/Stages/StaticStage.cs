@@ -56,24 +56,24 @@ namespace Stasistium.Stages
                 if (result.HasChanges)
                 {
                     var performed = await result.Perform;
-                    newCache.Ids1 = new string[performed.result.Count];
-                    newCache.PreviouseCache1 = performed.cache;
+                    newCache.Ids1 = new string[performed.Count];
+                    newCache.PreviouseCache1 = result.Cache;
 
-                    for (int i = 0; i < performed.result.Count; i++)
+                    for (int i = 0; i < performed.Count; i++)
                     {
-                        var child = performed.result[i];
+                        var child = performed[i];
 
                         if (child.HasChanges)
                         {
                             var childPerformed = await child.Perform;
 
                             string? oldHash = null;
-                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.result.Id, out oldHash))
+                            if (cache != null && !cache.IdToHash.TryGetValue(childPerformed.Id, out oldHash))
                                 throw this.Context.Exception("Should Not Happen");
-                            var childHashChanges = oldHash != childPerformed.result.Hash;
+                            var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(StageResult.Create(childPerformed.result, childPerformed.result.Hash, childHashChanges, childPerformed.result.Id));
-                            newCache.IdToHash.Add(child.Id, childPerformed.result.Id);
+                            list.Add(StageResult.Create(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
+                            newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
                         else
@@ -82,11 +82,11 @@ namespace Stasistium.Stages
                             var childTask = LazyTask.Create(async () =>
                             {
                                 var childPerform = await child.Perform;
-                                return (childPerform.result, childPerform.result.Hash);
+                                return childPerform;
                             });
-                            list.Add(StageResult.Create(childTask, false, child.Id));
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
+                            list.Add(StageResult.Create(childTask, false, child.Id, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
@@ -104,14 +104,17 @@ namespace Stasistium.Stages
                         var childTask = LazyTask.Create(async () =>
                         {
                             var performed = await result.Perform;
-                            var chiledIndex = performed.result[i];
+                            var chiledIndex = performed[i];
                             var childPerform = await chiledIndex.Perform;
                             // We are in the no changes part. So ther must be no changes.
                             System.Diagnostics.Debug.Assert(!chiledIndex.HasChanges);
 
-                            return (childPerform.result, childPerform.result.Hash);
+                            return childPerform;
                         });
-                        list.Add(StageResult.Create(childTask, false, cache.Ids1[i]));
+
+                        if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids1[i], out var oldHash))
+                            throw this.Context.Exception("Should Not Happen");
+                        list.Add(StageResult.Create(childTask, false, cache.Ids1[i], oldHash));
                     }
                     newCache.PreviouseCache1 = cache.PreviouseCache1;
                     newCache.Ids1 = cache.Ids1;
@@ -125,7 +128,7 @@ namespace Stasistium.Stages
 
 
 
-                return (result:list.ToImmutable(),cache: newCache);
+                return (result: list.ToImmutable(), cache: newCache);
             });
 
             var hasChanges = result.HasChanges;
@@ -141,13 +144,18 @@ namespace Stasistium.Stages
                 }
                 ids.AddRange(performed.cache.Ids1);
 
+                return StageResultList.Create(performed.result, hasChanges, ids.ToImmutable(), performed.cache);
             }
             else
             {
                 ids.AddRange(cache.Ids1);
             }
-
-            return StageResultList.Create(task, hasChanges, ids.ToImmutable());
+            var actualTask = LazyTask.Create(async () =>
+            {
+                var temp = await task;
+                return temp.result;
+            });
+            return StageResultList.Create(actualTask, hasChanges, ids.ToImmutable(), cache);
         }
     }
 
