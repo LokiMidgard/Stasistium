@@ -6,6 +6,9 @@ using System.Text;
 using Blocks = Microsoft.Toolkit.Parsers.Markdown.Blocks;
 using Inlines = Microsoft.Toolkit.Parsers.Markdown.Inlines;
 using System.Collections.Generic;
+using Microsoft.Toolkit.Parsers.Markdown.Blocks;
+using Microsoft.Toolkit.Parsers.Markdown.Inlines;
+using System.Linq;
 
 namespace Stasistium.Stages
 {
@@ -30,6 +33,30 @@ namespace Stasistium.Stages
 
     public class MarkdownRenderer
     {
+
+        public static string GetHeaderText(HeaderBlock headerBlock)
+        {
+            return ToText2(headerBlock.Inlines);
+
+            static string ToText2(IEnumerable<MarkdownInline> inlines)
+            {
+                return string.Join(" ", inlines.Select(ToText));
+            }
+
+            static string ToText(MarkdownInline inline)
+            {
+                if (inline is TextRunInline textRun)
+                    return textRun.Text;
+                if (inline is BoldTextInline bold)
+                    return ToText2(bold.Inlines);
+                if (inline is ItalicTextInline italic)
+                    return ToText2(italic.Inlines);
+                if (inline is StrikethroughTextInline strikethrough)
+                    return ToText2(strikethrough.Inlines);
+
+                return inline.ToString()!;
+            }
+        }
 
         public string Render(MarkdownDocument document)
         {
@@ -70,9 +97,15 @@ namespace Stasistium.Stages
                     break;
 
                 case Blocks.HeaderBlock header:
-
                     builder.Append("<h");
                     builder.Append(header.HeaderLevel.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                    var id = GetHeaderText(header).Replace(' ', '-');
+                    if (id.Length > 0)
+                    {
+                        builder.Append(" id=\"");
+                        builder.Append(id);
+                        builder.Append("\" ");
+                    }
                     builder.Append(">");
 
                     foreach (var item in header.Inlines)
