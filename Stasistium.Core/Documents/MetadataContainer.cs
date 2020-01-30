@@ -155,6 +155,17 @@ namespace Stasistium.Documents
             else
                 return null;
         }
+        public MetadataContainer? Remove(Type t)
+        {
+            if (t is null)
+                throw new ArgumentNullException(nameof(t));
+            if (this.values.ContainsKey(t))
+                return new MetadataContainer(this.values.Remove(t), this.Context);
+            else
+                return this;
+        }
+        public MetadataContainer? Remove<T>()
+            where T : class => this.Remove(typeof(T));
 
 
         [return: NotNullIfNotNull("value")]
