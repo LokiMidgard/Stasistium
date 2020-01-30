@@ -52,13 +52,12 @@ namespace Stasistium.Documents
 
         public IGeneratorContext Context { get; }
 
-        [return: MaybeNull]
-        public T GetValue<T>()
+        public T? GetValue<T>()
             where T : class
         {
             if (this.values.TryGetValue(typeof(T), out var obj))
                 return (T)obj;
-            return null!/*It may be null, so ther should no warning*/;
+            return null;
         }
 
         public MetadataContainer AddOrUpdate<T>(T value)
@@ -99,13 +98,19 @@ namespace Stasistium.Documents
         public MetadataContainer Add<T>(T value)
             where T : class => new MetadataContainer(this.values.Add(typeof(T), value), this.Context);
 
-        public MetadataContainer? Update<T>(T value)
+        public MetadataContainer Update<T>(T value, out T? oldValue)
             where T : class
         {
             if (this.values.ContainsKey(typeof(T)))
+            {
+                oldValue = (T)this.values[typeof(T)];
                 return new MetadataContainer(this.values.SetItem(typeof(T), value), this.Context);
+            }
             else
-                return null;
+            {
+                oldValue = default;
+                return this;
+            }
         }
 
         public MetadataContainer AddOrUpdate(Type t, object value)
@@ -143,7 +148,7 @@ namespace Stasistium.Documents
             return new MetadataContainer(this.values.Add(t, CheckTypeCast(t, value)), this.Context);
         }
 
-        public MetadataContainer? Update(Type t, object value)
+        public MetadataContainer Update(Type t, object value)
         {
             if (t is null)
                 throw new ArgumentNullException(nameof(t));
@@ -153,9 +158,9 @@ namespace Stasistium.Documents
             if (this.values.ContainsKey(t))
                 return new MetadataContainer(this.values.SetItem(t, value), this.Context);
             else
-                return null;
+                return this;
         }
-        public MetadataContainer? Remove(Type t)
+        public MetadataContainer Remove(Type t)
         {
             if (t is null)
                 throw new ArgumentNullException(nameof(t));
@@ -164,7 +169,7 @@ namespace Stasistium.Documents
             else
                 return this;
         }
-        public MetadataContainer? Remove<T>()
+        public MetadataContainer Remove<T>()
             where T : class => this.Remove(typeof(T));
 
 
