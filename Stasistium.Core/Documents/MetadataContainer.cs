@@ -52,8 +52,15 @@ namespace Stasistium.Documents
 
         public IGeneratorContext Context { get; }
 
-        public T? GetValue<T>()
+        public T GetValue<T>()
             where T : class
+        {
+            if (this.values.TryGetValue(typeof(T), out var obj))
+                return (T)obj;
+            throw new ArgumentOutOfRangeException($"No entry of Type {typeof(T)}");
+        }
+        public T? TryGetValue<T>()
+           where T : class
         {
             if (this.values.TryGetValue(typeof(T), out var obj))
                 return (T)obj;
