@@ -11,7 +11,7 @@ namespace Stasistium.Stages
     public class StreamToText<TInCache> : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple1List0StageBase<Stream, TInCache, string>
         where TInCache : class
     {
-        public StreamToText(StagePerformHandler<Stream, TInCache> input, Encoding? encoding, IGeneratorContext context, string? name = null) : base(input, context, name)
+        public StreamToText(StageBase<Stream, TInCache> input, Encoding? encoding, IGeneratorContext context, string? name = null) : base(input, context, name)
         {
             this.Encoding = encoding ?? Encoding.UTF8;
         }
@@ -39,7 +39,7 @@ namespace Stasistium
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
-            return new StreamToText<T>(input.DoIt, encoding, input.Context, name);
+            return new StreamToText<T>(input, encoding, input.Context, name);
         }
     }
 }

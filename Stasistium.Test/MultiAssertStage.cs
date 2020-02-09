@@ -11,7 +11,7 @@ namespace Stasistium.Test
     public class MultiAssertStage<T> : MultiStageBase<string, string, MultiAssertStage<T>.Cache>
         where T : class
     {
-        private readonly StagePerformHandler<string, string, T> input;
+        private readonly MultiStageBase<string, string, T> input;
 
         private readonly System.Collections.Concurrent.ConcurrentBag<Run> runs = new System.Collections.Concurrent.ConcurrentBag<Run>();
 
@@ -26,14 +26,14 @@ namespace Stasistium.Test
             }
         }
 
-        public MultiAssertStage(StagePerformHandler<string, string, T> input, IGeneratorContext context, string? name = null) : base(context, name)
+        public MultiAssertStage(MultiStageBase<string, string, T> input, IGeneratorContext context, string? name = null) : base(context, name)
         {
             this.input = input;
         }
 
         protected override async Task<StageResultList<string, string, MultiAssertStage<T>.Cache>> DoInternal([AllowNull] MultiAssertStage<T>.Cache? cache, OptionToken options)
         {
-            var r = await this.input(cache?.PreviousCache, options);
+            var r = await this.input.DoIt(cache?.PreviousCache, options);
 
             var inputHadChanges = r.HasChanges;
             var inputIds = r.Ids;

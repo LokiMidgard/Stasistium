@@ -29,7 +29,7 @@ for (int i = 1; i <= numberOfElements; i++)
     string baseGenerics = string.Join(", ", Enumerable.Range(1,i).Select(x=> "T, TCache"+x) );
     string whereStatements = string.Join("\n        ", Enumerable.Range(1,i).Select(x=> "where TCache"+x+" : class") );
 
-    string constructorArguments = string.Join(", ", Enumerable.Range(1,i).Select(x=> "StagePerformHandler<T, TCache"+x+"> input"+x) );
+    string constructorArguments = string.Join(", ", Enumerable.Range(1,i).Select(x=> "StageBase<T, TCache"+x+"> input"+x) );
     string baseArguments = string.Join(", ", Enumerable.Range(1,i).Select(x=> "input"+x) );
     
     string overideArguments =string.Join(", ", Enumerable.Range(1,i).Select(x=> "IDocument<T> input"+x) );
@@ -66,7 +66,7 @@ for (int i = 1; i <= numberOfElements; i++)
     string baseGenerics = string.Join(", ", Enumerable.Range(1,i).Select(x=> "TCache"+x) );
     string whereStatements = string.Join("\n        ", Enumerable.Range(1,i).Select(x=> "where TItemCache"+x+" : class\n        where TCache"+x+" : class") );
 
-    string constructorArguments = string.Join(", ", Enumerable.Range(1,i).Select(x=> "StagePerformHandler<T, TItemCache"+x+", TCache"+x+"> input"+x) );
+    string constructorArguments = string.Join(", ", Enumerable.Range(1,i).Select(x=> "MultiStageBase<T, TItemCache"+x+", TCache"+x+"> input"+x) );
     
     string overideArguments =string.Join(", ", Enumerable.Range(1,i).Select(x=> "ImmutableList<IDocument<T>> input"+x) );
     string toListArguments =string.Join(", ", Enumerable.Range(1,i).Select(x=> "input"+x) );
@@ -81,7 +81,7 @@ for (int i = 1; i <= numberOfElements; i++)
 for (int j = 1; j <= i; j++)
 {
 #>
-        private readonly StagePerformHandler<T, TItemCache<#= j #>, TCache<#= j #>> input<#= j #>;
+        private readonly MultiStageBase<T, TItemCache<#= j #>, TCache<#= j #>> input<#= j #>;
 <#
 }
 #>
@@ -103,7 +103,7 @@ for (int j = 1; j <= i; j++)
 for (int j = 1; j <= i; j++)
 {
 #>
-            var resultTask<#= j #> = this.input<#= j #>(cache?.PreviouseCache<#= j #>, options);
+            var resultTask<#= j #> = this.input<#= j #>.DoIt(cache?.PreviouseCache<#= j #>, options);
 <#
 }
 #>
@@ -311,7 +311,7 @@ for (int i = 1; i <= numberOfElements; i++)
 {
     string classGenerics = string.Join(", ", Enumerable.Range(1,i).Select(x=> "TCache"+x) );
     string argumentList = string.Join(", ", Enumerable.Range(1,i).Select(x=> "StageBase<T, TCache"+x+"> input"+x) );
-    string argumentList2 = string.Join(", ", Enumerable.Range(1,i).Select(x=> "input"+x+".DoIt") );
+    string argumentList2 = string.Join(", ", Enumerable.Range(1,i).Select(x=> "input"+x) );
     string generics = string.Join(", ", Enumerable.Range(1,i).Select(x=> "TCache"+x) );
     
     string whereStatements = string.Join("\n            ", Enumerable.Range(1,i).Select(x=> "where TCache"+x+" : class") );
@@ -334,7 +334,7 @@ for (int i = 1; i <= numberOfElements; i++)
 {
     string classGenerics = string.Join(", ", Enumerable.Range(1,i).Select(x=> "TItemCache"+x+", TCache"+x) );
     string argumentList = string.Join(", ", Enumerable.Range(1,i).Select(x=> "MultiStageBase<T, TItemCache"+x+", TCache"+x+"> input"+x) );
-    string argumentList2 = string.Join(", ", Enumerable.Range(1,i).Select(x=> "input"+x+".DoIt") );
+    string argumentList2 = string.Join(", ", Enumerable.Range(1,i).Select(x=> "input"+x) );
     string generics = string.Join(", ", Enumerable.Range(1,i).Select(x=> "TItemCache"+x+", TCache"+x) );
     
     string whereStatements = string.Join("\n            ", Enumerable.Range(1,i).Select(x=> "where TItemCache"+x+" : class\n        where TCache"+x+" : class") );

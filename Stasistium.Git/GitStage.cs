@@ -15,7 +15,7 @@ namespace Stasistium.Stages
         private System.IO.DirectoryInfo? workingDir;
 
 
-        public GitStage(StagePerformHandler<string, TPreviousCache> input, IGeneratorContext context, string? name) : base(input, context, name, true)
+        public GitStage(StageBase<string, TPreviousCache> input, IGeneratorContext context, string? name) : base(input, context, name, true)
         {
         }
 

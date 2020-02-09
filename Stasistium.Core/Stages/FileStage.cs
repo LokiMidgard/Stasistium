@@ -12,9 +12,9 @@ namespace Stasistium.Stages
     public class FileStage<TInCache> : StageBase<Stream, FileStageCache<TInCache>>
         where TInCache : class
     {
-        private readonly StagePerformHandler<string, TInCache> input;
+        private readonly StageBase<string, TInCache> input;
 
-        public FileStage(StagePerformHandler<string, TInCache> input, IGeneratorContext context, string? name = null) : base(context, name)
+        public FileStage(StageBase<string, TInCache> input, IGeneratorContext context, string? name = null) : base(context, name)
         {
             this.input = input;
         }
@@ -24,7 +24,7 @@ namespace Stasistium.Stages
         {
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
-            var input = await this.input(cache?.PreviousCache, options).ConfigureAwait(false);
+            var input = await this.input.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
 
             var task = LazyTask.Create(async () =>
             {

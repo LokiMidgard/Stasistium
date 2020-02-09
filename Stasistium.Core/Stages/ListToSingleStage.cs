@@ -13,7 +13,7 @@ namespace Stasistium.Stages
     {
         private readonly Func<ImmutableList<IDocument<TIn>>, IDocument<TOut>> transform;
 
-        public ListToSingleStage(StagePerformHandler<TIn, TInItemCache, TInCache> inputList0, Func<ImmutableList<IDocument<TIn>>, IDocument<TOut>> transform, IGeneratorContext context, string? name) : base(inputList0, context, name)
+        public ListToSingleStage(MultiStageBase<TIn, TInItemCache, TInCache> inputList0, Func<ImmutableList<IDocument<TIn>>, IDocument<TOut>> transform, IGeneratorContext context, string? name) : base(inputList0, context, name)
         {
             this.transform = transform ?? throw new ArgumentNullException(nameof(transform));
         }
@@ -37,7 +37,7 @@ namespace Stasistium
                 throw new ArgumentNullException(nameof(input));
             if (transform is null)
                 throw new ArgumentNullException(nameof(transform));
-            return new ListToSingleStage<TIn, TInItemCache, TInCache, TOut>(input.DoIt, transform, input.Context, name);
+            return new ListToSingleStage<TIn, TInItemCache, TInCache, TOut>(input, transform, input.Context, name);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Stasistium.Stages
     {
         private readonly Func<MarkdownDocument>? generateDocuement;
 
-        public MarkdownStringStage(StagePerformHandler<string, TPreviousCache> input, Func<MarkdownDocument>? generateDocuement, IGeneratorContext context, string? name) : base(input, context, name)
+        public MarkdownStringStage(StageBase<string, TPreviousCache> input, Func<MarkdownDocument>? generateDocuement, IGeneratorContext context, string? name) : base(input, context, name)
         {
             this.generateDocuement = generateDocuement;
         }

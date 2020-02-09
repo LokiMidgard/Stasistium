@@ -14,7 +14,7 @@ namespace Stasistium.Stages
     {
 
 
-        public GitRefToFilesStage(StagePerformHandler<GitRefStage, TPreviousCache> input, IGeneratorContext context, string? name) : base(input, context, name)
+        public GitRefToFilesStage(StageBase<GitRefStage, TPreviousCache> input, IGeneratorContext context, string? name) : base(input, context, name)
         {
         }
 

@@ -68,19 +68,19 @@ namespace Single.Simple {
 
     {
     <#for(int j = 0; j< single; j++){#>
-        private readonly StagePerformHandler<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>;
+        private readonly StageBase<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>;
     <#}#>
     <#for(int j = 0; j< list; j++){#>
-        private readonly StagePerformHandler<TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>> inputList<#= j #>;
+        private readonly MultiStageBase<TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>> inputList<#= j #>;
     <#}#>
         private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple<#= single #>List<#= list #>StageBase(
     <#for(int j = 0; j< single; j++){#>
-        StagePerformHandler<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>,
+        StageBase<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>,
     <#}#>
         <#for(int j = 0; j< list; j++){#>
-        StagePerformHandler<TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>> inputList<#= j #>,
+        MultiStageBase<TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>> inputList<#= j #>,
     <#}#>
         IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
@@ -110,19 +110,19 @@ namespace Single.Simple {
 #>
             await Task.WhenAll(
 <#for(int j = 0; j< single; j++){#>
-                this.inputSingle<#= j #>(cache?.PreviousCache<#= j #>, options),
+                this.inputSingle<#= j #>.DoIt(cache?.PreviousCache<#= j #>, options),
 <#}#>
 <#for(int j = 0; j< list; j++){#>
-                this.inputList<#= j #>(cache?.PreviousCache<#= j + single #>, options),
+                this.inputList<#= j #>.DoIt(cache?.PreviousCache<#= j + single #>, options),
 <#}#>
                 Task.CompletedTask
             ).ConfigureAwait(false);
                 <#}#>
 <#for(int j = 0; j< single; j++){#>
-            var inputSingle<#= j #>Result = await this.inputSingle<#= j #>(cache?.PreviousCache<#= j #>, options).ConfigureAwait(false);
+            var inputSingle<#= j #>Result = await this.inputSingle<#= j #>.DoIt(cache?.PreviousCache<#= j #>, options).ConfigureAwait(false);
 <#}#>
 <#for(int j = 0; j< list; j++){#>
-            var inputList<#= j #>Result = await this.inputList<#= j #>(cache?.PreviousCache<#= j + single #>, options).ConfigureAwait(false);
+            var inputList<#= j #>Result = await this.inputList<#= j #>.DoIt(cache?.PreviousCache<#= j + single #>, options).ConfigureAwait(false);
 <#}#>
 
 
@@ -135,10 +135,10 @@ namespace Single.Simple {
 #>
             await Task.WhenAll(
 <#for(int j = 0; j< single; j++){#>
-                this.inputSingle<#= j #>(cache?.PreviousCache<#= j #>, options),
+                this.inputSingle<#= j #>.DoIt(cache?.PreviousCache<#= j #>, options),
 <#}#>
 <#for(int j = 0; j< list; j++){#>
-                this.inputList<#= j #>(cache?.PreviousCache<#= j + single #>, options),
+                this.inputList<#= j #>.DoIt(cache?.PreviousCache<#= j + single #>, options),
 <#}#>
                 Task.CompletedTask
             ).ConfigureAwait(false);
@@ -290,19 +290,19 @@ namespace Multiple.Simple {
 
     {
     <#for(int j = 0; j< single; j++){#>
-        private readonly StagePerformHandler<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>;
+        private readonly StageBase<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>;
     <#}#>
     <#for(int j = 0; j< list; j++){#>
-        private readonly StagePerformHandler<TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>> inputList<#= j #>;
+        private readonly MultiStageBase<TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>> inputList<#= j #>;
     <#}#>
         private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle<#= single #>List<#= list #>StageBase(
     <#for(int j = 0; j< single; j++){#>
-        StagePerformHandler<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>,
+        StageBase<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>,
     <#}#>
         <#for(int j = 0; j< list; j++){#>
-        StagePerformHandler<TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>> inputList<#= j #>,
+        MultiStageBase<TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>> inputList<#= j #>,
     <#}#>
         IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
@@ -336,21 +336,21 @@ namespace Multiple.Simple {
 #>
             await Task.WhenAll(
 <#for(int j = 0; j< single; j++){#>
-                this.inputSingle<#= j #>(cache?.PreviousCache<#= j #>, options),
+                this.inputSingle<#= j #>.DoIt(cache?.PreviousCache<#= j #>, options),
 <#}#>
 <#for(int j = 0; j< list; j++){#>
-                this.inputList<#= j #>(cache?.PreviousCache<#= j + single #>, options),
+                this.inputList<#= j #>.DoIt(cache?.PreviousCache<#= j + single #>, options),
 <#}#>
                 Task.CompletedTask
             ).ConfigureAwait(false);
                 <#}#>
 <#for(int j = 0; j< single; j++){#>
-            var inputSingle<#= j #>Result = await this.inputSingle<#= j #>(cache?.PreviousCache<#= j #>, options).ConfigureAwait(false);
+            var inputSingle<#= j #>Result = await this.inputSingle<#= j #>.DoIt(cache?.PreviousCache<#= j #>, options).ConfigureAwait(false);
 <#}#>
 <#for(int j = 0; j< list; j++){
 
 #>
-            var inputList<#= j #>Result = await this.inputList<#= j #>(cache?.PreviousCache<#= j + single #>, options).ConfigureAwait(false);
+            var inputList<#= j #>Result = await this.inputList<#= j #>.DoIt(cache?.PreviousCache<#= j + single #>, options).ConfigureAwait(false);
 <#}#>
              
             var task = LazyTask.Create(async () =>
@@ -509,19 +509,19 @@ var parameter = new StringBuilder();
 //        where TCache : class
 //    {
 //    <#for(int j = 0; j< single; j++){#>
-//        private readonly StagePerformHandler<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>;
+//        private readonly StageBase<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>;
 //    <#}#>
 //    <#for(int j = 0; j< list; j++){#>
-//        private readonly StagePerformHandler<TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>> inputList<#= j #>;
+//        private readonly StageBase<TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>> inputList<#= j #>;
 //    <#}#>
 //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle<#= single #>List<#= list #>StageBase(
 //    <#for(int j = 0; j< single; j++){#>
-//        StagePerformHandler<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>,
+//        StageBase<TInputSingle<#= j #>, TPreviousSingleCache<#= j #>> inputSingle<#= j #>,
 //    <#}#>
 //        <#for(int j = 0; j< list; j++){#>
-//        StagePerformHandler<TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>> inputList<#= j #>,
+//        StageBase<TInputList<#= j #>, TPreviousItemCache<#= j #>, TPreviousListCache<#= j #>> inputList<#= j #>,
 //    <#}#>
 //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {

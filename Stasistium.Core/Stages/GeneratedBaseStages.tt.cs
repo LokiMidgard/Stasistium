@@ -335,11 +335,11 @@ namespace Single.Simple {
 
     
     {
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
             private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple0List1StageBase(
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                     this.inputList0 = inputList0;
@@ -353,7 +353,7 @@ namespace Single.Simple {
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
 
-            var inputList0Result = await this.inputList0(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -434,11 +434,11 @@ namespace Multiple.Simple {
 
     
     {
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
             private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle0List1StageBase(
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                     this.inputList0 = inputList0;
@@ -456,7 +456,7 @@ namespace Multiple.Simple {
                 throw new ArgumentNullException(nameof(options));
 
 
-            var inputList0Result = await this.inputList0(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -549,11 +549,11 @@ namespace Multiple.Simple {
 // > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
 //        where TCache : class
 //    {
-//    //    //        private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+//    //    //        private readonly StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
 //    //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle0List1StageBase(
-//    //        //        StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+//    //        //        StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
 //    //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {
 //    //    //            this.inputList0 = inputList0;
@@ -690,13 +690,13 @@ namespace Single.Simple {
 
     
     {
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
             private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple0List2StageBase(
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                     this.inputList0 = inputList0;
@@ -712,12 +712,12 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputList0(cache?.PreviousCache0, options),
-                this.inputList1(cache?.PreviousCache1, options),
+                this.inputList0.DoIt(cache?.PreviousCache0, options),
+                this.inputList1.DoIt(cache?.PreviousCache1, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputList0Result = await this.inputList0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache1, options).ConfigureAwait(false);
+                            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -725,8 +725,8 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputList0(cache?.PreviousCache0, options),
-                this.inputList1(cache?.PreviousCache1, options),
+                this.inputList0.DoIt(cache?.PreviousCache0, options),
+                this.inputList1.DoIt(cache?.PreviousCache1, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputList0Performed = await inputList0Result.Perform;
@@ -820,13 +820,13 @@ namespace Multiple.Simple {
 
     
     {
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
             private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle0List2StageBase(
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                     this.inputList0 = inputList0;
@@ -847,12 +847,12 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputList0(cache?.PreviousCache0, options),
-                this.inputList1(cache?.PreviousCache1, options),
+                this.inputList0.DoIt(cache?.PreviousCache0, options),
+                this.inputList1.DoIt(cache?.PreviousCache1, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputList0Result = await this.inputList0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache1, options).ConfigureAwait(false);
+                            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -964,13 +964,13 @@ await Task.WhenAll(
 // > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
 //        where TCache : class
 //    {
-//    //    //        private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-//    //        private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+//    //    //        private readonly StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+//    //        private readonly StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
 //    //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle0List2StageBase(
-//    //        //        StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-//    //        StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+//    //        //        StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+//    //        StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
 //    //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {
 //    //    //            this.inputList0 = inputList0;
@@ -1116,15 +1116,15 @@ namespace Single.Simple {
 
     
     {
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-            private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
             private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple0List3StageBase(
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                     this.inputList0 = inputList0;
@@ -1141,14 +1141,14 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputList0(cache?.PreviousCache0, options),
-                this.inputList1(cache?.PreviousCache1, options),
-                this.inputList2(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache0, options),
+                this.inputList1.DoIt(cache?.PreviousCache1, options),
+                this.inputList2.DoIt(cache?.PreviousCache2, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputList0Result = await this.inputList0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2(cache?.PreviousCache2, options).ConfigureAwait(false);
+                            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -1156,9 +1156,9 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputList0(cache?.PreviousCache0, options),
-                this.inputList1(cache?.PreviousCache1, options),
-                this.inputList2(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache0, options),
+                this.inputList1.DoIt(cache?.PreviousCache1, options),
+                this.inputList2.DoIt(cache?.PreviousCache2, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputList0Performed = await inputList0Result.Perform;
@@ -1266,15 +1266,15 @@ namespace Multiple.Simple {
 
     
     {
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-            private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
             private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle0List3StageBase(
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                     this.inputList0 = inputList0;
@@ -1297,14 +1297,14 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputList0(cache?.PreviousCache0, options),
-                this.inputList1(cache?.PreviousCache1, options),
-                this.inputList2(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache0, options),
+                this.inputList1.DoIt(cache?.PreviousCache1, options),
+                this.inputList2.DoIt(cache?.PreviousCache2, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputList0Result = await this.inputList0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2(cache?.PreviousCache2, options).ConfigureAwait(false);
+                            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -1428,15 +1428,15 @@ await Task.WhenAll(
 // > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
 //        where TCache : class
 //    {
-//    //    //        private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-//    //        private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-//    //        private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+//    //    //        private readonly StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+//    //        private readonly StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+//    //        private readonly StageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
 //    //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle0List3StageBase(
-//    //        //        StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-//    //        StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-//    //        StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+//    //        //        StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+//    //        StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+//    //        StageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
 //    //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {
 //    //    //            this.inputList0 = inputList0;
@@ -1591,17 +1591,17 @@ namespace Single.Simple {
 
     
     {
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-            private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
-            private readonly StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+            private readonly MultiStageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
             private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple0List4StageBase(
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-            StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+            MultiStageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                     this.inputList0 = inputList0;
@@ -1619,16 +1619,16 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputList0(cache?.PreviousCache0, options),
-                this.inputList1(cache?.PreviousCache1, options),
-                this.inputList2(cache?.PreviousCache2, options),
-                this.inputList3(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache0, options),
+                this.inputList1.DoIt(cache?.PreviousCache1, options),
+                this.inputList2.DoIt(cache?.PreviousCache2, options),
+                this.inputList3.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputList0Result = await this.inputList0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList3Result = await this.inputList3(cache?.PreviousCache3, options).ConfigureAwait(false);
+                            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -1636,10 +1636,10 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputList0(cache?.PreviousCache0, options),
-                this.inputList1(cache?.PreviousCache1, options),
-                this.inputList2(cache?.PreviousCache2, options),
-                this.inputList3(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache0, options),
+                this.inputList1.DoIt(cache?.PreviousCache1, options),
+                this.inputList2.DoIt(cache?.PreviousCache2, options),
+                this.inputList3.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputList0Performed = await inputList0Result.Perform;
@@ -1761,17 +1761,17 @@ namespace Multiple.Simple {
 
     
     {
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-            private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
-            private readonly StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+            private readonly MultiStageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
             private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle0List4StageBase(
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-            StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+            MultiStageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                     this.inputList0 = inputList0;
@@ -1796,16 +1796,16 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputList0(cache?.PreviousCache0, options),
-                this.inputList1(cache?.PreviousCache1, options),
-                this.inputList2(cache?.PreviousCache2, options),
-                this.inputList3(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache0, options),
+                this.inputList1.DoIt(cache?.PreviousCache1, options),
+                this.inputList2.DoIt(cache?.PreviousCache2, options),
+                this.inputList3.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputList0Result = await this.inputList0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList3Result = await this.inputList3(cache?.PreviousCache3, options).ConfigureAwait(false);
+                            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -1941,17 +1941,17 @@ await Task.WhenAll(
 // > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
 //        where TCache : class
 //    {
-//    //    //        private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-//    //        private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-//    //        private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
-//    //        private readonly StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
+//    //    //        private readonly StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+//    //        private readonly StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+//    //        private readonly StageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+//    //        private readonly StageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
 //    //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle0List4StageBase(
-//    //        //        StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-//    //        StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-//    //        StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-//    //        StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
+//    //        //        StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+//    //        StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+//    //        StageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+//    //        StageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
 //    //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {
 //    //    //            this.inputList0 = inputList0;
@@ -2097,11 +2097,11 @@ namespace Single.Simple {
              where TPreviousSingleCache0 : class
             
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
                 private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple1List0StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
                     IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -2115,7 +2115,7 @@ namespace Single.Simple {
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
 
-            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -2190,11 +2190,11 @@ namespace Multiple.Simple {
              where TPreviousSingleCache0 : class
             
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
                 private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle1List0StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
                     IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -2212,7 +2212,7 @@ namespace Multiple.Simple {
                 throw new ArgumentNullException(nameof(options));
 
 
-            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -2301,11 +2301,11 @@ namespace Multiple.Simple {
 // > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
 //        where TCache : class
 //    {
-//    //        private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+//    //        private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
 //    //    //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle1List0StageBase(
-//    //        StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+//    //        StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
 //    //        //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {
 //    //            this.inputSingle0 = inputSingle0;
@@ -2440,13 +2440,13 @@ namespace Single.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
             private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple1List1StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -2462,12 +2462,12 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputList0(cache?.PreviousCache1, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputList0.DoIt(cache?.PreviousCache1, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache1, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -2475,8 +2475,8 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputList0(cache?.PreviousCache1, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputList0.DoIt(cache?.PreviousCache1, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -2560,13 +2560,13 @@ namespace Multiple.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
             private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle1List1StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -2587,12 +2587,12 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputList0(cache?.PreviousCache1, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputList0.DoIt(cache?.PreviousCache1, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache1, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -2696,13 +2696,13 @@ namespace Multiple.Simple {
 // > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
 //        where TCache : class
 //    {
-//    //        private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-//    //    //        private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+//    //        private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+//    //    //        private readonly StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
 //    //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle1List1StageBase(
-//    //        StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-//    //        //        StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+//    //        StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+//    //        //        StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
 //    //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {
 //    //            this.inputSingle0 = inputSingle0;
@@ -2846,15 +2846,15 @@ namespace Single.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
             private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple1List2StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -2871,14 +2871,14 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputList0(cache?.PreviousCache1, options),
-                this.inputList1(cache?.PreviousCache2, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputList0.DoIt(cache?.PreviousCache1, options),
+                this.inputList1.DoIt(cache?.PreviousCache2, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache2, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -2886,9 +2886,9 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputList0(cache?.PreviousCache1, options),
-                this.inputList1(cache?.PreviousCache2, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputList0.DoIt(cache?.PreviousCache1, options),
+                this.inputList1.DoIt(cache?.PreviousCache2, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -2989,15 +2989,15 @@ namespace Multiple.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
             private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle1List2StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -3020,14 +3020,14 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputList0(cache?.PreviousCache1, options),
-                this.inputList1(cache?.PreviousCache2, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputList0.DoIt(cache?.PreviousCache1, options),
+                this.inputList1.DoIt(cache?.PreviousCache2, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache2, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -3146,15 +3146,15 @@ await Task.WhenAll(
 // > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
 //        where TCache : class
 //    {
-//    //        private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-//    //    //        private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-//    //        private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+//    //        private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+//    //    //        private readonly StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+//    //        private readonly StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
 //    //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle1List2StageBase(
-//    //        StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-//    //        //        StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-//    //        StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+//    //        StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+//    //        //        StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+//    //        StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
 //    //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {
 //    //            this.inputSingle0 = inputSingle0;
@@ -3307,17 +3307,17 @@ namespace Single.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-            private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
             private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple1List3StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -3335,16 +3335,16 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputList0(cache?.PreviousCache1, options),
-                this.inputList1(cache?.PreviousCache2, options),
-                this.inputList2(cache?.PreviousCache3, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputList0.DoIt(cache?.PreviousCache1, options),
+                this.inputList1.DoIt(cache?.PreviousCache2, options),
+                this.inputList2.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2(cache?.PreviousCache3, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -3352,10 +3352,10 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputList0(cache?.PreviousCache1, options),
-                this.inputList1(cache?.PreviousCache2, options),
-                this.inputList2(cache?.PreviousCache3, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputList0.DoIt(cache?.PreviousCache1, options),
+                this.inputList1.DoIt(cache?.PreviousCache2, options),
+                this.inputList2.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -3470,17 +3470,17 @@ namespace Multiple.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-            private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
             private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle1List3StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -3505,16 +3505,16 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputList0(cache?.PreviousCache1, options),
-                this.inputList1(cache?.PreviousCache2, options),
-                this.inputList2(cache?.PreviousCache3, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputList0.DoIt(cache?.PreviousCache1, options),
+                this.inputList1.DoIt(cache?.PreviousCache2, options),
+                this.inputList2.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2(cache?.PreviousCache3, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -3645,17 +3645,17 @@ await Task.WhenAll(
 // > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
 //        where TCache : class
 //    {
-//    //        private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-//    //    //        private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-//    //        private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-//    //        private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+//    //        private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+//    //    //        private readonly StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+//    //        private readonly StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+//    //        private readonly StageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
 //    //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle1List3StageBase(
-//    //        StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-//    //        //        StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-//    //        StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-//    //        StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+//    //        StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+//    //        //        StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+//    //        StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+//    //        StageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
 //    //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {
 //    //            this.inputSingle0 = inputSingle0;
@@ -3817,19 +3817,19 @@ namespace Single.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-            private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
-            private readonly StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+            private readonly MultiStageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
             private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple1List4StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-            StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+            MultiStageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -3848,18 +3848,18 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputList0(cache?.PreviousCache1, options),
-                this.inputList1(cache?.PreviousCache2, options),
-                this.inputList2(cache?.PreviousCache3, options),
-                this.inputList3(cache?.PreviousCache4, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputList0.DoIt(cache?.PreviousCache1, options),
+                this.inputList1.DoIt(cache?.PreviousCache2, options),
+                this.inputList2.DoIt(cache?.PreviousCache3, options),
+                this.inputList3.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList3Result = await this.inputList3(cache?.PreviousCache4, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -3867,11 +3867,11 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputList0(cache?.PreviousCache1, options),
-                this.inputList1(cache?.PreviousCache2, options),
-                this.inputList2(cache?.PreviousCache3, options),
-                this.inputList3(cache?.PreviousCache4, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputList0.DoIt(cache?.PreviousCache1, options),
+                this.inputList1.DoIt(cache?.PreviousCache2, options),
+                this.inputList2.DoIt(cache?.PreviousCache3, options),
+                this.inputList3.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -4000,19 +4000,19 @@ namespace Multiple.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-            private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
-            private readonly StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+            private readonly MultiStageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
             private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle1List4StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-            StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+            MultiStageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -4039,18 +4039,18 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputList0(cache?.PreviousCache1, options),
-                this.inputList1(cache?.PreviousCache2, options),
-                this.inputList2(cache?.PreviousCache3, options),
-                this.inputList3(cache?.PreviousCache4, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputList0.DoIt(cache?.PreviousCache1, options),
+                this.inputList1.DoIt(cache?.PreviousCache2, options),
+                this.inputList2.DoIt(cache?.PreviousCache3, options),
+                this.inputList3.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList3Result = await this.inputList3(cache?.PreviousCache4, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -4193,19 +4193,19 @@ await Task.WhenAll(
 // > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
 //        where TCache : class
 //    {
-//    //        private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-//    //    //        private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-//    //        private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-//    //        private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
-//    //        private readonly StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
+//    //        private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+//    //    //        private readonly StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+//    //        private readonly StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+//    //        private readonly StageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+//    //        private readonly StageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
 //    //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle1List4StageBase(
-//    //        StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-//    //        //        StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-//    //        StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-//    //        StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-//    //        StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
+//    //        StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+//    //        //        StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+//    //        StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+//    //        StageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+//    //        StageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
 //    //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {
 //    //            this.inputSingle0 = inputSingle0;
@@ -4358,13 +4358,13 @@ namespace Single.Simple {
      where TPreviousSingleCache1 : class
             
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
                 private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple2List0StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
                     IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -4380,12 +4380,12 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -4393,8 +4393,8 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -4472,13 +4472,13 @@ namespace Multiple.Simple {
      where TPreviousSingleCache1 : class
             
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
                 private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle2List0StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
                     IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -4499,12 +4499,12 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -4604,13 +4604,13 @@ namespace Multiple.Simple {
 // > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
 //        where TCache : class
 //    {
-//    //        private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-//    //        private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+//    //        private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+//    //        private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
 //    //    //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle2List0StageBase(
-//    //        StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-//    //        StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+//    //        StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+//    //        StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
 //    //        //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {
 //    //            this.inputSingle0 = inputSingle0;
@@ -4752,15 +4752,15 @@ namespace Single.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
             private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple2List1StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -4777,14 +4777,14 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputList0(cache?.PreviousCache2, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputList0.DoIt(cache?.PreviousCache2, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache2, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -4792,9 +4792,9 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputList0(cache?.PreviousCache2, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputList0.DoIt(cache?.PreviousCache2, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -4885,15 +4885,15 @@ namespace Multiple.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
             private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle2List1StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -4916,14 +4916,14 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputList0(cache?.PreviousCache2, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputList0.DoIt(cache?.PreviousCache2, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache2, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -5034,15 +5034,15 @@ namespace Multiple.Simple {
 // > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
 //        where TCache : class
 //    {
-//    //        private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-//    //        private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-//    //    //        private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+//    //        private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+//    //        private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+//    //    //        private readonly StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
 //    //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle2List1StageBase(
-//    //        StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-//    //        StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-//    //        //        StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+//    //        StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+//    //        StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+//    //        //        StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
 //    //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {
 //    //            this.inputSingle0 = inputSingle0;
@@ -5193,17 +5193,17 @@ namespace Single.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
             private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple2List2StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -5221,16 +5221,16 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputList0(cache?.PreviousCache2, options),
-                this.inputList1(cache?.PreviousCache3, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputList0.DoIt(cache?.PreviousCache2, options),
+                this.inputList1.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache3, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -5238,10 +5238,10 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputList0(cache?.PreviousCache2, options),
-                this.inputList1(cache?.PreviousCache3, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputList0.DoIt(cache?.PreviousCache2, options),
+                this.inputList1.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -5349,17 +5349,17 @@ namespace Multiple.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
             private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle2List2StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -5384,16 +5384,16 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputList0(cache?.PreviousCache2, options),
-                this.inputList1(cache?.PreviousCache3, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputList0.DoIt(cache?.PreviousCache2, options),
+                this.inputList1.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache3, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -5519,17 +5519,17 @@ await Task.WhenAll(
 // > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
 //        where TCache : class
 //    {
-//    //        private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-//    //        private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-//    //    //        private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-//    //        private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+//    //        private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+//    //        private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+//    //    //        private readonly StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+//    //        private readonly StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
 //    //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle2List2StageBase(
-//    //        StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-//    //        StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-//    //        //        StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-//    //        StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+//    //        StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+//    //        StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+//    //        //        StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+//    //        StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
 //    //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {
 //    //            this.inputSingle0 = inputSingle0;
@@ -5689,19 +5689,19 @@ namespace Single.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-            private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
             private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple2List3StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -5720,18 +5720,18 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputList0(cache?.PreviousCache2, options),
-                this.inputList1(cache?.PreviousCache3, options),
-                this.inputList2(cache?.PreviousCache4, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputList0.DoIt(cache?.PreviousCache2, options),
+                this.inputList1.DoIt(cache?.PreviousCache3, options),
+                this.inputList2.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2(cache?.PreviousCache4, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -5739,11 +5739,11 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputList0(cache?.PreviousCache2, options),
-                this.inputList1(cache?.PreviousCache3, options),
-                this.inputList2(cache?.PreviousCache4, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputList0.DoIt(cache?.PreviousCache2, options),
+                this.inputList1.DoIt(cache?.PreviousCache3, options),
+                this.inputList2.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -5865,19 +5865,19 @@ namespace Multiple.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-            private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
             private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle2List3StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -5904,18 +5904,18 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputList0(cache?.PreviousCache2, options),
-                this.inputList1(cache?.PreviousCache3, options),
-                this.inputList2(cache?.PreviousCache4, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputList0.DoIt(cache?.PreviousCache2, options),
+                this.inputList1.DoIt(cache?.PreviousCache3, options),
+                this.inputList2.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2(cache?.PreviousCache4, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -6053,19 +6053,19 @@ await Task.WhenAll(
 // > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
 //        where TCache : class
 //    {
-//    //        private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-//    //        private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-//    //    //        private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-//    //        private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-//    //        private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+//    //        private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+//    //        private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+//    //    //        private readonly StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+//    //        private readonly StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+//    //        private readonly StageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
 //    //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle2List3StageBase(
-//    //        StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-//    //        StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-//    //        //        StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-//    //        StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-//    //        StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+//    //        StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+//    //        StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+//    //        //        StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+//    //        StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+//    //        StageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
 //    //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {
 //    //            this.inputSingle0 = inputSingle0;
@@ -6234,21 +6234,21 @@ namespace Single.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-            private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
-            private readonly StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+            private readonly MultiStageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
             private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple2List4StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-            StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+            MultiStageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -6268,20 +6268,20 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputList0(cache?.PreviousCache2, options),
-                this.inputList1(cache?.PreviousCache3, options),
-                this.inputList2(cache?.PreviousCache4, options),
-                this.inputList3(cache?.PreviousCache5, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputList0.DoIt(cache?.PreviousCache2, options),
+                this.inputList1.DoIt(cache?.PreviousCache3, options),
+                this.inputList2.DoIt(cache?.PreviousCache4, options),
+                this.inputList3.DoIt(cache?.PreviousCache5, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2(cache?.PreviousCache4, options).ConfigureAwait(false);
-            var inputList3Result = await this.inputList3(cache?.PreviousCache5, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -6289,12 +6289,12 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputList0(cache?.PreviousCache2, options),
-                this.inputList1(cache?.PreviousCache3, options),
-                this.inputList2(cache?.PreviousCache4, options),
-                this.inputList3(cache?.PreviousCache5, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputList0.DoIt(cache?.PreviousCache2, options),
+                this.inputList1.DoIt(cache?.PreviousCache3, options),
+                this.inputList2.DoIt(cache?.PreviousCache4, options),
+                this.inputList3.DoIt(cache?.PreviousCache5, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -6430,21 +6430,21 @@ namespace Multiple.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-            private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
-            private readonly StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+            private readonly MultiStageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
             private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle2List4StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-            StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+            MultiStageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -6473,20 +6473,20 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputList0(cache?.PreviousCache2, options),
-                this.inputList1(cache?.PreviousCache3, options),
-                this.inputList2(cache?.PreviousCache4, options),
-                this.inputList3(cache?.PreviousCache5, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputList0.DoIt(cache?.PreviousCache2, options),
+                this.inputList1.DoIt(cache?.PreviousCache3, options),
+                this.inputList2.DoIt(cache?.PreviousCache4, options),
+                this.inputList3.DoIt(cache?.PreviousCache5, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2(cache?.PreviousCache4, options).ConfigureAwait(false);
-            var inputList3Result = await this.inputList3(cache?.PreviousCache5, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -6636,21 +6636,21 @@ await Task.WhenAll(
 // > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
 //        where TCache : class
 //    {
-//    //        private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-//    //        private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-//    //    //        private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-//    //        private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-//    //        private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
-//    //        private readonly StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
+//    //        private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+//    //        private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+//    //    //        private readonly StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+//    //        private readonly StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+//    //        private readonly StageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+//    //        private readonly StageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
 //    //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle2List4StageBase(
-//    //        StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-//    //        StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-//    //        //        StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-//    //        StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-//    //        StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-//    //        StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
+//    //        StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+//    //        StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+//    //        //        StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+//    //        StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+//    //        StageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+//    //        StageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
 //    //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {
 //    //            this.inputSingle0 = inputSingle0;
@@ -6810,15 +6810,15 @@ namespace Single.Simple {
      where TPreviousSingleCache2 : class
             
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-            private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+            private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
                 private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple3List0StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-            StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+            StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
                     IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -6835,14 +6835,14 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2(cache?.PreviousCache2, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -6850,9 +6850,9 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -6937,15 +6937,15 @@ namespace Multiple.Simple {
      where TPreviousSingleCache2 : class
             
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-            private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+            private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
                 private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle3List0StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-            StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+            StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
                     IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -6968,14 +6968,14 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2(cache?.PreviousCache2, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -7082,15 +7082,15 @@ namespace Multiple.Simple {
 // > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
 //        where TCache : class
 //    {
-//    //        private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-//    //        private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-//    //        private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+//    //        private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+//    //        private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+//    //        private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
 //    //    //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle3List0StageBase(
-//    //        StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-//    //        StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-//    //        StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+//    //        StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+//    //        StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+//    //        StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
 //    //        //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {
 //    //            this.inputSingle0 = inputSingle0;
@@ -7239,17 +7239,17 @@ namespace Single.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-            private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+            private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
             private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple3List1StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-            StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+            StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -7267,16 +7267,16 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputList0(cache?.PreviousCache3, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache3, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -7284,10 +7284,10 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputList0(cache?.PreviousCache3, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -7385,17 +7385,17 @@ namespace Multiple.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-            private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+            private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
             private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle3List1StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-            StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+            StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -7420,16 +7420,16 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputList0(cache?.PreviousCache3, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache3, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -7547,17 +7547,17 @@ namespace Multiple.Simple {
 // > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
 //        where TCache : class
 //    {
-//    //        private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-//    //        private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-//    //        private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-//    //    //        private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+//    //        private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+//    //        private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+//    //        private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+//    //    //        private readonly StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
 //    //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle3List1StageBase(
-//    //        StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-//    //        StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-//    //        StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-//    //        //        StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+//    //        StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+//    //        StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+//    //        StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+//    //        //        StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
 //    //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {
 //    //            this.inputSingle0 = inputSingle0;
@@ -7715,19 +7715,19 @@ namespace Single.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-            private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+            private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
             private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple3List2StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-            StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+            StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -7746,18 +7746,18 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputList0(cache?.PreviousCache3, options),
-                this.inputList1(cache?.PreviousCache4, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache3, options),
+                this.inputList1.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache4, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -7765,11 +7765,11 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputList0(cache?.PreviousCache3, options),
-                this.inputList1(cache?.PreviousCache4, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache3, options),
+                this.inputList1.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -7884,19 +7884,19 @@ namespace Multiple.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-            private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+            private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
             private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle3List2StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-            StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+            StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -7923,18 +7923,18 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputList0(cache?.PreviousCache3, options),
-                this.inputList1(cache?.PreviousCache4, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache3, options),
+                this.inputList1.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache4, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -8067,19 +8067,19 @@ await Task.WhenAll(
 // > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
 //        where TCache : class
 //    {
-//    //        private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-//    //        private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-//    //        private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-//    //    //        private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-//    //        private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+//    //        private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+//    //        private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+//    //        private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+//    //    //        private readonly StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+//    //        private readonly StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
 //    //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle3List2StageBase(
-//    //        StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-//    //        StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-//    //        StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-//    //        //        StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-//    //        StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+//    //        StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+//    //        StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+//    //        StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+//    //        //        StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+//    //        StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
 //    //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {
 //    //            this.inputSingle0 = inputSingle0;
@@ -8246,21 +8246,21 @@ namespace Single.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-            private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-            private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+            private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
             private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple3List3StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-            StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+            StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -8280,20 +8280,20 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputList0(cache?.PreviousCache3, options),
-                this.inputList1(cache?.PreviousCache4, options),
-                this.inputList2(cache?.PreviousCache5, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache3, options),
+                this.inputList1.DoIt(cache?.PreviousCache4, options),
+                this.inputList2.DoIt(cache?.PreviousCache5, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache4, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2(cache?.PreviousCache5, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -8301,12 +8301,12 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputList0(cache?.PreviousCache3, options),
-                this.inputList1(cache?.PreviousCache4, options),
-                this.inputList2(cache?.PreviousCache5, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache3, options),
+                this.inputList1.DoIt(cache?.PreviousCache4, options),
+                this.inputList2.DoIt(cache?.PreviousCache5, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -8435,21 +8435,21 @@ namespace Multiple.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-            private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-            private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+            private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
             private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle3List3StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-            StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+            StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -8478,20 +8478,20 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputList0(cache?.PreviousCache3, options),
-                this.inputList1(cache?.PreviousCache4, options),
-                this.inputList2(cache?.PreviousCache5, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache3, options),
+                this.inputList1.DoIt(cache?.PreviousCache4, options),
+                this.inputList2.DoIt(cache?.PreviousCache5, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache4, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2(cache?.PreviousCache5, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -8636,21 +8636,21 @@ await Task.WhenAll(
 // > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
 //        where TCache : class
 //    {
-//    //        private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-//    //        private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-//    //        private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-//    //    //        private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-//    //        private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-//    //        private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+//    //        private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+//    //        private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+//    //        private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+//    //    //        private readonly StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+//    //        private readonly StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+//    //        private readonly StageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
 //    //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle3List3StageBase(
-//    //        StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-//    //        StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-//    //        StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-//    //        //        StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-//    //        StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-//    //        StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+//    //        StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+//    //        StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+//    //        StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+//    //        //        StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+//    //        StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+//    //        StageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
 //    //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {
 //    //            this.inputSingle0 = inputSingle0;
@@ -8826,23 +8826,23 @@ namespace Single.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-            private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-            private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
-            private readonly StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+            private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+            private readonly MultiStageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
             private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple3List4StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-            StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-            StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+            StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+            MultiStageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -8863,22 +8863,22 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputList0(cache?.PreviousCache3, options),
-                this.inputList1(cache?.PreviousCache4, options),
-                this.inputList2(cache?.PreviousCache5, options),
-                this.inputList3(cache?.PreviousCache6, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache3, options),
+                this.inputList1.DoIt(cache?.PreviousCache4, options),
+                this.inputList2.DoIt(cache?.PreviousCache5, options),
+                this.inputList3.DoIt(cache?.PreviousCache6, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache4, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2(cache?.PreviousCache5, options).ConfigureAwait(false);
-            var inputList3Result = await this.inputList3(cache?.PreviousCache6, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
+            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache6, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -8886,13 +8886,13 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputList0(cache?.PreviousCache3, options),
-                this.inputList1(cache?.PreviousCache4, options),
-                this.inputList2(cache?.PreviousCache5, options),
-                this.inputList3(cache?.PreviousCache6, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache3, options),
+                this.inputList1.DoIt(cache?.PreviousCache4, options),
+                this.inputList2.DoIt(cache?.PreviousCache5, options),
+                this.inputList3.DoIt(cache?.PreviousCache6, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -9035,23 +9035,23 @@ namespace Multiple.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-            private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-            private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
-            private readonly StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+            private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+            private readonly MultiStageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
             private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle3List4StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-            StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-            StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+            StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+            MultiStageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -9082,22 +9082,22 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputList0(cache?.PreviousCache3, options),
-                this.inputList1(cache?.PreviousCache4, options),
-                this.inputList2(cache?.PreviousCache5, options),
-                this.inputList3(cache?.PreviousCache6, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache3, options),
+                this.inputList1.DoIt(cache?.PreviousCache4, options),
+                this.inputList2.DoIt(cache?.PreviousCache5, options),
+                this.inputList3.DoIt(cache?.PreviousCache6, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache4, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2(cache?.PreviousCache5, options).ConfigureAwait(false);
-            var inputList3Result = await this.inputList3(cache?.PreviousCache6, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
+            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache6, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -9254,23 +9254,23 @@ await Task.WhenAll(
 // > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
 //        where TCache : class
 //    {
-//    //        private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-//    //        private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-//    //        private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-//    //    //        private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-//    //        private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-//    //        private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
-//    //        private readonly StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
+//    //        private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+//    //        private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+//    //        private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+//    //    //        private readonly StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+//    //        private readonly StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+//    //        private readonly StageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+//    //        private readonly StageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
 //    //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle3List4StageBase(
-//    //        StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-//    //        StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-//    //        StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-//    //        //        StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-//    //        StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-//    //        StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-//    //        StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
+//    //        StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+//    //        StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+//    //        StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+//    //        //        StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+//    //        StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+//    //        StageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+//    //        StageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
 //    //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {
 //    //            this.inputSingle0 = inputSingle0;
@@ -9437,17 +9437,17 @@ namespace Single.Simple {
      where TPreviousSingleCache3 : class
             
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-            private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-            private readonly StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+            private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+            private readonly StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3;
                 private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple4List0StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-            StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-            StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+            StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+            StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3,
                     IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -9465,16 +9465,16 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputSingle3(cache?.PreviousCache3, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputSingle3Result = await this.inputSingle3(cache?.PreviousCache3, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -9482,10 +9482,10 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputSingle3(cache?.PreviousCache3, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -9577,17 +9577,17 @@ namespace Multiple.Simple {
      where TPreviousSingleCache3 : class
             
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-            private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-            private readonly StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+            private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+            private readonly StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3;
                 private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle4List0StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-            StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-            StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+            StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+            StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3,
                     IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -9612,16 +9612,16 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputSingle3(cache?.PreviousCache3, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputSingle3Result = await this.inputSingle3(cache?.PreviousCache3, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -9735,17 +9735,17 @@ namespace Multiple.Simple {
 // > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
 //        where TCache : class
 //    {
-//    //        private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-//    //        private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-//    //        private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-//    //        private readonly StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3;
+//    //        private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+//    //        private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+//    //        private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+//    //        private readonly StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3;
 //    //    //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle4List0StageBase(
-//    //        StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-//    //        StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-//    //        StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-//    //        StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3,
+//    //        StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+//    //        StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+//    //        StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+//    //        StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3,
 //    //        //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {
 //    //            this.inputSingle0 = inputSingle0;
@@ -9901,19 +9901,19 @@ namespace Single.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-            private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-            private readonly StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+            private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+            private readonly StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
             private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple4List1StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-            StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-            StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+            StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+            StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -9932,18 +9932,18 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputSingle3(cache?.PreviousCache3, options),
-                this.inputList0(cache?.PreviousCache4, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputSingle3Result = await this.inputSingle3(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache4, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -9951,11 +9951,11 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputSingle3(cache?.PreviousCache3, options),
-                this.inputList0(cache?.PreviousCache4, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -10060,19 +10060,19 @@ namespace Multiple.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-            private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-            private readonly StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+            private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+            private readonly StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
             private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle4List1StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-            StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-            StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+            StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+            StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -10099,18 +10099,18 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputSingle3(cache?.PreviousCache3, options),
-                this.inputList0(cache?.PreviousCache4, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputSingle3Result = await this.inputSingle3(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache4, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -10235,19 +10235,19 @@ namespace Multiple.Simple {
 // > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
 //        where TCache : class
 //    {
-//    //        private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-//    //        private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-//    //        private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-//    //        private readonly StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3;
-//    //    //        private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+//    //        private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+//    //        private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+//    //        private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+//    //        private readonly StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3;
+//    //    //        private readonly StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
 //    //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle4List1StageBase(
-//    //        StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-//    //        StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-//    //        StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-//    //        StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3,
-//    //        //        StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+//    //        StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+//    //        StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+//    //        StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+//    //        StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3,
+//    //        //        StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
 //    //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {
 //    //            this.inputSingle0 = inputSingle0;
@@ -10412,21 +10412,21 @@ namespace Single.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-            private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-            private readonly StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+            private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+            private readonly StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
             private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple4List2StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-            StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-            StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+            StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+            StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -10446,20 +10446,20 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputSingle3(cache?.PreviousCache3, options),
-                this.inputList0(cache?.PreviousCache4, options),
-                this.inputList1(cache?.PreviousCache5, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache4, options),
+                this.inputList1.DoIt(cache?.PreviousCache5, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputSingle3Result = await this.inputSingle3(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache4, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache5, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -10467,12 +10467,12 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputSingle3(cache?.PreviousCache3, options),
-                this.inputList0(cache?.PreviousCache4, options),
-                this.inputList1(cache?.PreviousCache5, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache4, options),
+                this.inputList1.DoIt(cache?.PreviousCache5, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -10594,21 +10594,21 @@ namespace Multiple.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-            private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-            private readonly StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+            private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+            private readonly StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
             private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle4List2StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-            StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-            StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+            StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+            StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -10637,20 +10637,20 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputSingle3(cache?.PreviousCache3, options),
-                this.inputList0(cache?.PreviousCache4, options),
-                this.inputList1(cache?.PreviousCache5, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache4, options),
+                this.inputList1.DoIt(cache?.PreviousCache5, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputSingle3Result = await this.inputSingle3(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache4, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache5, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -10790,21 +10790,21 @@ await Task.WhenAll(
 // > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
 //        where TCache : class
 //    {
-//    //        private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-//    //        private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-//    //        private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-//    //        private readonly StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3;
-//    //    //        private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-//    //        private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+//    //        private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+//    //        private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+//    //        private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+//    //        private readonly StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3;
+//    //    //        private readonly StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+//    //        private readonly StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
 //    //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle4List2StageBase(
-//    //        StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-//    //        StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-//    //        StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-//    //        StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3,
-//    //        //        StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-//    //        StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+//    //        StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+//    //        StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+//    //        StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+//    //        StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3,
+//    //        //        StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+//    //        StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
 //    //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {
 //    //            this.inputSingle0 = inputSingle0;
@@ -10978,23 +10978,23 @@ namespace Single.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-            private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-            private readonly StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-            private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+            private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+            private readonly StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
             private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple4List3StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-            StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-            StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+            StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+            StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -11015,22 +11015,22 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputSingle3(cache?.PreviousCache3, options),
-                this.inputList0(cache?.PreviousCache4, options),
-                this.inputList1(cache?.PreviousCache5, options),
-                this.inputList2(cache?.PreviousCache6, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache4, options),
+                this.inputList1.DoIt(cache?.PreviousCache5, options),
+                this.inputList2.DoIt(cache?.PreviousCache6, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputSingle3Result = await this.inputSingle3(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache4, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache5, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2(cache?.PreviousCache6, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache6, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -11038,13 +11038,13 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputSingle3(cache?.PreviousCache3, options),
-                this.inputList0(cache?.PreviousCache4, options),
-                this.inputList1(cache?.PreviousCache5, options),
-                this.inputList2(cache?.PreviousCache6, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache4, options),
+                this.inputList1.DoIt(cache?.PreviousCache5, options),
+                this.inputList2.DoIt(cache?.PreviousCache6, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -11180,23 +11180,23 @@ namespace Multiple.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-            private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-            private readonly StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-            private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+            private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+            private readonly StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
             private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle4List3StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-            StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-            StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+            StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+            StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -11227,22 +11227,22 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputSingle3(cache?.PreviousCache3, options),
-                this.inputList0(cache?.PreviousCache4, options),
-                this.inputList1(cache?.PreviousCache5, options),
-                this.inputList2(cache?.PreviousCache6, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache4, options),
+                this.inputList1.DoIt(cache?.PreviousCache5, options),
+                this.inputList2.DoIt(cache?.PreviousCache6, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputSingle3Result = await this.inputSingle3(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache4, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache5, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2(cache?.PreviousCache6, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache6, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -11394,23 +11394,23 @@ await Task.WhenAll(
 // > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
 //        where TCache : class
 //    {
-//    //        private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-//    //        private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-//    //        private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-//    //        private readonly StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3;
-//    //    //        private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-//    //        private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-//    //        private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+//    //        private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+//    //        private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+//    //        private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+//    //        private readonly StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3;
+//    //    //        private readonly StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+//    //        private readonly StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+//    //        private readonly StageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
 //    //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle4List3StageBase(
-//    //        StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-//    //        StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-//    //        StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-//    //        StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3,
-//    //        //        StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-//    //        StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-//    //        StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+//    //        StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+//    //        StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+//    //        StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+//    //        StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3,
+//    //        //        StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+//    //        StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+//    //        StageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
 //    //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {
 //    //            this.inputSingle0 = inputSingle0;
@@ -11593,25 +11593,25 @@ namespace Single.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-            private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-            private readonly StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-            private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
-            private readonly StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+            private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+            private readonly StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+            private readonly MultiStageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
             private readonly bool updateOnRefresh;
 
         public OutputSingleInputSingleSimple4List4StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-            StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-            StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-            StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+            StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+            StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+            MultiStageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -11633,24 +11633,24 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputSingle3(cache?.PreviousCache3, options),
-                this.inputList0(cache?.PreviousCache4, options),
-                this.inputList1(cache?.PreviousCache5, options),
-                this.inputList2(cache?.PreviousCache6, options),
-                this.inputList3(cache?.PreviousCache7, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache4, options),
+                this.inputList1.DoIt(cache?.PreviousCache5, options),
+                this.inputList2.DoIt(cache?.PreviousCache6, options),
+                this.inputList3.DoIt(cache?.PreviousCache7, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputSingle3Result = await this.inputSingle3(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache4, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache5, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2(cache?.PreviousCache6, options).ConfigureAwait(false);
-            var inputList3Result = await this.inputList3(cache?.PreviousCache7, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache6, options).ConfigureAwait(false);
+            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache7, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -11658,14 +11658,14 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputSingle3(cache?.PreviousCache3, options),
-                this.inputList0(cache?.PreviousCache4, options),
-                this.inputList1(cache?.PreviousCache5, options),
-                this.inputList2(cache?.PreviousCache6, options),
-                this.inputList3(cache?.PreviousCache7, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache4, options),
+                this.inputList1.DoIt(cache?.PreviousCache5, options),
+                this.inputList2.DoIt(cache?.PreviousCache6, options),
+                this.inputList3.DoIt(cache?.PreviousCache7, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -11815,25 +11815,25 @@ namespace Multiple.Simple {
 
     
     {
-            private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-            private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-            private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-            private readonly StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3;
-                private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-            private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-            private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
-            private readonly StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
+            private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+            private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+            private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+            private readonly StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3;
+                private readonly MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+            private readonly MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+            private readonly MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+            private readonly MultiStageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
             private readonly bool updateOnRefresh;
 
         public OutputMultiSimpleInputSingle4List4StageBase(
-            StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-            StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-            StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-            StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3,
-                    StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-            StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-            StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-            StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
+            StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+            StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+            StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+            StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3,
+                    MultiStageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+            MultiStageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+            MultiStageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+            MultiStageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
             IGeneratorContext context, string? name, bool updateOnRefresh = false) : base(context, name)
         {
                 this.inputSingle0 = inputSingle0;
@@ -11866,24 +11866,24 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0(cache?.PreviousCache0, options),
-                this.inputSingle1(cache?.PreviousCache1, options),
-                this.inputSingle2(cache?.PreviousCache2, options),
-                this.inputSingle3(cache?.PreviousCache3, options),
-                this.inputList0(cache?.PreviousCache4, options),
-                this.inputList1(cache?.PreviousCache5, options),
-                this.inputList2(cache?.PreviousCache6, options),
-                this.inputList3(cache?.PreviousCache7, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache4, options),
+                this.inputList1.DoIt(cache?.PreviousCache5, options),
+                this.inputList2.DoIt(cache?.PreviousCache6, options),
+                this.inputList3.DoIt(cache?.PreviousCache7, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputSingle3Result = await this.inputSingle3(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0(cache?.PreviousCache4, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1(cache?.PreviousCache5, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2(cache?.PreviousCache6, options).ConfigureAwait(false);
-            var inputList3Result = await this.inputList3(cache?.PreviousCache7, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache6, options).ConfigureAwait(false);
+            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache7, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -12047,25 +12047,25 @@ await Task.WhenAll(
 // > : MultiStageBase<TResult, TResultCache, CacheIds<TCache>>
 //        where TCache : class
 //    {
-//    //        private readonly StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0;
-//    //        private readonly StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1;
-//    //        private readonly StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2;
-//    //        private readonly StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3;
-//    //    //        private readonly StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
-//    //        private readonly StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
-//    //        private readonly StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
-//    //        private readonly StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
+//    //        private readonly StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0;
+//    //        private readonly StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1;
+//    //        private readonly StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2;
+//    //        private readonly StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3;
+//    //    //        private readonly StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0;
+//    //        private readonly StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1;
+//    //        private readonly StageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2;
+//    //        private readonly StageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3;
 //    //        private readonly bool updateOnRefresh;
 //
 //        public OutputMultiInputSingle4List4StageBase(
-//    //        StagePerformHandler<TInputSingle0, TPreviousSingleCache0> inputSingle0,
-//    //        StagePerformHandler<TInputSingle1, TPreviousSingleCache1> inputSingle1,
-//    //        StagePerformHandler<TInputSingle2, TPreviousSingleCache2> inputSingle2,
-//    //        StagePerformHandler<TInputSingle3, TPreviousSingleCache3> inputSingle3,
-//    //        //        StagePerformHandler<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
-//    //        StagePerformHandler<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
-//    //        StagePerformHandler<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
-//    //        StagePerformHandler<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
+//    //        StageBase<TInputSingle0, TPreviousSingleCache0> inputSingle0,
+//    //        StageBase<TInputSingle1, TPreviousSingleCache1> inputSingle1,
+//    //        StageBase<TInputSingle2, TPreviousSingleCache2> inputSingle2,
+//    //        StageBase<TInputSingle3, TPreviousSingleCache3> inputSingle3,
+//    //        //        StageBase<TInputList0, TPreviousItemCache0, TPreviousListCache0> inputList0,
+//    //        StageBase<TInputList1, TPreviousItemCache1, TPreviousListCache1> inputList1,
+//    //        StageBase<TInputList2, TPreviousItemCache2, TPreviousListCache2> inputList2,
+//    //        StageBase<TInputList3, TPreviousItemCache3, TPreviousListCache3> inputList3,
 //    //        GeneratorContext context, bool updateOnRefresh = false) : base(context)
 //        {
 //    //            this.inputSingle0 = inputSingle0;

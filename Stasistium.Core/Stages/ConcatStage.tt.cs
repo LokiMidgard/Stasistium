@@ -16,7 +16,7 @@ namespace Stasistium.Stages
     public class ConcatStage<T, TCache1> : GeneratedHelper.Multiple.Simple.OutputMultiSimpleInputSingle1List0StageBase<T, TCache1, T>
         where TCache1 : class
     {
-        public ConcatStage(StagePerformHandler<T, TCache1> input1, IGeneratorContext context, string? name) : base(input1, context, name)
+        public ConcatStage(StageBase<T, TCache1> input1, IGeneratorContext context, string? name) : base(input1, context, name)
         {
         }
 
@@ -32,7 +32,7 @@ namespace Stasistium.Stages
         where TCache1 : class
         where TCache2 : class
     {
-        public ConcatStage(StagePerformHandler<T, TCache1> input1, StagePerformHandler<T, TCache2> input2, IGeneratorContext context, string? name) : base(input1, input2, context, name)
+        public ConcatStage(StageBase<T, TCache1> input1, StageBase<T, TCache2> input2, IGeneratorContext context, string? name) : base(input1, input2, context, name)
         {
         }
 
@@ -49,7 +49,7 @@ namespace Stasistium.Stages
         where TCache2 : class
         where TCache3 : class
     {
-        public ConcatStage(StagePerformHandler<T, TCache1> input1, StagePerformHandler<T, TCache2> input2, StagePerformHandler<T, TCache3> input3, IGeneratorContext context, string? name) : base(input1, input2, input3, context, name)
+        public ConcatStage(StageBase<T, TCache1> input1, StageBase<T, TCache2> input2, StageBase<T, TCache3> input3, IGeneratorContext context, string? name) : base(input1, input2, input3, context, name)
         {
         }
 
@@ -67,7 +67,7 @@ namespace Stasistium.Stages
         where TCache3 : class
         where TCache4 : class
     {
-        public ConcatStage(StagePerformHandler<T, TCache1> input1, StagePerformHandler<T, TCache2> input2, StagePerformHandler<T, TCache3> input3, StagePerformHandler<T, TCache4> input4, IGeneratorContext context, string? name) : base(input1, input2, input3, input4, context, name)
+        public ConcatStage(StageBase<T, TCache1> input1, StageBase<T, TCache2> input2, StageBase<T, TCache3> input3, StageBase<T, TCache4> input4, IGeneratorContext context, string? name) : base(input1, input2, input3, input4, context, name)
         {
         }
 
@@ -85,15 +85,15 @@ namespace Stasistium.Stages
         where TCache1 : class
     {
 
-        private readonly StagePerformHandler<T, TItemCache1, TCache1> input1;
-        public ConcatManyStage(StagePerformHandler<T, TItemCache1, TCache1> input1, IGeneratorContext context, string? name = null) : base(context, name)
+        private readonly MultiStageBase<T, TItemCache1, TCache1> input1;
+        public ConcatManyStage(MultiStageBase<T, TItemCache1, TCache1> input1, IGeneratorContext context, string? name = null) : base(context, name)
         {
             this.input1 = input1;
         }
 
         protected override async Task<StageResultList<T, string, ConcatStageManyCache<TCache1>>> DoInternal([AllowNull] ConcatStageManyCache<TCache1>? cache, OptionToken options)
         {
-            var resultTask1 = this.input1(cache?.PreviouseCache1, options);
+            var resultTask1 = this.input1.DoIt(cache?.PreviouseCache1, options);
 await Task.WhenAll(
              resultTask1
 ).ConfigureAwait(false);
@@ -233,9 +233,9 @@ await Task.WhenAll(
         where TCache2 : class
     {
 
-        private readonly StagePerformHandler<T, TItemCache1, TCache1> input1;
-        private readonly StagePerformHandler<T, TItemCache2, TCache2> input2;
-        public ConcatManyStage(StagePerformHandler<T, TItemCache1, TCache1> input1, StagePerformHandler<T, TItemCache2, TCache2> input2, IGeneratorContext context, string? name = null) : base(context, name)
+        private readonly MultiStageBase<T, TItemCache1, TCache1> input1;
+        private readonly MultiStageBase<T, TItemCache2, TCache2> input2;
+        public ConcatManyStage(MultiStageBase<T, TItemCache1, TCache1> input1, MultiStageBase<T, TItemCache2, TCache2> input2, IGeneratorContext context, string? name = null) : base(context, name)
         {
             this.input1 = input1;
             this.input2 = input2;
@@ -243,8 +243,8 @@ await Task.WhenAll(
 
         protected override async Task<StageResultList<T, string, ConcatStageManyCache<TCache1, TCache2>>> DoInternal([AllowNull] ConcatStageManyCache<TCache1, TCache2>? cache, OptionToken options)
         {
-            var resultTask1 = this.input1(cache?.PreviouseCache1, options);
-            var resultTask2 = this.input2(cache?.PreviouseCache2, options);
+            var resultTask1 = this.input1.DoIt(cache?.PreviouseCache1, options);
+            var resultTask2 = this.input2.DoIt(cache?.PreviouseCache2, options);
 await Task.WhenAll(
              resultTask1
              ,resultTask2
@@ -470,10 +470,10 @@ await Task.WhenAll(
         where TCache3 : class
     {
 
-        private readonly StagePerformHandler<T, TItemCache1, TCache1> input1;
-        private readonly StagePerformHandler<T, TItemCache2, TCache2> input2;
-        private readonly StagePerformHandler<T, TItemCache3, TCache3> input3;
-        public ConcatManyStage(StagePerformHandler<T, TItemCache1, TCache1> input1, StagePerformHandler<T, TItemCache2, TCache2> input2, StagePerformHandler<T, TItemCache3, TCache3> input3, IGeneratorContext context, string? name = null) : base(context, name)
+        private readonly MultiStageBase<T, TItemCache1, TCache1> input1;
+        private readonly MultiStageBase<T, TItemCache2, TCache2> input2;
+        private readonly MultiStageBase<T, TItemCache3, TCache3> input3;
+        public ConcatManyStage(MultiStageBase<T, TItemCache1, TCache1> input1, MultiStageBase<T, TItemCache2, TCache2> input2, MultiStageBase<T, TItemCache3, TCache3> input3, IGeneratorContext context, string? name = null) : base(context, name)
         {
             this.input1 = input1;
             this.input2 = input2;
@@ -482,9 +482,9 @@ await Task.WhenAll(
 
         protected override async Task<StageResultList<T, string, ConcatStageManyCache<TCache1, TCache2, TCache3>>> DoInternal([AllowNull] ConcatStageManyCache<TCache1, TCache2, TCache3>? cache, OptionToken options)
         {
-            var resultTask1 = this.input1(cache?.PreviouseCache1, options);
-            var resultTask2 = this.input2(cache?.PreviouseCache2, options);
-            var resultTask3 = this.input3(cache?.PreviouseCache3, options);
+            var resultTask1 = this.input1.DoIt(cache?.PreviouseCache1, options);
+            var resultTask2 = this.input2.DoIt(cache?.PreviouseCache2, options);
+            var resultTask3 = this.input3.DoIt(cache?.PreviouseCache3, options);
 await Task.WhenAll(
              resultTask1
              ,resultTask2
@@ -796,11 +796,11 @@ await Task.WhenAll(
         where TCache4 : class
     {
 
-        private readonly StagePerformHandler<T, TItemCache1, TCache1> input1;
-        private readonly StagePerformHandler<T, TItemCache2, TCache2> input2;
-        private readonly StagePerformHandler<T, TItemCache3, TCache3> input3;
-        private readonly StagePerformHandler<T, TItemCache4, TCache4> input4;
-        public ConcatManyStage(StagePerformHandler<T, TItemCache1, TCache1> input1, StagePerformHandler<T, TItemCache2, TCache2> input2, StagePerformHandler<T, TItemCache3, TCache3> input3, StagePerformHandler<T, TItemCache4, TCache4> input4, IGeneratorContext context, string? name = null) : base(context, name)
+        private readonly MultiStageBase<T, TItemCache1, TCache1> input1;
+        private readonly MultiStageBase<T, TItemCache2, TCache2> input2;
+        private readonly MultiStageBase<T, TItemCache3, TCache3> input3;
+        private readonly MultiStageBase<T, TItemCache4, TCache4> input4;
+        public ConcatManyStage(MultiStageBase<T, TItemCache1, TCache1> input1, MultiStageBase<T, TItemCache2, TCache2> input2, MultiStageBase<T, TItemCache3, TCache3> input3, MultiStageBase<T, TItemCache4, TCache4> input4, IGeneratorContext context, string? name = null) : base(context, name)
         {
             this.input1 = input1;
             this.input2 = input2;
@@ -810,10 +810,10 @@ await Task.WhenAll(
 
         protected override async Task<StageResultList<T, string, ConcatStageManyCache<TCache1, TCache2, TCache3, TCache4>>> DoInternal([AllowNull] ConcatStageManyCache<TCache1, TCache2, TCache3, TCache4>? cache, OptionToken options)
         {
-            var resultTask1 = this.input1(cache?.PreviouseCache1, options);
-            var resultTask2 = this.input2(cache?.PreviouseCache2, options);
-            var resultTask3 = this.input3(cache?.PreviouseCache3, options);
-            var resultTask4 = this.input4(cache?.PreviouseCache4, options);
+            var resultTask1 = this.input1.DoIt(cache?.PreviouseCache1, options);
+            var resultTask2 = this.input2.DoIt(cache?.PreviouseCache2, options);
+            var resultTask3 = this.input3.DoIt(cache?.PreviouseCache3, options);
+            var resultTask4 = this.input4.DoIt(cache?.PreviouseCache4, options);
 await Task.WhenAll(
              resultTask1
              ,resultTask2
@@ -1212,7 +1212,7 @@ namespace Stasistium
         {
             if(input1 is null)
                  throw new ArgumentNullException(nameof(input1));
-            return new ConcatStage<T, TCache1>(input1.DoIt, input1.Context, name);
+            return new ConcatStage<T, TCache1>(input1, input1.Context, name);
         }
         public static ConcatStage<T, TCache1, TCache2> Concat<T, TCache1, TCache2>(this StageBase<T, TCache1> input1, StageBase<T, TCache2> input2, string? name = null)
             where TCache1 : class
@@ -1222,7 +1222,7 @@ namespace Stasistium
                  throw new ArgumentNullException(nameof(input1));
             if(input2 is null)
                  throw new ArgumentNullException(nameof(input2));
-            return new ConcatStage<T, TCache1, TCache2>(input1.DoIt, input2.DoIt, input1.Context, name);
+            return new ConcatStage<T, TCache1, TCache2>(input1, input2, input1.Context, name);
         }
         public static ConcatStage<T, TCache1, TCache2, TCache3> Concat<T, TCache1, TCache2, TCache3>(this StageBase<T, TCache1> input1, StageBase<T, TCache2> input2, StageBase<T, TCache3> input3, string? name = null)
             where TCache1 : class
@@ -1235,7 +1235,7 @@ namespace Stasistium
                  throw new ArgumentNullException(nameof(input2));
             if(input3 is null)
                  throw new ArgumentNullException(nameof(input3));
-            return new ConcatStage<T, TCache1, TCache2, TCache3>(input1.DoIt, input2.DoIt, input3.DoIt, input1.Context, name);
+            return new ConcatStage<T, TCache1, TCache2, TCache3>(input1, input2, input3, input1.Context, name);
         }
         public static ConcatStage<T, TCache1, TCache2, TCache3, TCache4> Concat<T, TCache1, TCache2, TCache3, TCache4>(this StageBase<T, TCache1> input1, StageBase<T, TCache2> input2, StageBase<T, TCache3> input3, StageBase<T, TCache4> input4, string? name = null)
             where TCache1 : class
@@ -1251,7 +1251,7 @@ namespace Stasistium
                  throw new ArgumentNullException(nameof(input3));
             if(input4 is null)
                  throw new ArgumentNullException(nameof(input4));
-            return new ConcatStage<T, TCache1, TCache2, TCache3, TCache4>(input1.DoIt, input2.DoIt, input3.DoIt, input4.DoIt, input1.Context, name);
+            return new ConcatStage<T, TCache1, TCache2, TCache3, TCache4>(input1, input2, input3, input4, input1.Context, name);
         }
 
         public static ConcatManyStage<T, TItemCache1, TCache1> Concat<T, TItemCache1, TCache1>(this MultiStageBase<T, TItemCache1, TCache1> input1, string? name = null)
@@ -1260,7 +1260,7 @@ namespace Stasistium
         {
             if(input1 is null)
                  throw new ArgumentNullException(nameof(input1));
-            return new ConcatManyStage<T, TItemCache1, TCache1>(input1.DoIt, input1.Context, name);
+            return new ConcatManyStage<T, TItemCache1, TCache1>(input1, input1.Context, name);
         }
         public static ConcatManyStage<T, TItemCache1, TCache1, TItemCache2, TCache2> Concat<T, TItemCache1, TCache1, TItemCache2, TCache2>(this MultiStageBase<T, TItemCache1, TCache1> input1, MultiStageBase<T, TItemCache2, TCache2> input2, string? name = null)
             where TItemCache1 : class
@@ -1272,7 +1272,7 @@ namespace Stasistium
                  throw new ArgumentNullException(nameof(input1));
             if(input2 is null)
                  throw new ArgumentNullException(nameof(input2));
-            return new ConcatManyStage<T, TItemCache1, TCache1, TItemCache2, TCache2>(input1.DoIt, input2.DoIt, input1.Context, name);
+            return new ConcatManyStage<T, TItemCache1, TCache1, TItemCache2, TCache2>(input1, input2, input1.Context, name);
         }
         public static ConcatManyStage<T, TItemCache1, TCache1, TItemCache2, TCache2, TItemCache3, TCache3> Concat<T, TItemCache1, TCache1, TItemCache2, TCache2, TItemCache3, TCache3>(this MultiStageBase<T, TItemCache1, TCache1> input1, MultiStageBase<T, TItemCache2, TCache2> input2, MultiStageBase<T, TItemCache3, TCache3> input3, string? name = null)
             where TItemCache1 : class
@@ -1288,7 +1288,7 @@ namespace Stasistium
                  throw new ArgumentNullException(nameof(input2));
             if(input3 is null)
                  throw new ArgumentNullException(nameof(input3));
-            return new ConcatManyStage<T, TItemCache1, TCache1, TItemCache2, TCache2, TItemCache3, TCache3>(input1.DoIt, input2.DoIt, input3.DoIt, input1.Context, name);
+            return new ConcatManyStage<T, TItemCache1, TCache1, TItemCache2, TCache2, TItemCache3, TCache3>(input1, input2, input3, input1.Context, name);
         }
         public static ConcatManyStage<T, TItemCache1, TCache1, TItemCache2, TCache2, TItemCache3, TCache3, TItemCache4, TCache4> Concat<T, TItemCache1, TCache1, TItemCache2, TCache2, TItemCache3, TCache3, TItemCache4, TCache4>(this MultiStageBase<T, TItemCache1, TCache1> input1, MultiStageBase<T, TItemCache2, TCache2> input2, MultiStageBase<T, TItemCache3, TCache3> input3, MultiStageBase<T, TItemCache4, TCache4> input4, string? name = null)
             where TItemCache1 : class
@@ -1308,7 +1308,7 @@ namespace Stasistium
                  throw new ArgumentNullException(nameof(input3));
             if(input4 is null)
                  throw new ArgumentNullException(nameof(input4));
-            return new ConcatManyStage<T, TItemCache1, TCache1, TItemCache2, TCache2, TItemCache3, TCache3, TItemCache4, TCache4>(input1.DoIt, input2.DoIt, input3.DoIt, input4.DoIt, input1.Context, name);
+            return new ConcatManyStage<T, TItemCache1, TCache1, TItemCache2, TCache2, TItemCache3, TCache3, TItemCache4, TCache4>(input1, input2, input3, input4, input1.Context, name);
         }
     }
 }

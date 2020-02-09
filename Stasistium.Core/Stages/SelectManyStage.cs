@@ -20,9 +20,9 @@ where TInputCache : class
 
         private readonly Func<StageBase<TInput, GeneratedHelper.CacheId<string>>, MultiStageBase<TResult, TItemCache, TCache>> createPipline;
 
-        private readonly StagePerformHandler<TInput, TInputItemCache, TInputCache> input;
+        private readonly MultiStageBase<TInput, TInputItemCache, TInputCache> input;
 
-        public SelectManyStage(StagePerformHandler<TInput, TInputItemCache, TInputCache> input, Func<StageBase<TInput, GeneratedHelper.CacheId<string>>, MultiStageBase<TResult, TItemCache, TCache>> createPipline, IGeneratorContext context, string? name = null) : base(context, name)
+        public SelectManyStage(MultiStageBase<TInput, TInputItemCache, TInputCache> input, Func<StageBase<TInput, GeneratedHelper.CacheId<string>>, MultiStageBase<TResult, TItemCache, TCache>> createPipline, IGeneratorContext context, string? name = null) : base(context, name)
         {
             this.input = input ?? throw new ArgumentNullException(nameof(input));
             this.createPipline = createPipline ?? throw new ArgumentNullException(nameof(createPipline));
@@ -30,7 +30,7 @@ where TInputCache : class
 
         protected override async Task<StageResultList<TResult, TItemCache, SelectManyCache<TInputCache, TItemCache, TCache>>> DoInternal([AllowNull] SelectManyCache<TInputCache, TItemCache, TCache>? cache, OptionToken options)
         {
-            var input = await this.input(cache?.PreviousCache, options).ConfigureAwait(false);
+            var input = await this.input.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
 
             var task = LazyTask.Create(async () =>
             {

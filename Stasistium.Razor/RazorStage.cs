@@ -17,7 +17,7 @@ namespace Stasistium.Stages
         private readonly string id;
         private readonly string? viewStartId;
 
-        public RazorProviderStage(StagePerformHandler<IFileProvider, TInputItemCache, TInputCache> inputList0, string contentId, string? id, string? viewStartId, IGeneratorContext context, string? name) : base(inputList0, context, name)
+        public RazorProviderStage(MultiStageBase<IFileProvider, TInputItemCache, TInputCache> inputList0, string contentId, string? id, string? viewStartId, IGeneratorContext context, string? name) : base(inputList0, context, name)
         {
             this.ContentId = contentId;
             this.id = id ?? Guid.NewGuid().ToString();
@@ -40,10 +40,10 @@ namespace Stasistium.Stages
         where TDocumentCache : class
         where TRendererCache : class
     {
-        private readonly StagePerformHandler<T, TDocumentCache> inputDocument;
-        private readonly StagePerformHandler<RazorProvider, TRendererCache> inputRazor;
+        private readonly StageBase<T, TDocumentCache> inputDocument;
+        private readonly StageBase<RazorProvider, TRendererCache> inputRazor;
 
-        public RazorStage(StagePerformHandler<T, TDocumentCache> inputDocument, StagePerformHandler<RazorProvider, TRendererCache> inputRazor, IGeneratorContext context, string? name) : base(inputDocument, inputRazor, context, name)
+        public RazorStage(StageBase<T, TDocumentCache> inputDocument, StageBase<RazorProvider, TRendererCache> inputRazor, IGeneratorContext context, string? name) : base(inputDocument, inputRazor, context, name)
         {
             this.inputDocument = inputDocument;
             this.inputRazor = inputRazor;
@@ -74,7 +74,7 @@ namespace Stasistium.Stages
     {
         private readonly Func<IDocument<T>, TModel> selector;
 
-        public RazorStage(StagePerformHandler<T, TDocumentCache> inputDocument, StagePerformHandler<RazorProvider, TRendererCache> inputRazor, Func<IDocument<T>, TModel> selector, IGeneratorContext context, string? name) : base(inputDocument, inputRazor, context, name)
+        public RazorStage(StageBase<T, TDocumentCache> inputDocument, StageBase<RazorProvider, TRendererCache> inputRazor, Func<IDocument<T>, TModel> selector, IGeneratorContext context, string? name) : base(inputDocument, inputRazor, context, name)
         {
             this.selector = selector;
         }

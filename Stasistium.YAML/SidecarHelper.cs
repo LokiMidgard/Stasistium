@@ -19,7 +19,7 @@ namespace Stasistium.Stages
 
         public SidecarMetadata<TMetadata, TPreviousItemCache, TPreviousListCache> For<TMetadata>(string extension, MetadataUpdate<TMetadata>? updateCallback = null)
         {
-            return new SidecarMetadata<TMetadata, TPreviousItemCache, TPreviousListCache>(this.stage.DoIt, extension, updateCallback, this.stage.Context, this.name);
+            return new SidecarMetadata<TMetadata, TPreviousItemCache, TPreviousListCache>(this.stage, extension, updateCallback, this.stage.Context, this.name);
         }
     }
 #pragma warning restore CA2227 // Collection properties should be read only

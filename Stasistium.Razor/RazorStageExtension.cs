@@ -18,7 +18,7 @@ namespace Stasistium
                 throw new ArgumentNullException(nameof(input));
             if (contentProviderId is null)
                 throw new ArgumentNullException(nameof(contentProviderId));
-            return new RazorProviderStage<TInputItemCache, TInputCache>(input.DoIt, contentProviderId, id, viewStartId, input.Context, name);
+            return new RazorProviderStage<TInputItemCache, TInputCache>(input, contentProviderId, id, viewStartId, input.Context, name);
         }
 
         public static RazorStage<T, TDocumentCache, TRenderCache> Razor<T, TDocumentCache, TRenderCache>(this StageBase<T, TDocumentCache> input, StageBase<RazorProvider, TRenderCache> renderer, string? name = null)
@@ -33,7 +33,7 @@ namespace Stasistium
             if (!input.Context.Equals(renderer.Context))
                 throw new ArgumentException("Both inputs must use the same Context");
 
-            return new RazorStage<T, TDocumentCache, TRenderCache>(input.DoIt, renderer.DoIt, input.Context, name);
+            return new RazorStage<T, TDocumentCache, TRenderCache>(input, renderer, input.Context, name);
         }
 
         public static FileProviderStage<TInputItemCache, TInputCache> FileProvider<TInputItemCache, TInputCache>(this MultiStageBase<Stream, TInputItemCache, TInputCache> input, string providerId, string? name = null)
@@ -44,7 +44,7 @@ namespace Stasistium
                 throw new ArgumentNullException(nameof(input));
             if (providerId is null)
                 throw new ArgumentNullException(nameof(providerId));
-            return new FileProviderStage<TInputItemCache, TInputCache>(providerId, input.DoIt, input.Context, name);
+            return new FileProviderStage<TInputItemCache, TInputCache>(providerId, input, input.Context, name);
         }
     }
 }

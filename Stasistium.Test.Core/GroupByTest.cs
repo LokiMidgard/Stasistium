@@ -27,7 +27,7 @@ namespace Stasistium.Test.Core
             var group = mok.GroupBy(x => x.Id[0],
                 (input, key) =>
                 {
-                    var stage = new MultiAssertStage<StartCache<ImmutableList<(string id, string content)>, char>>(input.DoIt, input.Context);
+                    var stage = new MultiAssertStage<StartCache<ImmutableList<(string id, string content)>, char>>(input, input.Context);
                     var success = lookup.TryAdd(key, stage);
                     Assert.IsTrue(success, "Create pipline should only be called once for each key");
                     return stage;
@@ -64,7 +64,7 @@ namespace Stasistium.Test.Core
             var group = mok.GroupBy(x => x.Id[0],
                 (input, key) =>
                 {
-                    var stage = new MultiAssertStage<StartCache<ImmutableList<(string id, string content)>, char>>(input.DoIt, input.Context);
+                    var stage = new MultiAssertStage<StartCache<ImmutableList<(string id, string content)>, char>>(input, input.Context);
                     var success = lookup.TryAdd(key, stage);
                     Assert.IsTrue(success, "Create pipline should only be called once for each key");
                     return stage;
@@ -109,7 +109,7 @@ namespace Stasistium.Test.Core
             var group = mok.GroupBy(x => x.Id[0],
                 (input, key) =>
                 {
-                    var stage = new MultiAssertStage<StartCache<ImmutableList<(string id, string content)>, char>>(input.DoIt, input.Context);
+                    var stage = new MultiAssertStage<StartCache<ImmutableList<(string id, string content)>, char>>(input, input.Context);
                     var success = lookup.TryAdd(key, stage);
                     Assert.IsTrue(success, "Create pipline should only be called once for each key");
                     return stage;
@@ -155,7 +155,7 @@ namespace Stasistium.Test.Core
             var group = mok.GroupBy(x => x.Id[0],
                 (input, key) =>
                 {
-                    var stage = new MultiAssertStage<StartCache<ImmutableList<(string id, string content)>, char>>(input.DoIt, input.Context);
+                    var stage = new MultiAssertStage<StartCache<ImmutableList<(string id, string content)>, char>>(input, input.Context);
                     var success = lookup.TryAdd(key, stage);
                     Assert.IsTrue(success, "Create pipline should only be called once for each key");
                     return stage;
@@ -203,7 +203,7 @@ namespace Stasistium.Test.Core
             var group = mok.GroupBy(x => x.Id[0],
                 (input, key) =>
                 {
-                    var stage = new MultiAssertStage<StartCache<ImmutableList<(string id, string content)>, char>>(input.DoIt, input.Context);
+                    var stage = new MultiAssertStage<StartCache<ImmutableList<(string id, string content)>, char>>(input, input.Context);
                     var success = lookup.TryAdd(key, stage);
                     Assert.IsTrue(success, "Create pipline should only be called once for each key");
                     return stage;

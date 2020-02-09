@@ -17,7 +17,7 @@ namespace Stasistium.Stages
     {
         public MarkdownRenderer Renderer { get; }
 
-        public MarkdownToHtmlStage(StagePerformHandler<MarkdownDocument, TInputCache> inputSingle0, MarkdownRenderer? renderer, IGeneratorContext context, string? name) : base(inputSingle0, context, name)
+        public MarkdownToHtmlStage(StageBase<MarkdownDocument, TInputCache> inputSingle0, MarkdownRenderer? renderer, IGeneratorContext context, string? name) : base(inputSingle0, context, name)
         {
             this.Renderer = renderer ?? new MarkdownRenderer();
         }

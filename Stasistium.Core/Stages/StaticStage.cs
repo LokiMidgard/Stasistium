@@ -37,7 +37,7 @@ namespace Stasistium.Stages
         where TItemCache1 : class
         where TCache1 : class
     {
-        StagePerformHandler<T, TCache1, TCache1> input;
+        MultiStageBase<T, TCache1, TCache1> input;
 
         public ConcatStageMany2(GeneratorContext context) : base(context)
         {
@@ -45,7 +45,7 @@ namespace Stasistium.Stages
 
         protected override async Task<StageResultList<T, string, ConcatStageManyCache<TCache1>>> DoInternal([AllowNull] ConcatStageManyCache<TCache1>? cache, OptionToken options)
         {
-            var result = await this.input(cache?.PreviouseCache1, options).ConfigureAwait(false);
+            var result = await this.input.DoIt(cache?.PreviouseCache1, options).ConfigureAwait(false);
 
             var task = LazyTask.Create(async () =>
             {

@@ -14,16 +14,16 @@ namespace Stasistium.Stages
     public class FileSystemStage<T> : MultiStageBase<Stream, string, FileSystemCache<T>>
         where T : class
     {
-        private readonly StagePerformHandler<string, T> input;
+        private readonly StageBase<string, T> input;
 
-        public FileSystemStage(StagePerformHandler<string, T> input, IGeneratorContext context, string? name) : base(context, name)
+        public FileSystemStage(StageBase<string, T> input, IGeneratorContext context, string? name) : base(context, name)
         {
             this.input = input;
         }
 
         protected override async Task<StageResultList<Stream, string, FileSystemCache<T>>> DoInternal([AllowNull] FileSystemCache<T>? cache, OptionToken options)
         {
-            var result = await this.input(cache?.PreviousCache, options).ConfigureAwait(false);
+            var result = await this.input.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
 
             var task = LazyTask.Create(async () =>
             {

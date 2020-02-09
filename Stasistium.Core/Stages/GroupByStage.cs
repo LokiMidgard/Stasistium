@@ -23,9 +23,9 @@ namespace Stasistium.Stages
 
         private readonly Func<IDocument<TInput>, TKey> keySelector;
 
-        private readonly StagePerformHandler<TInput, TInputItemCache, TInputCache> input;
+        private readonly MultiStageBase<TInput, TInputItemCache, TInputCache> input;
 
-        public GroupByStage(StagePerformHandler<TInput, TInputItemCache, TInputCache> input, Func<IDocument<TInput>, TKey> keySelector, Func<MultiStageBase<TInput, TInputItemCache, StartCache<TInputCache, TKey>>, TKey, MultiStageBase<TResult, TItemCache, TCache>> createPipline, IGeneratorContext context, string? name = null) : base(context, name)
+        public GroupByStage(MultiStageBase<TInput, TInputItemCache, TInputCache> input, Func<IDocument<TInput>, TKey> keySelector, Func<MultiStageBase<TInput, TInputItemCache, StartCache<TInputCache, TKey>>, TKey, MultiStageBase<TResult, TItemCache, TCache>> createPipline, IGeneratorContext context, string? name = null) : base(context, name)
         {
             this.input = input ?? throw new ArgumentNullException(nameof(input));
             this.createPipline = createPipline ?? throw new ArgumentNullException(nameof(createPipline));
@@ -34,7 +34,7 @@ namespace Stasistium.Stages
 
         protected override async Task<StageResultList<TResult, TItemCache, GroupByCache>> DoInternal([AllowNull] GroupByCache? cache, OptionToken options)
         {
-            var input = await this.input(cache?.PreviousCache, options).ConfigureAwait(false);
+            var input = await this.input.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
 
             var task = LazyTask.Create(async () =>
             {
@@ -156,7 +156,7 @@ namespace Stasistium.Stages
 
             protected override async Task<StageResultList<TInput, TInputItemCache, StartCache<TInputCache, TKey>>> DoInternal([AllowNull] StartCache<TInputCache, TKey>? cache, OptionToken options)
             {
-                var input = await this.parent.input(cache?.PreviousCache, options).ConfigureAwait(false);
+                var input = await this.parent.input.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
 
                 var task = LazyTask.Create(async () =>
                 {
@@ -286,7 +286,7 @@ namespace Stasistium
     where TInputItemCache : class
     where TInputCache : class
         {
-            return new GroupByStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache, TKey>(input.DoIt, keySelector, createPipline, input.Context, name);
+            return new GroupByStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache, TKey>(input, keySelector, createPipline, input.Context, name);
         }
     }
 }

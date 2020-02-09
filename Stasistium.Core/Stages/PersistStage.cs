@@ -14,14 +14,14 @@ namespace Stasistium.Stages
         where TPreviousItemCache : class
     {
         private readonly GenerationOptions generatorOptions;
-        private readonly StagePerformHandler<Stream, TPreviousItemCache, TPreviousCache> inputList;
+        private readonly MultiStageBase<Stream, TPreviousItemCache, TPreviousCache> inputList;
         private readonly DirectoryInfo output;
 
         public string Name { get; }
 
         private readonly IGeneratorContext context;
 
-        public PersistStage(StagePerformHandler<System.IO.Stream, TPreviousItemCache, TPreviousCache> inputList, DirectoryInfo output, GenerationOptions generatorOptions, IGeneratorContext context, string? name = null)
+        public PersistStage(MultiStageBase<System.IO.Stream, TPreviousItemCache, TPreviousCache> inputList, DirectoryInfo output, GenerationOptions generatorOptions, IGeneratorContext context, string? name = null)
         {
             if (context is null)
                 throw new ArgumentNullException(nameof(context));
@@ -57,7 +57,7 @@ namespace Stasistium.Stages
             else
                 cache = null;
 
-            var result = await this.inputList(cache, this.generatorOptions.Token).ConfigureAwait(false);
+            var result = await this.inputList.DoIt(cache, this.generatorOptions.Token).ConfigureAwait(false);
             this.context.Logger.Info($"Cache is {(result.HasChanges ? "INVALID" : "valid")}");
             if (result.HasChanges)
             {

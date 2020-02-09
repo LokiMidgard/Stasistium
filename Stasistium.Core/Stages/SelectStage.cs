@@ -20,9 +20,9 @@ namespace Stasistium.Stages
 
         private readonly Func<StageBase<TInput, StartCache<TInputCache>>, StageBase<TResult, TItemCache>> createPipline;
 
-        private readonly StagePerformHandler<TInput, TInputItemCache, TInputCache> input;
+        private readonly MultiStageBase<TInput, TInputItemCache, TInputCache> input;
 
-        public SelectStage(StagePerformHandler<TInput, TInputItemCache, TInputCache> input, Func<StageBase<TInput, StartCache<TInputCache>>, StageBase<TResult, TItemCache>> createPipline, IGeneratorContext context, string? name = null) : base(context, name)
+        public SelectStage(MultiStageBase<TInput, TInputItemCache, TInputCache> input, Func<StageBase<TInput, StartCache<TInputCache>>, StageBase<TResult, TItemCache>> createPipline, IGeneratorContext context, string? name = null) : base(context, name)
         {
             this.input = input ?? throw new ArgumentNullException(nameof(input));
             this.createPipline = createPipline ?? throw new ArgumentNullException(nameof(createPipline));
@@ -30,7 +30,7 @@ namespace Stasistium.Stages
 
         protected override async Task<StageResultList<TResult, TItemCache, SelectCache<TInputCache, TItemCache>>> DoInternal([AllowNull] SelectCache<TInputCache, TItemCache>? cache, OptionToken options)
         {
-            var input = await this.input(cache?.PreviousCache, options).ConfigureAwait(false);
+            var input = await this.input.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
 
             var task = LazyTask.Create(async () =>
             {
@@ -127,7 +127,7 @@ namespace Stasistium.Stages
 
             protected override async Task<StageResult<TInput, StartCache<TInputCache>>> DoInternal([AllowNull] StartCache<TInputCache>? cache, OptionToken options)
             {
-                var input = await this.parent.input(cache?.PreviousCache, options).ConfigureAwait(false);
+                var input = await this.parent.input.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
 
                 var task = LazyTask.Create(async () =>
                 {
@@ -198,10 +198,10 @@ where TInputCache2 : class
 
         private readonly Func<StageBase<TInput1, StartCache<TInputCache1>>, StageBase<TInput2, TInputCache2>, StageBase<TResult, TItemCache>> createPipline;
 
-        private readonly StagePerformHandler<TInput1, TInputItemCache1, TInputCache1> input;
+        private readonly MultiStageBase<TInput1, TInputItemCache1, TInputCache1> input;
         private readonly StageBase<TInput2, TInputCache2> input2;
 
-        public SelectStage(StagePerformHandler<TInput1, TInputItemCache1, TInputCache1> input, StageBase<TInput2, TInputCache2> input2, Func<StageBase<TInput1, StartCache<TInputCache1>>, StageBase<TInput2, TInputCache2>, StageBase<TResult, TItemCache>> createPipline, IGeneratorContext context, string? name = null) : base(context, name)
+        public SelectStage(MultiStageBase<TInput1, TInputItemCache1, TInputCache1> input, StageBase<TInput2, TInputCache2> input2, Func<StageBase<TInput1, StartCache<TInputCache1>>, StageBase<TInput2, TInputCache2>, StageBase<TResult, TItemCache>> createPipline, IGeneratorContext context, string? name = null) : base(context, name)
         {
             this.input = input ?? throw new ArgumentNullException(nameof(input));
             this.input2 = input2 ?? throw new ArgumentNullException(nameof(input2));
@@ -210,7 +210,7 @@ where TInputCache2 : class
 
         protected override async Task<StageResultList<TResult, TItemCache, SelectCache<TInputCache1, TInputCache2, TItemCache>>> DoInternal([AllowNull] SelectCache<TInputCache1, TInputCache2, TItemCache>? cache, OptionToken options)
         {
-            var input = await this.input(cache?.PreviousCache, options).ConfigureAwait(false);
+            var input = await this.input.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
             var input2 = await this.input2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
 
             var task = LazyTask.Create(async () =>
@@ -312,7 +312,7 @@ where TInputCache2 : class
 
             protected override async Task<StageResult<TInput1, StartCache<TInputCache1>>> DoInternal([AllowNull] StartCache<TInputCache1>? cache, OptionToken options)
             {
-                var input = await this.parent.input(cache?.PreviousCache, options).ConfigureAwait(false);
+                var input = await this.parent.input.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
 
                 var task = LazyTask.Create(async () =>
                 {
@@ -383,10 +383,10 @@ where TInputCache2 : class
 
         private readonly Func<StageBase<TInput1, StartCache<TInputCache1>>, MultiStageBase<TInput2, TInputItemCache2, TInputCache2>, StageBase<TResult, TItemCache>> createPipline;
 
-        private readonly StagePerformHandler<TInput1, TInputItemCache1, TInputCache1> input;
+        private readonly MultiStageBase<TInput1, TInputItemCache1, TInputCache1> input;
         private readonly MultiStageBase<TInput2, TInputItemCache2, TInputCache2> input2;
 
-        public SelectStage(StagePerformHandler<TInput1, TInputItemCache1, TInputCache1> input, MultiStageBase<TInput2, TInputItemCache2, TInputCache2> input2, Func<StageBase<TInput1, StartCache<TInputCache1>>, MultiStageBase<TInput2, TInputItemCache2, TInputCache2>, StageBase<TResult, TItemCache>> createPipline, IGeneratorContext context, string? name = null) : base(context, name)
+        public SelectStage(MultiStageBase<TInput1, TInputItemCache1, TInputCache1> input, MultiStageBase<TInput2, TInputItemCache2, TInputCache2> input2, Func<StageBase<TInput1, StartCache<TInputCache1>>, MultiStageBase<TInput2, TInputItemCache2, TInputCache2>, StageBase<TResult, TItemCache>> createPipline, IGeneratorContext context, string? name = null) : base(context, name)
         {
             this.input = input ?? throw new ArgumentNullException(nameof(input));
             this.input2 = input2 ?? throw new ArgumentNullException(nameof(input2));
@@ -395,7 +395,7 @@ where TInputCache2 : class
 
         protected override async Task<StageResultList<TResult, TItemCache, SelectCache<TInputCache1, TInputCache2, TItemCache>>> DoInternal([AllowNull] SelectCache<TInputCache1, TInputCache2, TItemCache>? cache, OptionToken options)
         {
-            var input = await this.input(cache?.PreviousCache, options).ConfigureAwait(false);
+            var input = await this.input.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
             var input2 = await this.input2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
 
             var task = LazyTask.Create(async () =>
@@ -497,7 +497,7 @@ where TInputCache2 : class
 
             protected override async Task<StageResult<TInput1, StartCache<TInputCache1>>> DoInternal([AllowNull] StartCache<TInputCache1>? cache, OptionToken options)
             {
-                var input = await this.parent.input(cache?.PreviousCache, options).ConfigureAwait(false);
+                var input = await this.parent.input.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
 
                 var task = LazyTask.Create(async () =>
                 {
@@ -576,7 +576,7 @@ namespace Stasistium
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
-            return new SelectStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache>(input.DoIt, createPipline, input.Context, name);
+            return new SelectStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache>(input, createPipline, input.Context, name);
         }
         public static SelectStage<TInput, TInputItemCache, TInputCache, TInput2, TInputCache2, TResult, TItemCache> Select<TInput, TInputItemCache, TInputCache, TInput2, TInputCache2, TResult, TItemCache>(this MultiStageBase<TInput, TInputItemCache, TInputCache> input, StageBase<TInput2, TInputCache2> input2, Func<StageBase<TInput, StartCache<TInputCache>>, StageBase<TInput2, TInputCache2>, StageBase<TResult, TItemCache>> createPipline, string? name = null)
     where TInputCache : class
@@ -586,7 +586,7 @@ namespace Stasistium
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
-            return new SelectStage<TInput, TInputItemCache, TInputCache, TInput2, TInputCache2, TResult, TItemCache>(input.DoIt, input2, createPipline, input.Context, name);
+            return new SelectStage<TInput, TInputItemCache, TInputCache, TInput2, TInputCache2, TResult, TItemCache>(input, input2, createPipline, input.Context, name);
         }
         public static SelectStage<TInput, TInputItemCache, TInputCache, TInput2, TInputItemCache2, TInputCache2, TResult, TItemCache> Select<TInput, TInputItemCache, TInputCache, TInput2, TInputItemCache2, TInputCache2, TResult, TItemCache>(this MultiStageBase<TInput, TInputItemCache, TInputCache> input, MultiStageBase<TInput2, TInputItemCache2, TInputCache2> input2, Func<StageBase<TInput, StartCache<TInputCache>>, MultiStageBase<TInput2, TInputItemCache2, TInputCache2>, StageBase<TResult, TItemCache>> createPipline, string? name = null)
     where TInputCache : class
@@ -597,7 +597,7 @@ namespace Stasistium
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
-            return new SelectStage<TInput, TInputItemCache, TInputCache, TInput2, TInputItemCache2, TInputCache2, TResult, TItemCache>(input.DoIt, input2, createPipline, input.Context, name);
+            return new SelectStage<TInput, TInputItemCache, TInputCache, TInput2, TInputItemCache2, TInputCache2, TResult, TItemCache>(input, input2, createPipline, input.Context, name);
         }
 
     }

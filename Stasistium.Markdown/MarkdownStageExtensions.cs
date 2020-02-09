@@ -12,14 +12,14 @@ namespace Stasistium
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
-            return new MarkdownStreamStage<T>(input.DoIt, generateDocuement, input.Context, name);
+            return new MarkdownStreamStage<T>(input, generateDocuement, input.Context, name);
         }
         public static MarkdownStringStage<T> Markdown<T>(this StageBase<string, T> input, Func<MarkdownDocument>? generateDocuement = null, string? name = null)
             where T : class
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
-            return new MarkdownStringStage<T>(input.DoIt, generateDocuement, input.Context, name);
+            return new MarkdownStringStage<T>(input, generateDocuement, input.Context, name);
         }
 
         public static MarkdownToHtmlStage<T> MarkdownToHtml<T>(this StageBase<MarkdownDocument, T> input, MarkdownRenderer? renderer = null, string? name = null)
@@ -27,7 +27,7 @@ namespace Stasistium
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
-            return new MarkdownToHtmlStage<T>(input.DoIt, renderer, input.Context, name);
+            return new MarkdownToHtmlStage<T>(input, renderer, input.Context, name);
         }
 
     }

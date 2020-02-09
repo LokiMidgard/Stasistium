@@ -9,7 +9,7 @@ namespace Stasistium.Stages
         where TPreviousCache : class
         where TPreviousItemCache : class
     {
-        public SingleStage(StagePerformHandler<TIn, TPreviousItemCache, TPreviousCache> input, IGeneratorContext context, string? name = null) : base(input, context,name)
+        public SingleStage(MultiStageBase<TIn, TPreviousItemCache, TPreviousCache> input, IGeneratorContext context, string? name = null) : base(input, context,name)
         {
         }
 

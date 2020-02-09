@@ -13,10 +13,10 @@ namespace Stasistium.Stages
         where TInCache : class
         where TInItemCache : class
     {
-        private readonly StagePerformHandler<Stream, TInItemCache, TInCache> input;
+        private readonly MultiStageBase<Stream, TInItemCache, TInCache> input;
         private readonly MetadataUpdate<TMetadata>? update;
 
-        public SidecarMetadata(StagePerformHandler<Stream, TInItemCache, TInCache> input, string sidecarExtension, MetadataUpdate<TMetadata>? update, IGeneratorContext context, string? name = null) : base(context, name)
+        public SidecarMetadata(MultiStageBase<Stream, TInItemCache, TInCache> input, string sidecarExtension, MetadataUpdate<TMetadata>? update, IGeneratorContext context, string? name = null) : base(context, name)
         {
             if (sidecarExtension is null)
                 throw new ArgumentNullException(nameof(sidecarExtension));
@@ -31,7 +31,7 @@ namespace Stasistium.Stages
 
         protected override async Task<StageResultList<Stream, string, TransformStageCache<TInCache>>> DoInternal([AllowNull] TransformStageCache<TInCache>? cache, OptionToken options)
         {
-            var input = await this.input(cache?.ParentCache, options).ConfigureAwait(false);
+            var input = await this.input.DoIt(cache?.ParentCache, options).ConfigureAwait(false);
 
             var task = LazyTask.Create(async () =>
             {

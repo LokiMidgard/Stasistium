@@ -16,13 +16,13 @@ namespace Stasistium.Stages
         where TInputItemCache : class
     {
 
-        private readonly StagePerformHandler<TIn1, TInputItemCache, TInputCache1> input1;
-        private readonly StagePerformHandler<TIn2, TInputCache2> input2;
+        private readonly MultiStageBase<TIn1, TInputItemCache, TInputCache1> input1;
+        private readonly StageBase<TIn2, TInputCache2> input2;
 
         private readonly Func<IDocument<TIn1>, IDocument<TIn2>, IDocument<TOut>> mergeFunction;
 
 
-        public MergeStage(StagePerformHandler<TIn1, TInputItemCache, TInputCache1> input1, StagePerformHandler<TIn2, TInputCache2> input2, Func<IDocument<TIn1>, IDocument<TIn2>, IDocument<TOut>> mergeFunction, IGeneratorContext context, string? name = null) : base(context, name)
+        public MergeStage(MultiStageBase<TIn1, TInputItemCache, TInputCache1> input1, StageBase<TIn2, TInputCache2> input2, Func<IDocument<TIn1>, IDocument<TIn2>, IDocument<TOut>> mergeFunction, IGeneratorContext context, string? name = null) : base(context, name)
         {
             this.input1 = input1 ?? throw new ArgumentNullException(nameof(input1));
             this.input2 = input2 ?? throw new ArgumentNullException(nameof(input2));
@@ -31,8 +31,8 @@ namespace Stasistium.Stages
 
         protected override async Task<StageResultList<TOut, string, MergeCache<TInputCache1, TInputCache2>>> DoInternal([AllowNull] MergeCache<TInputCache1, TInputCache2>? cache, OptionToken options)
         {
-            var inputReadyToPerform = await this.input1(cache?.Cache1, options).ConfigureAwait(false);
-            var inputSingle = await this.input2(cache?.Cache2, options).ConfigureAwait(false);
+            var inputReadyToPerform = await this.input1.DoIt(cache?.Cache1, options).ConfigureAwait(false);
+            var inputSingle = await this.input2.DoIt(cache?.Cache2, options).ConfigureAwait(false);
 
             var task = LazyTask.Create(async () =>
             {
@@ -164,7 +164,7 @@ namespace Stasistium
                 throw new ArgumentNullException(nameof(combine));
             if (mergeFunction is null)
                 throw new ArgumentNullException(nameof(mergeFunction));
-            return new MergeStage<TOut, TIn1, TInputItemCache, TInputCache1, TIn2, TInputCache2>(input.DoIt, combine.DoIt, mergeFunction, combine.Context);
+            return new MergeStage<TOut, TIn1, TInputItemCache, TInputCache1, TIn2, TInputCache2>(input, combine, mergeFunction, combine.Context);
         }
     }
 }

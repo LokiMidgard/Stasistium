@@ -14,7 +14,7 @@ namespace Stasistium.Sass
         where TListItemCache : class
         where TListCache : class
     {
-        public SassStage(StagePerformHandler<string, TSingleCache> inputSingle0, StagePerformHandler<string, TListItemCache, TListCache> inputList0, IGeneratorContext context, string? name) : base(inputSingle0, inputList0, context, name)
+        public SassStage(StageBase<string, TSingleCache> inputSingle0, MultiStageBase<string, TListItemCache, TListCache> inputList0, IGeneratorContext context, string? name) : base(inputSingle0, inputList0, context, name)
         {
         }
 
@@ -71,7 +71,7 @@ namespace Stasistium
                 throw new System.ArgumentNullException(nameof(inputSingle0));
             if (inputList0 is null)
                 throw new System.ArgumentNullException(nameof(inputList0));
-            return new Sass.SassStage<TSingleCache, TListCache, TListItemCache>(inputSingle0.DoIt, inputList0.DoIt, inputSingle0.Context, name);
+            return new Sass.SassStage<TSingleCache, TListCache, TListItemCache>(inputSingle0, inputList0, inputSingle0.Context, name);
         }
     }
 }
