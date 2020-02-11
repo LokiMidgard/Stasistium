@@ -11,8 +11,15 @@ namespace Stasistium.Documents
         private readonly string relativeTo;
         private readonly Dictionary<string, string> lookup;
 
-        public string this[string index] => this.lookup[index];
-
+        public string? this[string index]
+        {
+            get
+            {
+                if (this.lookup.TryGetValue(index, out var result))
+                    return result;
+                return null;
+            }
+        }
 
         public RelativePathResolver(string relativeTo, IEnumerable<string> documents)
         {
@@ -29,7 +36,7 @@ namespace Stasistium.Documents
                 yield break;
             if (!currentFolder.EndsWith('/'))
                 currentFolder += '/';
-            if (fullpath.StartsWith(currentFolder))
+            if (fullpath.StartsWith(currentFolder, StringComparison.InvariantCulture))
                 yield return (fullpath.Substring(currentFolder.Length), fullpath);
         }
     }

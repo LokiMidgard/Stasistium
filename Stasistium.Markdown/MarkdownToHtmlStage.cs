@@ -36,6 +36,8 @@ namespace Stasistium.Stages
 
         public static string GetHeaderText(HeaderBlock headerBlock)
         {
+            if (headerBlock is null)
+                throw new ArgumentNullException(nameof(headerBlock));
             return ToText2(headerBlock.Inlines);
 
             static string ToText2(IEnumerable<MarkdownInline> inlines)
