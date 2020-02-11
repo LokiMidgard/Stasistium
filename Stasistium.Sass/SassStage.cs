@@ -29,7 +29,8 @@ namespace Stasistium.Sass
                 InputFile = input.Id,
                 TryImport = (string file, string path, out string? scss, out string? map) =>
                 {
-                    var combind = Path.Combine(path, file).Replace('\\', '/');
+                    // don't know where Scss gets the full path when we give only text and relative path.
+                    var combind = file.Replace('\\', '/');
 
                     var IdToSearch = resolver[combind];
                     if (IdToSearch is null)
