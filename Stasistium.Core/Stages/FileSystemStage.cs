@@ -122,7 +122,7 @@ namespace Stasistium.Stages
 
     internal class FileDocument : DocumentBase, IDocument<Stream>
     {
-        public FileDocument(FileInfo fileInfo, DirectoryInfo root, MetadataContainer? metadata, IGeneratorContext context) : base(Path.GetRelativePath(root.FullName, fileInfo.FullName), metadata, GetHash(fileInfo, context), context)
+        public FileDocument(FileInfo fileInfo, DirectoryInfo root, MetadataContainer? metadata, IGeneratorContext context) : base(Path.GetRelativePath(root.FullName, fileInfo.FullName).Replace('\\','/'), metadata, GetHash(fileInfo, context), context)
         {
             this.FileInfo = fileInfo;
             this.Root = root;
