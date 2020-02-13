@@ -16,6 +16,9 @@
     <ProjectReference Include="..\Stasistium.Markdown\Stasistium.Markdown.csproj" />
     <ProjectReference Include="..\Stasistium.Razor\Stasistium.Razor.csproj" />
     <ProjectReference Include="..\Stasistium.YAML\Stasistium.YAML.csproj" />
+
+    <PackageReference Include="Westwind.AspnetCore.LiveReload" Version="0.1.12" />
+
   </ItemGroup>
 
   <ItemGroup>

@@ -28,7 +28,10 @@ namespace Stasistium.Stages
 
         protected override Task<IDocument<RazorProvider>> Work(ImmutableList<IDocument<IFileProvider>> inputList0, OptionToken options)
         {
-            var render = new RazorProvider(RazorViewToStringRenderer.GetRenderer(inputList0.Select(x => x.Value), new RenderConfiguration(this.ContentId) { ViewStartId = this.viewStartId }));
+            var renderConfiguration = new RenderConfiguration(this.ContentId) { ViewStartId = this.viewStartId };
+            var fileProviders = inputList0.Select(x => x.Value);
+            var renderer = RazorViewToStringRenderer.GetRenderer(fileProviders, renderConfiguration);
+            var render = new RazorProvider(renderer);
             var hash = this.Context.GetHashForString(string.Join(",", inputList0.Select(x => x.Hash)));
 
             return Task.FromResult(this.Context.Create(render, hash, this.id));

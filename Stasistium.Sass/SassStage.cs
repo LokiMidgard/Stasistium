@@ -25,7 +25,7 @@ namespace Stasistium.Sass
             var resolver = new RelativePathResolver(input.Id, all.Select(x => x.Id));
             var lookup = all.ToDictionary(x => x.Id, x => x);
             var result = Scss.ConvertToCss(input.Value, new ScssOptions()
-            {
+            { 
                 InputFile = input.Id,
                 TryImport = (string file, string path, out string? scss, out string? map) =>
                 {

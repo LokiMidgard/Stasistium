@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Hosting.Internal;
+//using Microsoft.AspNetCore.Hosting.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
@@ -22,6 +22,8 @@ using Microsoft.Extensions.FileProviders;
 using System.Collections.Generic;
 using System.Text.Encodings.Web;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting.Internal;
+using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
 
 namespace Stasistium.Razor
 {
@@ -78,26 +80,30 @@ namespace Stasistium.Razor
         {
             var razorPageFactoryProvider = this._serviceProvider.GetRequiredService<IRazorPageFactoryProvider>();
             var razorPageFactoryResult = razorPageFactoryProvider.CreateFactory(Path.Combine(this.configuration.ContentProviderId, viewName));
-            var razorPage = razorPageFactoryResult.RazorPageFactory();
-
-            var pageActivator = this._serviceProvider.GetRequiredService<IRazorPageActivator>();
-            var htmlEncoder = this._serviceProvider.GetRequiredService<HtmlEncoder>();
-            var diagnosticSource = this._serviceProvider.GetRequiredService<DiagnosticSource>();
-
-            IReadOnlyList<IRazorPage>? viewStart = null;
-
-            if (this.configuration.ViewStartId != null)
+            if (razorPageFactoryResult.Success)
             {
-                var result = razorPageFactoryProvider.CreateFactory(this.configuration.ViewStartId);
-                if (result.Success)
-                    viewStart = new IRazorPage[] { result.RazorPageFactory() };
+
+                var razorPage = razorPageFactoryResult.RazorPageFactory();
+
+                var pageActivator = this._serviceProvider.GetRequiredService<IRazorPageActivator>();
+                var htmlEncoder = this._serviceProvider.GetRequiredService<HtmlEncoder>();
+                var diagnosticSource = this._serviceProvider.GetRequiredService<DiagnosticListener>();
+
+                IReadOnlyList<IRazorPage>? viewStart = null;
+
+                if (this.configuration.ViewStartId != null)
+                {
+                    var result = razorPageFactoryProvider.CreateFactory(this.configuration.ViewStartId);
+                    if (result.Success)
+                        viewStart = new IRazorPage[] { result.RazorPageFactory() };
+                }
+
+                if (viewStart is null)
+                    viewStart = Array.Empty<IRazorPage>();
+
+
+                return new RazorView(this._viewEngine, pageActivator, viewStart, razorPage, htmlEncoder, diagnosticSource);
             }
-
-            if (viewStart is null)
-                viewStart = Array.Empty<IRazorPage>();
-
-
-            return new RazorView(this._viewEngine, pageActivator, viewStart, razorPage, htmlEncoder, diagnosticSource);
             var getViewResult = this._viewEngine.GetView(executingFilePath: null, viewPath: viewName, isMainPage: true);
 
             if (getViewResult.Success)
@@ -127,12 +133,19 @@ namespace Stasistium.Razor
             var applicationEnvironment = PlatformServices.Default.Application;
             services.AddSingleton(applicationEnvironment);
 
+            var environment2 = new WebHostEnvironment()
+            {
+                ApplicationName = Assembly.GetEntryAssembly().GetName().Name,
+            };
+
+            
+
             var environment = new HostingEnvironment
             {
                 ApplicationName = Assembly.GetEntryAssembly().GetName().Name
             };
-            services.AddSingleton<IHostingEnvironment>(environment);
-
+            services.AddSingleton<Microsoft.Extensions.Hosting.IHostEnvironment>(environment);
+            services.AddSingleton<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>(environment2);
             //services.Configure<RazorViewEngineOptions>(options =>
             //{
 
@@ -147,16 +160,24 @@ namespace Stasistium.Razor
             var diagnosticSource = new DiagnosticListener("Microsoft.AspNetCore");
 #pragma warning restore CA2000 // Dispose objects before losing scope
             services.AddSingleton<DiagnosticSource>(diagnosticSource);
-
+            services.AddSingleton<System.Diagnostics.DiagnosticListener>(diagnosticSource);
             //services.AddSingleton<IRazorViewEngineFileProviderAccessor, DefaultRazorViewEngineFileProviderAccessor>()
 
 
             services.AddLogging();
+            
+
             services.AddMvc()
+                .AddRazorRuntimeCompilation(options =>
+                {
+                    options.FileProviders.Clear();
+                    foreach (var provider in fileProviders)
+                        options.FileProviders.Add(provider);
+                })
                 .AddRazorOptions(options =>
                 {
+
                     options.ViewLocationExpanders.Clear();
-                    options.FileProviders.Clear();
                     options.ViewLocationFormats.Clear();
                     options.PageViewLocationFormats.Clear();
 
@@ -176,13 +197,13 @@ namespace Stasistium.Razor
 
                     //options.ViewLocationFormats.Add($"/{contentId}/{{0}}");
                     //options.PageViewLocationFormats.Add($"/{contentId}/{{0}}");
-                    foreach (var provider in fileProviders)
-                        options.FileProviders.Add(provider);
                 })
                 .AddRazorPagesOptions(options =>
                 {
 
                 });
+
+
 
             services.AddSingleton<RazorViewToStringRenderer>();
             var provider = services.BuildServiceProvider();

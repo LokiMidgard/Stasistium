@@ -31,6 +31,7 @@ namespace Stasistium.Sample
             };
             var s = System.Diagnostics.Stopwatch.StartNew();
             var files = contentRepo
+                .Where(x=>true)
                 .SelectMany(input =>
                     input
                     .Transform(x => x.With(x.Metadata.Add(new GitMetadata() { Name = x.Value.FrindlyName, Type = x.Value.Type })))

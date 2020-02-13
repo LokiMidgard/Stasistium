@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <RootNamespace>Stasistium</RootNamespace>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <TransformOnBuild>true</TransformOnBuild>
   </PropertyGroup>
 
