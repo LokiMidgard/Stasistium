@@ -9,7 +9,7 @@ namespace Stasistium.Documents
     public class RelativePathResolver
     {
         private readonly string relativeTo;
-        private readonly Dictionary<string, string> lookup;
+        public readonly Dictionary<string, string> lookup;
 
         public string? this[string index]
         {
@@ -32,12 +32,24 @@ namespace Stasistium.Documents
             yield return ("/" + fullpath, fullpath);
 
             var currentFolder = System.IO.Path.GetDirectoryName(this.relativeTo)?.Replace('\\', '/');
-            if (currentFolder is null)
-                yield break;
-            if (!currentFolder.EndsWith('/'))
-                currentFolder += '/';
-            if (fullpath.StartsWith(currentFolder, StringComparison.InvariantCulture))
-                yield return (fullpath.Substring(currentFolder.Length), fullpath);
+            int depth = 0;
+            while (true)
+            {
+                if (currentFolder is null)
+                    yield break;
+                if (!currentFolder.EndsWith('/') && currentFolder.Length > 0)
+                    currentFolder += '/';
+                if (fullpath.StartsWith(currentFolder, StringComparison.InvariantCulture))
+                {
+                    var prefix = string.Join("", Enumerable.Repeat("../", depth));
+                    yield return (prefix + fullpath.Substring(currentFolder.Length), fullpath);
+                    yield break;
+                }
+                currentFolder = currentFolder.TrimEnd('/');
+                depth++;
+                currentFolder = System.IO.Path.GetDirectoryName(currentFolder)?.Replace('\\', '/');
+
+            }
         }
     }
 
