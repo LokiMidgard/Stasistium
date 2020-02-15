@@ -153,7 +153,7 @@ namespace Stasistium
 {
     public static partial class StageExtensions
     {
-        public static MergeStage<TOut, TIn1, TInputItemCache, TInputCache1, TIn2, TInputCache2> Merge<TOut, TIn1, TInputItemCache, TInputCache1, TIn2, TInputCache2>(this MultiStageBase<TIn1, TInputItemCache, TInputCache1> input, StageBase<TIn2, TInputCache2> combine, Func<IDocument<TIn1>, IDocument<TIn2>, IDocument<TOut>> mergeFunction)
+        public static MergeStage<TOut, TIn1, TInputItemCache, TInputCache1, TIn2, TInputCache2> Merge<TOut, TIn1, TInputItemCache, TInputCache1, TIn2, TInputCache2>(this MultiStageBase<TIn1, TInputItemCache, TInputCache1> input, StageBase<TIn2, TInputCache2> combine, Func<IDocument<TIn1>, IDocument<TIn2>, IDocument<TOut>> mergeFunction, string? name = null)
          where TInputCache1 : class
         where TInputCache2 : class
         where TInputItemCache : class
@@ -164,7 +164,7 @@ namespace Stasistium
                 throw new ArgumentNullException(nameof(combine));
             if (mergeFunction is null)
                 throw new ArgumentNullException(nameof(mergeFunction));
-            return new MergeStage<TOut, TIn1, TInputItemCache, TInputCache1, TIn2, TInputCache2>(input, combine, mergeFunction, combine.Context);
+            return new MergeStage<TOut, TIn1, TInputItemCache, TInputCache1, TIn2, TInputCache2>(input, combine, mergeFunction, combine.Context, name);
         }
     }
 }
