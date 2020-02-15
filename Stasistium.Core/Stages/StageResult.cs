@@ -26,6 +26,7 @@ namespace Stasistium.Stages
             => new StageResultList<TResult, TResultCache, TCache>(LazyTask.Create(() => result), hasChanges, documentId, cache);
     }
 
+    [System.Diagnostics.DebuggerDisplay("StageResult Id: {Id} has changes: {HasChanges}")]
     public class StageResult<TResult, TCache>
         where TCache : class
     {
@@ -47,6 +48,7 @@ namespace Stasistium.Stages
         /// </summary>
         public string Id { get; }
     }
+    [System.Diagnostics.DebuggerDisplay("StageResultList Ids: {IdList} has changes: {HasChanges}")]
     public class StageResultList<TResult, TCacheResult, TCache>
         where TCache : class
         where TCacheResult : class
@@ -66,6 +68,8 @@ namespace Stasistium.Stages
         /// The Id's of the entrys, if known.
         /// </summary>
         public ImmutableList<string> Ids { get; }
+
+        private string IdList => string.Join(", ", this.Ids);
 
     }
 
