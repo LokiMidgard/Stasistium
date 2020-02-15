@@ -304,7 +304,18 @@ namespace Stasistium.Serelizer
                         if (valueWrapper is null)
                             throw new ArgumentException($"Type {type} does not contains correct wrapper for property {pair.Key}");
 
+                        var setMethod = property.GetSetMethod();
+                        var getMethod = property.GetGetMethod();
+
+                        if (setMethod is null)
+                            throw new ArgumentException($"Type {type} does not have setter for property {pair.Key}");
+                        if (getMethod is null)
+                            throw new ArgumentException($"Type {type} does not have getter for property {pair.Key}");
+
+
                         var value = GetValue(valueWrapper, property.PropertyType);
+
+
 
                         property.SetValue(currentObject, value);
                     }
