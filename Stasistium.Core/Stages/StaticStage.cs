@@ -24,7 +24,7 @@ namespace Stasistium.Stages
         protected override Task<StageResult<TResult, string>> DoInternal([AllowNull] string? cache, OptionToken options)
         {
             var contentHash = this.hashFunction(this.Value);
-            return Task.FromResult(StageResult.Create(
+            return Task.FromResult(this.Context.CreateStageResult(
                 result: this.Context.Create(this.Value, contentHash, this.id),
                 cache: contentHash,
                 hasChanges: cache != contentHash,
@@ -72,7 +72,7 @@ namespace Stasistium.Stages
                                 throw this.Context.Exception("Should Not Happen");
                             var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(StageResult.Create(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
+                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
                             newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
@@ -86,7 +86,7 @@ namespace Stasistium.Stages
                             });
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
-                            list.Add(StageResult.Create(childTask, false, child.Id, oldHash));
+                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
@@ -114,7 +114,7 @@ namespace Stasistium.Stages
 
                         if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids1[i], out var oldHash))
                             throw this.Context.Exception("Should Not Happen");
-                        list.Add(StageResult.Create(childTask, false, cache.Ids1[i], oldHash));
+                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids1[i], oldHash));
                     }
                     newCache.PreviouseCache1 = cache.PreviouseCache1;
                     newCache.Ids1 = cache.Ids1;
@@ -144,7 +144,7 @@ namespace Stasistium.Stages
                 }
                 ids.AddRange(performed.cache.Ids1);
 
-                return StageResultList.Create(performed.result, hasChanges, ids.ToImmutable(), performed.cache);
+                return this.Context.CreateStageResultList(performed.result, hasChanges, ids.ToImmutable(), performed.cache);
             }
             else
             {
@@ -155,7 +155,7 @@ namespace Stasistium.Stages
                 var temp = await task;
                 return temp.result;
             });
-            return StageResultList.Create(actualTask, hasChanges, ids.ToImmutable(), cache);
+            return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutable(), cache);
         }
     }
 

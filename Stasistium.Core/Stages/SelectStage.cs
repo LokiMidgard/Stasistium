@@ -58,14 +58,14 @@ namespace Stasistium.Stages
                     {
                         var itemResult = await pipeDone.Perform;
                         var itemCache = pipeDone.Cache;
-                        return (result: StageResult.Create(itemResult, itemResult.Hash != lastHash, itemResult.Id, itemCache), lastCache: itemCache, lastHash: itemResult.Hash, inputId: item.Id);
+                        return (result: this.Context.CreateStageResult(itemResult, itemResult.Hash != lastHash, itemResult.Id, itemCache), lastCache: itemCache, lastHash: itemResult.Hash, inputId: item.Id);
                     }
                     else
                     {
                         if (lastOutputId is null)
                             throw new InvalidOperationException("This should not happen.");
 
-                        return (result: StageResult.Create(pipeDone.Perform, false, lastOutputId, pipeDone.Cache), lastCache: lastCache, lastHash: lastHash, inputId: item.Id);
+                        return (result: this.Context.CreateStageResult(pipeDone.Perform, false, lastOutputId, pipeDone.Cache), lastCache: lastCache, lastHash: lastHash, inputId: item.Id);
 
                     }
                 })).ConfigureAwait(false);
@@ -98,7 +98,7 @@ namespace Stasistium.Stages
                     hasChanges = !newCache.OutputIdOrder.SequenceEqual(cache.OutputIdOrder) || work.Any(x => x.HasChanges);
                 }
 
-                return StageResultList.Create(work, hasChanges, ids.ToImmutableList(), newCache);
+                return this.Context.CreateStageResultList(work, hasChanges, ids.ToImmutableList(), newCache);
             }
             else
             {
@@ -108,7 +108,7 @@ namespace Stasistium.Stages
                     return temp.Item1;
                 });
 
-                return StageResultList.Create(actualTask, hasChanges, ids.ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutableList(), cache);
             }
         }
 
@@ -157,7 +157,7 @@ namespace Stasistium.Stages
                         var result = await task;
                         id = result.result.Id;
                         hasChanges = cache is null || result.result.Hash != cache.Hash;
-                        return StageResult.Create(result.result, hasChanges, id, result.newCache);
+                        return this.Context.CreateStageResult(result.result, hasChanges, id, result.newCache);
                     }
                     else
                     {
@@ -179,7 +179,7 @@ namespace Stasistium.Stages
                     return tmep.result;
                 });
 
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
 
 
@@ -242,14 +242,14 @@ where TInputCache2 : class
                     {
                         var itemResult = await pipeDone.Perform;
                         var itemCache = pipeDone.Cache;
-                        return (result: StageResult.Create(itemResult, itemResult.Hash != lastHash, itemResult.Id, itemCache), lastCache: itemCache, lastHash: itemResult.Hash, inputId: item.Id);
+                        return (result: this.Context.CreateStageResult(itemResult, itemResult.Hash != lastHash, itemResult.Id, itemCache), lastCache: itemCache, lastHash: itemResult.Hash, inputId: item.Id);
                     }
                     else
                     {
                         if (lastOutputId is null)
                             throw new InvalidOperationException("This should not happen.");
 
-                        return (result: StageResult.Create(pipeDone.Perform, false, lastOutputId, pipeDone.Cache), lastCache: lastCache, lastHash: lastHash, inputId: item.Id);
+                        return (result: this.Context.CreateStageResult(pipeDone.Perform, false, lastOutputId, pipeDone.Cache), lastCache: lastCache, lastHash: lastHash, inputId: item.Id);
 
                     }
                 })).ConfigureAwait(false);
@@ -283,14 +283,14 @@ where TInputCache2 : class
                     hasChanges = !newCache.OutputIdOrder.SequenceEqual(cache.OutputIdOrder) || work.Any(x => x.HasChanges);
                 }
 
-                return StageResultList.Create(work, hasChanges, ids.ToImmutableList(), newCache);
+                return this.Context.CreateStageResultList(work, hasChanges, ids.ToImmutableList(), newCache);
             }
             var actualTask = LazyTask.Create(async () =>
             {
                 var temp = await task;
                 return temp.Item1;
             });
-            return StageResultList.Create(actualTask, hasChanges, ids.ToImmutableList(), cache);
+            return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutableList(), cache);
         }
 
 
@@ -343,7 +343,7 @@ where TInputCache2 : class
                         var newCache = current.Cache;
                         id = result.result.Id;
                         hasChanges = cache is null || result.result.Hash != cache.Hash;
-                        return StageResult.Create(result.result, hasChanges, id, result.newCache);
+                        return this.Context.CreateStageResult(result.result, hasChanges, id, result.newCache);
 
                     }
                     else
@@ -364,7 +364,7 @@ where TInputCache2 : class
                     var temp = await task;
                     return temp.result;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
 
 
@@ -427,14 +427,14 @@ where TInputCache2 : class
                     {
                         var itemResult = await pipeDone.Perform;
                         var itemCache = pipeDone.Cache;
-                        return (result: StageResult.Create(itemResult, itemResult.Hash != lastHash, itemResult.Id, itemCache), lastCache: itemCache, lastHash: itemResult.Hash, inputId: item.Id);
+                        return (result: this.Context.CreateStageResult(itemResult, itemResult.Hash != lastHash, itemResult.Id, itemCache), lastCache: itemCache, lastHash: itemResult.Hash, inputId: item.Id);
                     }
                     else
                     {
                         if (lastOutputId is null)
                             throw new InvalidOperationException("This should not happen.");
 
-                        return (result: StageResult.Create(pipeDone.Perform, false, lastOutputId, pipeDone.Cache), lastCache: lastCache, lastHash: lastHash, inputId: item.Id);
+                        return (result: this.Context.CreateStageResult(pipeDone.Perform, false, lastOutputId, pipeDone.Cache), lastCache: lastCache, lastHash: lastHash, inputId: item.Id);
 
                     }
                 })).ConfigureAwait(false);
@@ -468,14 +468,14 @@ where TInputCache2 : class
                     hasChanges = !newCache.OutputIdOrder.SequenceEqual(cache.OutputIdOrder) || work.Any(x => x.HasChanges);
                 }
 
-                return StageResultList.Create(work, hasChanges, ids.ToImmutableList(), newCache);
+                return this.Context.CreateStageResultList(work, hasChanges, ids.ToImmutableList(), newCache);
             }
             var actualTask = LazyTask.Create(async () =>
             {
                 var temp = await task;
                 return temp.Item1;
             });
-            return StageResultList.Create(actualTask, hasChanges, ids.ToImmutableList(), cache);
+            return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutableList(), cache);
         }
 
 
@@ -528,7 +528,7 @@ where TInputCache2 : class
                         var newCache = current.Cache;
                         id = result.result.Id;
                         hasChanges = cache is null || result.result.Hash != cache.Hash;
-                        return StageResult.Create(result.result, hasChanges, id, result.newCache);
+                        return this.Context.CreateStageResult(result.result, hasChanges, id, result.newCache);
 
                     }
                     else
@@ -549,7 +549,7 @@ where TInputCache2 : class
                     var temp = await task;
                     return temp.result;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
 
 

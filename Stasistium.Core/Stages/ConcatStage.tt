@@ -154,7 +154,7 @@ for (int j = 1; j <= i; j++)
                                 oldHash = null;
                             var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(StageResult.Create(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
+                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
                             newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
@@ -168,7 +168,7 @@ for (int j = 1; j <= i; j++)
                             });
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
-                            list.Add(StageResult.Create(childTask, false, child.Id, oldHash));
+                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
@@ -196,7 +196,7 @@ for (int j = 1; j <= i; j++)
                         if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids<#= j #>[currentIndex], out var oldHash))
                             throw this.Context.Exception("Should Not Happen");
 
-                        list.Add(StageResult.Create(childTask, false, cache.Ids<#= j #>[currentIndex], oldHash));
+                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids<#= j #>[currentIndex], oldHash));
                     }
                     newCache.PreviouseCache<#= j #> = cache.PreviouseCache<#= j #>;
                     newCache.Ids<#= j #> = cache.Ids<#= j #>;
@@ -246,7 +246,7 @@ for (int j = 1; j <= i; j++)
 <#
 }
 #>
-                return StageResultList.Create(performed.result, hasChanges, ids.ToImmutable(), performed.cache);
+                return this.Context.CreateStageResultList(performed.result, hasChanges, ids.ToImmutable(), performed.cache);
             }
             else
             {
@@ -262,7 +262,7 @@ for (int j = 1; j <= i; j++)
                     var temp = await task;
                 return temp.result;
             });
-            return StageResultList.Create(actualTask, hasChanges, ids.ToImmutable(), cache);
+            return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutable(), cache);
             }
         }
     }

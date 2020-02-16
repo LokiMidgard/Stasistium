@@ -61,7 +61,7 @@ namespace Stasistium.Stages
                         if (cache == null || cache.OutputIdToHash.TryGetValue(currentId, out string? oldHash))
                             oldHash = null;
                         currentItemHashChanges = oldHash != newItemCache;
-                        return (result: StageResult.Create(performing, currentItemHashChanges, currentId, newItemCache), inputId: currentItem.Id, hash: newItemCache);
+                        return (result: this.Context.CreateStageResult(performing, currentItemHashChanges, currentId, newItemCache), inputId: currentItem.Id, hash: newItemCache);
                     }
                     else
                     {
@@ -72,7 +72,7 @@ namespace Stasistium.Stages
                             var temp = await currentTask;
                             return temp.result;
                         });
-                        return (result: StageResult.Create(actualCurrentTask, currentItemHashChanges, currentId, itemHash), inputId: currentItem.Id, hash: itemHash);
+                        return (result: this.Context.CreateStageResult(actualCurrentTask, currentItemHashChanges, currentId, itemHash), inputId: currentItem.Id, hash: itemHash);
                     }
 
 
@@ -113,7 +113,7 @@ namespace Stasistium.Stages
                     hasChanges = perform.Item1.Any(x => x.HasChanges)
                         || cache.DocumentIds.SequenceEqual(documentIds);
                 }
-                return StageResultList.Create(perform.Item1, hasChanges, documentIds, perform.newCache);
+                return this.Context.CreateStageResultList(perform.Item1, hasChanges, documentIds, perform.newCache);
             }
             else
             {
@@ -124,7 +124,7 @@ namespace Stasistium.Stages
                     return temp.Item1;
                 });
 
-                return StageResultList.Create(actualTask, hasChanges, documentIds, cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, documentIds, cache);
             }
 
         }

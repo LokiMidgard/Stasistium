@@ -43,14 +43,14 @@ namespace Stasistium.Stages
                         if (cache != null && cache.Transformed.TryGetValue(transformed.Id, out var oldHash))
                             hasChanges = oldHash != transformed.Hash;
 
-                        return (result: StageResult.Create(transformed, hasChanges, transformed.Id, transformed.Hash), inputId: subInput.Id, outputHash: transformed.Hash);
+                        return (result: this.Context.CreateStageResult(transformed, hasChanges, transformed.Id, transformed.Hash), inputId: subInput.Id, outputHash: transformed.Hash);
                     }
                     else
                     {
                         if (cache == null || !cache.InputToOutputId.TryGetValue(subInput.Id, out var oldOutputId) || !cache.Transformed.TryGetValue(oldOutputId, out var oldOutputHash))
                             throw this.Context.Exception("No changes, so old value should be there.");
 
-                        return (result: StageResult.Create(LazyTask.Create(async () =>
+                        return (result: this.Context.CreateStageResult(LazyTask.Create(async () =>
                         {
 
                             var newSource = await subInput.Perform;
@@ -95,7 +95,7 @@ namespace Stasistium.Stages
                             hasChanges = true;
                     }
                 }
-                return StageResultList.Create(list, hasChanges, c.OutputIdOrder.ToImmutableList(), c);
+                return this.Context.CreateStageResultList(list, hasChanges, c.OutputIdOrder.ToImmutableList(), c);
 
             }
 
@@ -105,7 +105,7 @@ namespace Stasistium.Stages
                 return temp.result;
             });
 
-            return StageResultList.Create(actualTask, hasChanges, cache.OutputIdOrder.ToImmutableList(), cache);
+            return this.Context.CreateStageResultList(actualTask, hasChanges, cache.OutputIdOrder.ToImmutableList(), cache);
         }
 
 

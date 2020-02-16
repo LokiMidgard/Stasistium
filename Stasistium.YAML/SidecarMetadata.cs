@@ -85,7 +85,7 @@ namespace Stasistium.Stages
                         if (cache != null && cache.Transformed.TryGetValue(fileResult.Id, out var oldHash))
                             hasChanges = oldHash != fileResult.Hash;
 
-                        return (result: StageResult.Create<Stream, string>(fileResult, hasChanges, fileResult.Id, fileResult.Hash), inputId: file.Id, outputHash: fileResult.Hash);
+                        return (result: this.Context.CreateStageResult<Stream, string>(fileResult, hasChanges, fileResult.Id, fileResult.Hash), inputId: file.Id, outputHash: fileResult.Hash);
                     }
                     else if (file.HasChanges)
                     {
@@ -96,7 +96,7 @@ namespace Stasistium.Stages
                             hasChanges = oldHash != fileResult.Hash;
                         System.Diagnostics.Debug.Assert(hasChanges); // if the original file had changes so must this have.
 
-                        return (result: StageResult.Create<Stream, string>(fileResult, hasChanges, fileResult.Id, fileResult.Hash), inputId: file.Id, outputHash: fileResult.Hash);
+                        return (result: this.Context.CreateStageResult<Stream, string>(fileResult, hasChanges, fileResult.Id, fileResult.Hash), inputId: file.Id, outputHash: fileResult.Hash);
                     }
                     else
                     {
@@ -112,7 +112,7 @@ namespace Stasistium.Stages
                             return fileResult;
                         });
 
-                        return (result: StageResult.Create(task, false, oldOutputId, oldOutputHash), inputId: file.Id, outputHash: oldOutputHash);
+                        return (result: this.Context.CreateStageResult(task, false, oldOutputId, oldOutputHash), inputId: file.Id, outputHash: oldOutputHash);
                     }
                 })).ConfigureAwait(false);
 
@@ -148,7 +148,7 @@ namespace Stasistium.Stages
                             hasChanges = true;
                     }
                 }
-                return StageResultList.Create(list, hasChanges, c.OutputIdOrder.ToImmutableList(), c);
+                return this.Context.CreateStageResultList(list, hasChanges, c.OutputIdOrder.ToImmutableList(), c);
             }
 
             var actiualTask = LazyTask.Create(async () =>
@@ -157,7 +157,7 @@ namespace Stasistium.Stages
                 return temp.result;
             });
 
-            return StageResultList.Create(actiualTask, hasChanges, cache.OutputIdOrder.ToImmutableList(), cache);
+            return this.Context.CreateStageResultList(actiualTask, hasChanges, cache.OutputIdOrder.ToImmutableList(), cache);
         }
 
     }

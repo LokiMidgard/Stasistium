@@ -91,7 +91,7 @@ namespace Stasistium.Stages
                 throw new ArgumentNullException(nameof(rendererDocument));
 
             var renderer = rendererDocument.Value.Renderer;
-            var result = await renderer.RenderViewToStringAsync(input.Id, selector(input)).ConfigureAwait(false);
+            var result = await renderer.RenderViewToStringAsync(input.Id, this.selector(input)).ConfigureAwait(false);
             var output = input.With(result, this.Context.GetHashForString(result));
             return output;
         }

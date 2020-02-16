@@ -72,7 +72,7 @@ where TInputCache : class
 
                             var performedSingle = await singleResult.Perform;
                             var singlePerformedResult = performedSingle;
-                            list.Add((StageResult.Create(singlePerformedResult, singlePerformedResult.Hash != lastItemHash, singlePerformedResult.Id, singleResult.Cache), singlePerformedResult.Hash));
+                            list.Add((this.Context.CreateStageResult(singlePerformedResult, singlePerformedResult.Hash != lastItemHash, singlePerformedResult.Id, singleResult.Cache), singlePerformedResult.Hash));
                         }
                         lastCache = itemCache;
                     }
@@ -95,7 +95,7 @@ where TInputCache : class
                             if (!cache.OutputItemIdToHash.TryGetValue(resultIds[i], out string lastItemHash))
                                 throw this.Context.Exception("Should not happen");
                             var oldItemCache = resultOldCaches[i];
-                            list.Add((result: StageResult.Create(subTask, false, resultIds[i], oldItemCache), lastItemHash));
+                            list.Add((result: this.Context.CreateStageResult(subTask, false, resultIds[i], oldItemCache), lastItemHash));
                         }
                     }
 
@@ -131,7 +131,7 @@ where TInputCache : class
                 {
                     hasChanges = !newCache.OutputIdOrder.SequenceEqual(cache.OutputIdOrder) || work.Any(x => x.HasChanges);
                 }
-                return StageResultList.Create(work, hasChanges, ids.ToImmutableList(), newCache);
+                return this.Context.CreateStageResultList(work, hasChanges, ids.ToImmutableList(), newCache);
 
             }
             else
@@ -141,7 +141,7 @@ where TInputCache : class
                     var temp = await task;
                     return temp.Item1;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutableList(), cache);
             }
 
         }

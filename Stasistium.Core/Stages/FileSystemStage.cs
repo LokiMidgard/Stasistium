@@ -71,7 +71,7 @@ namespace Stasistium.Stages
 
                         hasChanges = document.Hash != lastHash;
 
-                        return (result: StageResult.Create(document as IDocument<Stream>, hasChanges, document.Id, document.Hash), writeTime, hash: document.Hash, id);
+                        return (result: this.Context.CreateStageResult(document as IDocument<Stream>, hasChanges, document.Id, document.Hash), writeTime, hash: document.Hash, id);
                     }
                     else
                     {
@@ -84,7 +84,7 @@ namespace Stasistium.Stages
                             return document as IDocument<Stream>;
                         });
 
-                        return (result: StageResult.Create(subTask, hasChanges, id, lastHash), writeTime, hash: lastHash, id);
+                        return (result: this.Context.CreateStageResult(subTask, hasChanges, id, lastHash), writeTime, hash: lastHash, id);
                     }
                 }).ToArray();
 
@@ -107,7 +107,7 @@ namespace Stasistium.Stages
                                 || !cache.IdOrder.SequenceEqual(r.newCache.IdOrder);
             var ids = r.newCache.IdOrder.ToImmutableList();
 
-            return StageResultList.Create(r.result, hasChanges, ids, r.newCache);
+            return this.Context.CreateStageResultList(r.result, hasChanges, ids, r.newCache);
         }
     }
 

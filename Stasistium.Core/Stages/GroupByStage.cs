@@ -76,11 +76,11 @@ namespace Stasistium.Stages
                             var itemResult = await pipeDone.Perform;
                             var itemCache = pipeDone.Cache;
 
-                            return (result: StageResultList.Create(itemResult, true, itemResult.Select(x => x.Id).ToImmutableList(), itemCache), lastCache: itemCache, key: x.Key);
+                            return (result: this.Context.CreateStageResultList(itemResult, true, itemResult.Select(x => x.Id).ToImmutableList(), itemCache), lastCache: itemCache, key: x.Key);
                         }
                         else
                         {
-                            return (result: StageResultList.Create(pipeDone.Perform, false, pipeDone.Ids, pipeDone.Cache), lastCache: lastCache, key: x.Key);
+                            return (result: this.Context.CreateStageResultList(pipeDone.Perform, false, pipeDone.Ids, pipeDone.Cache), lastCache: lastCache, key: x.Key);
 
                         }
                     })).ConfigureAwait(false);
@@ -122,7 +122,7 @@ namespace Stasistium.Stages
                     hasChanges = true;
                 if (!hasChanges)
                     this.Context.Logger.Info($"No longer has Changes");
-                return StageResultList.Create(work, hasChanges, ids, newCache);
+                return this.Context.CreateStageResultList(work, hasChanges, ids, newCache);
             }
             else
             {
@@ -135,7 +135,7 @@ namespace Stasistium.Stages
                     return temp.finishedList;
                 });
 
-                return StageResultList.Create(actualTask, hasChanges, ids, cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids, cache);
             }
         }
 
@@ -183,10 +183,10 @@ namespace Stasistium.Stages
                         {
                             var currentResult = await input.Perform;
                             var currentCache = input.Cache;
-                            return StageResult.Create(currentResult, input.HasChanges, currentResult.Id, currentCache);
+                            return this.Context.CreateStageResult(currentResult, input.HasChanges, currentResult.Id, currentCache);
                         }
                         else
-                            return StageResult.Create(input.Perform, input.HasChanges, input.Id, input.Cache);
+                            return this.Context.CreateStageResult(input.Perform, input.HasChanges, input.Id, input.Cache);
                     })).ConfigureAwait(false);
 
                     var newCache = new StartCache<TInputCache, TKey>()
@@ -214,7 +214,7 @@ namespace Stasistium.Stages
                     if (!hasChanges)
                         this.Context.Logger.Info($"No longer has changes for Key {this.key}");
 
-                    return StageResultList.Create(result, hasChanges, ids, newCache);
+                    return this.Context.CreateStageResultList(result, hasChanges, ids, newCache);
 
                 }
                 else
@@ -225,7 +225,7 @@ namespace Stasistium.Stages
                         var temp = await task;
                         return temp.Item1;
                     });
-                    return StageResultList.Create(actualTask, hasChanges, ids, cache);
+                    return this.Context.CreateStageResultList(actualTask, hasChanges, ids, cache);
                 }
             }
 

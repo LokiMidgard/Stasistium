@@ -90,7 +90,7 @@ namespace Stasistium.Stages
                             hasChanges = true;
                     }
                 }
-                return StageResultList.Create(list, hasChanges, c.OutputIdOrder.ToImmutableList(), c);
+                return this.Context.CreateStageResultList(list, hasChanges, c.OutputIdOrder.ToImmutableList(), c);
 
             }
             var actualTask = LazyTask.Create(async () =>
@@ -98,7 +98,7 @@ namespace Stasistium.Stages
                 var temp = await task;
                 return temp.result;
             });
-            return StageResultList.Create(actualTask, hasChanges, cache.OutputIdOrder.ToImmutableList(), cache);
+            return this.Context.CreateStageResultList(actualTask, hasChanges, cache.OutputIdOrder.ToImmutableList(), cache);
         }
 
 

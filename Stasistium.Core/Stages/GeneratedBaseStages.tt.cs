@@ -73,7 +73,7 @@ namespace Single.Simple {
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -81,7 +81,7 @@ namespace Single.Simple {
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -143,7 +143,7 @@ namespace Multiple.Simple {
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -169,14 +169,14 @@ namespace Multiple.Simple {
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -283,7 +283,7 @@ namespace Multiple.Simple {
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
@@ -398,7 +398,7 @@ namespace Single.Simple {
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -406,7 +406,7 @@ namespace Single.Simple {
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -482,7 +482,7 @@ namespace Multiple.Simple {
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -512,14 +512,14 @@ namespace Multiple.Simple {
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -634,7 +634,7 @@ namespace Multiple.Simple {
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
@@ -780,7 +780,7 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -788,7 +788,7 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -892,7 +892,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -926,14 +926,14 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -1056,7 +1056,7 @@ await Task.WhenAll(
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
@@ -1222,7 +1222,7 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -1230,7 +1230,7 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -1351,7 +1351,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -1389,14 +1389,14 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -1527,7 +1527,7 @@ await Task.WhenAll(
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
@@ -1713,7 +1713,7 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -1721,7 +1721,7 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -1859,7 +1859,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -1901,14 +1901,14 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -2047,7 +2047,7 @@ await Task.WhenAll(
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
@@ -2156,7 +2156,7 @@ namespace Single.Simple {
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -2164,7 +2164,7 @@ namespace Single.Simple {
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -2235,7 +2235,7 @@ namespace Multiple.Simple {
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -2264,14 +2264,14 @@ namespace Multiple.Simple {
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -2386,7 +2386,7 @@ namespace Multiple.Simple {
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
@@ -2522,7 +2522,7 @@ namespace Single.Simple {
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -2530,7 +2530,7 @@ namespace Single.Simple {
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -2625,7 +2625,7 @@ namespace Multiple.Simple {
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -2658,14 +2658,14 @@ namespace Multiple.Simple {
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -2788,7 +2788,7 @@ namespace Multiple.Simple {
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
@@ -2947,7 +2947,7 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -2955,7 +2955,7 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -3070,7 +3070,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -3107,14 +3107,14 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -3245,7 +3245,7 @@ await Task.WhenAll(
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
@@ -3424,7 +3424,7 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -3432,7 +3432,7 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -3564,7 +3564,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -3605,14 +3605,14 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -3751,7 +3751,7 @@ await Task.WhenAll(
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
@@ -3950,7 +3950,7 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -3958,7 +3958,7 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -4107,7 +4107,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -4152,14 +4152,14 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -4306,7 +4306,7 @@ await Task.WhenAll(
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
@@ -4436,7 +4436,7 @@ namespace Single.Simple {
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -4444,7 +4444,7 @@ namespace Single.Simple {
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -4534,7 +4534,7 @@ namespace Multiple.Simple {
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -4566,14 +4566,14 @@ namespace Multiple.Simple {
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -4696,7 +4696,7 @@ namespace Multiple.Simple {
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
@@ -4845,7 +4845,7 @@ namespace Single.Simple {
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -4853,7 +4853,7 @@ namespace Single.Simple {
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -4959,7 +4959,7 @@ namespace Multiple.Simple {
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -4995,14 +4995,14 @@ namespace Multiple.Simple {
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -5133,7 +5133,7 @@ namespace Multiple.Simple {
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
@@ -5305,7 +5305,7 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -5313,7 +5313,7 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -5439,7 +5439,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -5479,14 +5479,14 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -5625,7 +5625,7 @@ await Task.WhenAll(
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
@@ -5817,7 +5817,7 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -5825,7 +5825,7 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -5968,7 +5968,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -6012,14 +6012,14 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -6166,7 +6166,7 @@ await Task.WhenAll(
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
@@ -6378,7 +6378,7 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -6386,7 +6386,7 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -6546,7 +6546,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -6594,14 +6594,14 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -6756,7 +6756,7 @@ await Task.WhenAll(
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
@@ -6899,7 +6899,7 @@ namespace Single.Simple {
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -6907,7 +6907,7 @@ namespace Single.Simple {
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -7008,7 +7008,7 @@ namespace Multiple.Simple {
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -7043,14 +7043,14 @@ namespace Multiple.Simple {
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -7181,7 +7181,7 @@ namespace Multiple.Simple {
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
@@ -7343,7 +7343,7 @@ namespace Single.Simple {
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -7351,7 +7351,7 @@ namespace Single.Simple {
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -7468,7 +7468,7 @@ namespace Multiple.Simple {
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -7507,14 +7507,14 @@ namespace Multiple.Simple {
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -7653,7 +7653,7 @@ namespace Multiple.Simple {
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
@@ -7838,7 +7838,7 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -7846,7 +7846,7 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -7983,7 +7983,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -8026,14 +8026,14 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -8180,7 +8180,7 @@ await Task.WhenAll(
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
@@ -8385,7 +8385,7 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -8393,7 +8393,7 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -8547,7 +8547,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -8594,14 +8594,14 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -8756,7 +8756,7 @@ await Task.WhenAll(
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
@@ -8981,7 +8981,7 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -8989,7 +8989,7 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -9160,7 +9160,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -9211,14 +9211,14 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -9381,7 +9381,7 @@ await Task.WhenAll(
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
@@ -9537,7 +9537,7 @@ namespace Single.Simple {
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -9545,7 +9545,7 @@ namespace Single.Simple {
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -9657,7 +9657,7 @@ namespace Multiple.Simple {
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -9695,14 +9695,14 @@ namespace Multiple.Simple {
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -9841,7 +9841,7 @@ namespace Multiple.Simple {
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
@@ -10016,7 +10016,7 @@ namespace Single.Simple {
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -10024,7 +10024,7 @@ namespace Single.Simple {
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -10152,7 +10152,7 @@ namespace Multiple.Simple {
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -10194,14 +10194,14 @@ namespace Multiple.Simple {
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -10348,7 +10348,7 @@ namespace Multiple.Simple {
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
@@ -10546,7 +10546,7 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -10554,7 +10554,7 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -10702,7 +10702,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -10748,14 +10748,14 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -10910,7 +10910,7 @@ await Task.WhenAll(
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
@@ -11128,7 +11128,7 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -11136,7 +11136,7 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -11301,7 +11301,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -11351,14 +11351,14 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -11521,7 +11521,7 @@ await Task.WhenAll(
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
@@ -11759,7 +11759,7 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return StageResult.Create(result.work, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache);
 
             }
             else {
@@ -11767,7 +11767,7 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResult.Create(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
             }
         }
 
@@ -11949,7 +11949,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: StageResult.Create( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
+                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -12003,14 +12003,14 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return StageResultList.Create(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache);
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return StageResultList.Create(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache);
             }
         }
 
@@ -12181,7 +12181,7 @@ await Task.WhenAll(
 //            // if currentCache is null, hasChanges must be true and so currentCache will be set.
 //            var theId = currentCache!.Ids;
 //
-//            return StageResult.Create(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
+//            return this.Context.CreateStageResult(task, hasChanges, theId.Select(x => x.id).ToImmutableList());
 //        }
 //
 //        protected virtual bool ForceUpdate([AllowNull]TCache cache, OptionToken options) => true;
