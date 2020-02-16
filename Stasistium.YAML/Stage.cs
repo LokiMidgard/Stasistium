@@ -14,7 +14,7 @@ namespace Stasistium
             where TPreviousListCache : class
             where TPreviousItemCache : class
         {
-            return new SidecarHelper<TPreviousItemCache, TPreviousListCache>(stage);
+            return new SidecarHelper<TPreviousItemCache, TPreviousListCache>(stage, name);
         }
     }
 

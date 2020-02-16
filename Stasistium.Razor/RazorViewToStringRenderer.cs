@@ -21,7 +21,6 @@ using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.Extensions.FileProviders;
 using System.Collections.Generic;
 using System.Text.Encodings.Web;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
 
@@ -135,14 +134,14 @@ namespace Stasistium.Razor
 
             var environment2 = new WebHostEnvironment()
             {
-                ApplicationName = Assembly.GetEntryAssembly().GetName().Name,
+                ApplicationName = Assembly.GetEntryAssembly()!.GetName().Name,
             };
 
             
 
             var environment = new HostingEnvironment
             {
-                ApplicationName = Assembly.GetEntryAssembly().GetName().Name
+                ApplicationName = Assembly.GetEntryAssembly()!.GetName().Name
             };
             services.AddSingleton<Microsoft.Extensions.Hosting.IHostEnvironment>(environment);
             services.AddSingleton<Microsoft.AspNetCore.Hosting.IWebHostEnvironment>(environment2);
