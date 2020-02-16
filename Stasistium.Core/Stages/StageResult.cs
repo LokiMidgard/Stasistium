@@ -36,7 +36,8 @@ namespace Stasistium.Stages
             this.HasChanges = hasChanges;
             this.Id = documentId;
             this.Cache = cache ?? throw new ArgumentNullException(nameof(cache));
-            this.Context = context;
+            this.Context = context ?? throw new ArgumentNullException(nameof(context));
+            this.Context.Logger.Info($"{documentId} {(hasChanges ? "Changed" : "remained unchanged")}");
         }
 
         public LazyTask<IDocument<TResult>> Perform { get; }
@@ -61,7 +62,8 @@ namespace Stasistium.Stages
             this.HasChanges = hasChanges;
             this.Ids = ids;
             this.Cache = cache ?? throw new ArgumentNullException(nameof(cache));
-            this.Context = context;
+            this.Context = context ?? throw new ArgumentNullException(nameof(context));
+            this.Context.Logger.Info($"{string.Join(", ",ids)} {(hasChanges ? "Changed" : "remained unchanged")}");
         }
 
         public LazyTask<ImmutableList<StageResult<TResult, TCacheResult>>> Perform { get; }
