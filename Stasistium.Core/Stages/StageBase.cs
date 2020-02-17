@@ -74,7 +74,7 @@ namespace Stasistium.Stages
             }
             finally
             {
-                await this.semaphore.WaitAsync().ConfigureAwait(false);
+                 this.semaphore.Release();
                 stopWatch.Stop();
                 this.Context.Logger.Info($"END Took {stopWatch.Elapsed}");
             }
