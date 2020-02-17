@@ -40,39 +40,45 @@ namespace Stasistium.Stages
     public abstract class StageBase<TResult, TCache> : StageBase
         where TCache : class
     {
-
+        private readonly System.Threading.SemaphoreSlim semaphore = new System.Threading.SemaphoreSlim(1, 1);
         private (Guid lastId, Task<StageResult<TResult, TCache>> result) lastRun;
 
         protected StageBase(IGeneratorContext context, string? name) : base(context, name)
         {
+            context.DisposeOnDispose(this.semaphore);
         }
 
         protected abstract Task<StageResult<TResult, TCache>> DoInternal([AllowNull]TCache? cache, OptionToken options);
 
-        public Task<StageResult<TResult, TCache>> DoIt([AllowNull]TCache? cache, OptionToken options)
+        public async Task<StageResult<TResult, TCache>> DoIt([AllowNull]TCache? cache, OptionToken options)
         {
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
             using var indent = this.Context.Logger.Indent();
             this.Context.Logger.Info($"BEGIN");
             var stopWatch = System.Diagnostics.Stopwatch.StartNew();
+
+            Task<StageResult<TResult, TCache>> result;
             try
             {
-
+                await this.semaphore.WaitAsync().ConfigureAwait(false);
                 var lastRun = this.lastRun;
                 if (lastRun.lastId == options.GenerationId)
-                    return lastRun.result;
-
-                var result = this.DoInternal(cache, options);
-                this.lastRun = (options.GenerationId, result);
-                return result;
+                    result = lastRun.result;
+                else
+                {
+                    result = this.DoInternal(cache, options);
+                    this.lastRun = (options.GenerationId, result);
+                }
 
             }
             finally
             {
+                await this.semaphore.WaitAsync().ConfigureAwait(false);
                 stopWatch.Stop();
                 this.Context.Logger.Info($"END Took {stopWatch.Elapsed}");
             }
+            return await result.ConfigureAwait(false);
         }
 
 
@@ -84,37 +90,44 @@ namespace Stasistium.Stages
     {
 
         private (Guid lastId, Task<StageResultList<TResult, TCacheResult, TCache>> result) lastRun;
+        private readonly System.Threading.SemaphoreSlim semaphore = new System.Threading.SemaphoreSlim(1, 1);
 
         protected MultiStageBase(IGeneratorContext context, string? name = null) : base(context, name)
         {
+            context.DisposeOnDispose(this.semaphore);
         }
 
 
 
         protected abstract Task<StageResultList<TResult, TCacheResult, TCache>> DoInternal([AllowNull]TCache? cache, OptionToken options);
 
-        public Task<StageResultList<TResult, TCacheResult, TCache>> DoIt([AllowNull]TCache? cache, OptionToken options)
+        public async Task<StageResultList<TResult, TCacheResult, TCache>> DoIt([AllowNull]TCache? cache, OptionToken options)
         {
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
             using var indent = this.Context.Logger.Indent();
             this.Context.Logger.Info($"BEGIN");
             var stopWatch = System.Diagnostics.Stopwatch.StartNew();
+            Task<StageResultList<TResult, TCacheResult, TCache>> result;
             try
             {
+                await this.semaphore.WaitAsync().ConfigureAwait(false);
                 var lastRun = this.lastRun;
                 if (lastRun.lastId == options.GenerationId)
-                    return lastRun.result;
-
-                var result = this.DoInternal(cache, options);
-                this.lastRun = (options.GenerationId, result);
-                return result;
+                    result = lastRun.result;
+                else
+                {
+                    result = this.DoInternal(cache, options);
+                    this.lastRun = (options.GenerationId, result);
+                }
             }
             finally
             {
+                this.semaphore.Release();
                 stopWatch.Stop();
                 this.Context.Logger.Info($"END Took {stopWatch.Elapsed}");
             }
+            return await result.ConfigureAwait(false);
         }
 
     }
