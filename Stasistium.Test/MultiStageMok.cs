@@ -35,10 +35,10 @@ namespace Stasistium.Test
                 var hasChanges = nullable is null
                     || nullable.Value.content != c.content;
                 var document = this.Context.Create(c.content, c.content, c.id);
-                return this.Context.CreateStageResult(document, hasChanges, document.Id, document.Hash);
+                return this.Context.CreateStageResult(document, hasChanges, document.Id, document.Hash, document.Hash);
             }).ToImmutableList();
 
-            return Task.FromResult(this.Context.CreateStageResultList(list, hasChanges, this.Current.Select(x => x.id).ToImmutableList(), this.Current));
+            return Task.FromResult(this.Context.CreateStageResultList(list, hasChanges, this.Current.Select(x => x.id).ToImmutableList(), this.Current, this.Context.GetHashForObject(list.Select(x => x.Hash))));
         }
     }
 }

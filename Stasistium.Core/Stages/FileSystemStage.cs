@@ -71,7 +71,7 @@ namespace Stasistium.Stages
 
                         hasChanges = document.Hash != lastHash;
 
-                        return (result: this.Context.CreateStageResult(document as IDocument<Stream>, hasChanges, document.Id, document.Hash), writeTime, hash: document.Hash, id);
+                        return (result: this.Context.CreateStageResult(document as IDocument<Stream>, hasChanges, document.Id, document.Hash, document.Hash), writeTime, hash: document.Hash, id);
                     }
                     else
                     {
@@ -84,7 +84,7 @@ namespace Stasistium.Stages
                             return document as IDocument<Stream>;
                         });
 
-                        return (result: this.Context.CreateStageResult(subTask, hasChanges, id, lastHash), writeTime, hash: lastHash, id);
+                        return (result: this.Context.CreateStageResult(subTask, hasChanges, id, lastHash, lastHash), writeTime, hash: lastHash, id);
                     }
                 }).ToArray();
 
@@ -94,8 +94,8 @@ namespace Stasistium.Stages
                     PreviousCache = newPreviousCache,
                     PathToHash = callculated.ToDictionary(x => x.id, x => x.hash),
                     PathToWriteTime = callculated.ToDictionary(x => x.id, x => x.writeTime),
-                    IdOrder = callculated.Select(x => x.id).ToArray()
-
+                    IdOrder = callculated.Select(x => x.id).ToArray(),
+                    Hash = this.Context.GetHashForObject(callculated.Select(x => x.hash)),
                 };
                 var resultList = callculated.Select(X => X.result).ToImmutableList();
                 return (result: resultList, newCache);
@@ -107,7 +107,7 @@ namespace Stasistium.Stages
                                 || !cache.IdOrder.SequenceEqual(r.newCache.IdOrder);
             var ids = r.newCache.IdOrder.ToImmutableList();
 
-            return this.Context.CreateStageResultList(r.result, hasChanges, ids, r.newCache);
+            return this.Context.CreateStageResultList(r.result, hasChanges, ids, r.newCache, r.newCache.Hash);
         }
     }
 
@@ -117,12 +117,13 @@ namespace Stasistium.Stages
         public Dictionary<string, DateTime> PathToWriteTime { get; set; }
         public Dictionary<string, string> PathToHash { get; set; }
         public string[] IdOrder { get; set; }
+        public string Hash { get; set; }
     }
 
 
     internal class FileDocument : DocumentBase, IDocument<Stream>
     {
-        public FileDocument(FileInfo fileInfo, DirectoryInfo root, MetadataContainer? metadata, IGeneratorContext context) : base(Path.GetRelativePath(root.FullName, fileInfo.FullName).Replace('\\','/'), metadata, GetHash(fileInfo, context), context)
+        public FileDocument(FileInfo fileInfo, DirectoryInfo root, MetadataContainer? metadata, IGeneratorContext context) : base(Path.GetRelativePath(root.FullName, fileInfo.FullName).Replace('\\', '/'), metadata, GetHash(fileInfo, context), context)
         {
             this.FileInfo = fileInfo;
             this.Root = root;

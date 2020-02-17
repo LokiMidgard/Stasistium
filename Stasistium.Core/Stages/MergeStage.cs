@@ -61,7 +61,7 @@ namespace Stasistium.Stages
                         if (cache == null || cache.OutputIdToHash.TryGetValue(currentId, out string? oldHash))
                             oldHash = null;
                         currentItemHashChanges = oldHash != newItemCache;
-                        return (result: this.Context.CreateStageResult(performing, currentItemHashChanges, currentId, newItemCache), inputId: currentItem.Id, hash: newItemCache);
+                        return (result: this.Context.CreateStageResult(performing, currentItemHashChanges, currentId, newItemCache, newItemCache), inputId: currentItem.Id);
                     }
                     else
                     {
@@ -72,7 +72,7 @@ namespace Stasistium.Stages
                             var temp = await currentTask;
                             return temp.result;
                         });
-                        return (result: this.Context.CreateStageResult(actualCurrentTask, currentItemHashChanges, currentId, itemHash), inputId: currentItem.Id, hash: itemHash);
+                        return (result: this.Context.CreateStageResult(actualCurrentTask, currentItemHashChanges, currentId, itemHash, itemHash), inputId: currentItem.Id);
                     }
 
 
@@ -94,8 +94,9 @@ namespace Stasistium.Stages
                     Cache1 = inputListCache,
                     Cache2 = singleCache,
                     InputIdToOutputId = results.ToDictionary(x => x.inputId, x => x.result.Id),
-                    OutputIdToHash = results.ToDictionary(x => x.result.Id, x => x.hash),
-                    DocumentIds = results.Select(x => x.result.Id).ToArray()
+                    OutputIdToHash = results.ToDictionary(x => x.result.Id, x => x.result.Hash),
+                    DocumentIds = results.Select(x => x.result.Id).ToArray(),
+                    Hash = this.Context.GetHashForObject(results.Select(x => x.result.Hash)),
                 };
 
                 return (results.Select(x => x.result).ToImmutableList(), newCache);
@@ -113,7 +114,7 @@ namespace Stasistium.Stages
                     hasChanges = perform.Item1.Any(x => x.HasChanges)
                         || cache.DocumentIds.SequenceEqual(documentIds);
                 }
-                return this.Context.CreateStageResultList(perform.Item1, hasChanges, documentIds, perform.newCache);
+                return this.Context.CreateStageResultList(perform.Item1, hasChanges, documentIds, perform.newCache, perform.newCache.Hash);
             }
             else
             {
@@ -124,7 +125,7 @@ namespace Stasistium.Stages
                     return temp.Item1;
                 });
 
-                return this.Context.CreateStageResultList(actualTask, hasChanges, documentIds, cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, documentIds, cache, cache.Hash);
             }
 
         }
@@ -143,6 +144,7 @@ namespace Stasistium.Stages
 
         // we need the order so we cant use the dictionarys above
         public string[] DocumentIds { get; set; }
+        public string Hash { get; set; }
     }
 #pragma warning restore CA2227 // Collection properties should be read only
 #pragma warning restore CA1819 // Properties should not return arrays

@@ -55,9 +55,9 @@ namespace Stasistium.Test
                 Entrys = subs
             });
 
-            var list = subs.Select(x => this.Context.CreateStageResult(x.subResult, x.subHasChanges, x.Id, x.subCache)).ToImmutableList();
+            var list = subs.Select(x => this.Context.CreateStageResult(x.subResult, x.subHasChanges, x.Id, x.subCache, x.Hash)).ToImmutableList();
 
-            return this.Context.CreateStageResultList(list, inputHadChanges || list.Any(x => x.HasChanges), list.Select(x => x.Id).ToImmutableList(), new Cache() { PreviousCache = newInputCache });
+            return this.Context.CreateStageResultList(list, inputHadChanges || list.Any(x => x.HasChanges), list.Select(x => x.Id).ToImmutableList(), new Cache() { PreviousCache = newInputCache }, this.Context.GetHashForObject(list.Select(x => x.Hash)));
         }
 
 

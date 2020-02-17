@@ -65,7 +65,8 @@ namespace Stasistium.Stages
                 var newCache = new WhereStageCache<TInCache>()
                 {
                     OutputIdOrder = list.Select(x => x.Id).ToArray(),
-                    ParentCache = input.Cache
+                    ParentCache = input.Cache,
+                    Hash = this.Context.GetHashForObject(list.Select(x => x.Hash))
                 };
                 return (result: list.ToImmutableList(), cache: newCache);
             });
@@ -90,7 +91,7 @@ namespace Stasistium.Stages
                             hasChanges = true;
                     }
                 }
-                return this.Context.CreateStageResultList(list, hasChanges, c.OutputIdOrder.ToImmutableList(), c);
+                return this.Context.CreateStageResultList(list, hasChanges, c.OutputIdOrder.ToImmutableList(), c, this.Context.GetHashForObject(list.Select(x => x.Hash)));
 
             }
             var actualTask = LazyTask.Create(async () =>
@@ -98,7 +99,7 @@ namespace Stasistium.Stages
                 var temp = await task;
                 return temp.result;
             });
-            return this.Context.CreateStageResultList(actualTask, hasChanges, cache.OutputIdOrder.ToImmutableList(), cache);
+            return this.Context.CreateStageResultList(actualTask, hasChanges, cache.OutputIdOrder.ToImmutableList(), cache, cache.Hash);
         }
 
 
@@ -114,7 +115,7 @@ namespace Stasistium.Stages
         public TInCache ParentCache { get; set; }
 
         public string[] OutputIdOrder { get; set; }
-
+        public string Hash { get; set; }
     }
 #pragma warning restore CA1819 // Properties should not return arrays
 #pragma warning restore CA2227 // Collection properties should be read only

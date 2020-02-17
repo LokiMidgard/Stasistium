@@ -76,11 +76,11 @@ namespace Stasistium.Stages
                             var itemResult = await pipeDone.Perform;
                             var itemCache = pipeDone.Cache;
 
-                            return (result: this.Context.CreateStageResultList(itemResult, true, itemResult.Select(x => x.Id).ToImmutableList(), itemCache), lastCache: itemCache, key: x.Key);
+                            return (result: this.Context.CreateStageResultList(itemResult, true, itemResult.Select(x => x.Id).ToImmutableList(), itemCache, pipeDone.Hash), lastCache: itemCache, key: x.Key);
                         }
                         else
                         {
-                            return (result: this.Context.CreateStageResultList(pipeDone.Perform, false, pipeDone.Ids, pipeDone.Cache), lastCache: lastCache, key: x.Key);
+                            return (result: this.Context.CreateStageResultList(pipeDone.Perform, false, pipeDone.Ids, pipeDone.Cache, pipeDone.Hash), lastCache: lastCache, key: x.Key);
 
                         }
                     })).ConfigureAwait(false);
@@ -96,7 +96,8 @@ namespace Stasistium.Stages
                     OutputIdOrder = finishedList.Select(x => x.Id).ToArray(),
                     InputIdToKey = keyValues.ToDictionary(x => x.Document.Id, x => x.Key),
                     KeyToOutputId = resultList.ToDictionary(x => x.key, x => x.result.Ids.ToArray()),
-                    PreviousCache = inputCache
+                    PreviousCache = inputCache,
+                    Hash = this.Context.GetHashForObject(finishedList.Select(x => x.Hash)),
                 };
 
                 return (finishedList, newCache);
@@ -122,7 +123,7 @@ namespace Stasistium.Stages
                     hasChanges = true;
                 if (!hasChanges)
                     this.Context.Logger.Info($"No longer has Changes");
-                return this.Context.CreateStageResultList(work, hasChanges, ids, newCache);
+                return this.Context.CreateStageResultList(work, hasChanges, ids, newCache, newCache.Hash);
             }
             else
             {
@@ -135,7 +136,7 @@ namespace Stasistium.Stages
                     return temp.finishedList;
                 });
 
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids, cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids, cache, cache.Hash);
             }
         }
 
@@ -183,17 +184,18 @@ namespace Stasistium.Stages
                         {
                             var currentResult = await input.Perform;
                             var currentCache = input.Cache;
-                            return this.Context.CreateStageResult(currentResult, input.HasChanges, currentResult.Id, currentCache);
+                            return this.Context.CreateStageResult(currentResult, input.HasChanges, currentResult.Id, currentCache, input.Hash);
                         }
                         else
-                            return this.Context.CreateStageResult(input.Perform, input.HasChanges, input.Id, input.Cache);
+                            return this.Context.CreateStageResult(input.Perform, input.HasChanges, input.Id, input.Cache, input.Hash);
                     })).ConfigureAwait(false);
 
                     var newCache = new StartCache<TInputCache, TKey>()
                     {
                         PreviousCache = inputCache,
                         InputIdToKey = itemToKey.ToDictionary(x => x.Document.Id, x => x.Key),
-                        Ids = item.Select(x => x.Id).ToArray()
+                        Ids = item.Select(x => x.Id).ToArray(),
+                        Hash = this.Context.GetHashForObject(item.Select(x => x.Hash)),
                     };
                     return (resultList.ToImmutableList(), newCache);
                 });
@@ -214,7 +216,7 @@ namespace Stasistium.Stages
                     if (!hasChanges)
                         this.Context.Logger.Info($"No longer has changes for Key {this.key}");
 
-                    return this.Context.CreateStageResultList(result, hasChanges, ids, newCache);
+                    return this.Context.CreateStageResultList(result, hasChanges, ids, newCache, newCache.Hash);
 
                 }
                 else
@@ -225,7 +227,7 @@ namespace Stasistium.Stages
                         var temp = await task;
                         return temp.Item1;
                     });
-                    return this.Context.CreateStageResultList(actualTask, hasChanges, ids, cache);
+                    return this.Context.CreateStageResultList(actualTask, hasChanges, ids, cache, cache.Hash);
                 }
             }
 
@@ -256,6 +258,7 @@ namespace Stasistium.Stages
             //public Dictionary<string, string> InputItemOutputIdLookup { get; set; }
             public Dictionary<string, TKey> InputIdToKey { get; set; }
             public Dictionary<TKey, string[]> KeyToOutputId { get; set; }
+            public string Hash { get; set; }
         }
 #pragma warning restore CA2227 // Collection properties should be read only
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
@@ -269,6 +272,7 @@ namespace Stasistium.Stages
         public TInputCache PreviousCache { get; set; }
         public Dictionary<string, TKey> InputIdToKey { get; set; }
         public string[] Ids { get; set; }
+        public string Hash { get; set; }
     }
 
 

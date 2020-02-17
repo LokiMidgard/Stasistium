@@ -24,11 +24,13 @@ namespace Stasistium.Stages
         protected override Task<StageResult<TResult, string>> DoInternal([AllowNull] string? cache, OptionToken options)
         {
             var contentHash = this.hashFunction(this.Value);
+            var result = this.Context.Create(this.Value, contentHash, this.id);
             return Task.FromResult(this.Context.CreateStageResult(
-                result: this.Context.Create(this.Value, contentHash, this.id),
-                cache: contentHash,
-                hasChanges: cache != contentHash,
-                documentId: this.id));
+                result: result,
+                cache: result.Hash,
+                hasChanges: cache != result.Hash,
+                documentId: this.id,
+                hash: result.Hash));
         }
     }
 
@@ -52,7 +54,7 @@ namespace Stasistium.Stages
                 var list = ImmutableList<StageResult<T, string>>.Empty.ToBuilder();
                 var newCache = new ConcatStageManyCache<TCache1>();
 
-
+                var hashList = new List<string>();
                 if (result.HasChanges)
                 {
                     var performed = await result.Perform;
@@ -72,7 +74,7 @@ namespace Stasistium.Stages
                                 throw this.Context.Exception("Should Not Happen");
                             var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
+                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash, childPerformed.Hash));
                             newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
@@ -86,11 +88,12 @@ namespace Stasistium.Stages
                             });
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
-                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash));
+                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
                         newCache.Ids1[i] = child.Id;
+                        hashList.Add(child.Hash);
                     }
 
                 }
@@ -114,7 +117,8 @@ namespace Stasistium.Stages
 
                         if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids1[i], out var oldHash))
                             throw this.Context.Exception("Should Not Happen");
-                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids1[i], oldHash));
+                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids1[i], oldHash, oldHash));
+                        hashList.Add(oldHash);
                     }
                     newCache.PreviouseCache1 = cache.PreviouseCache1;
                     newCache.Ids1 = cache.Ids1;
@@ -125,7 +129,7 @@ namespace Stasistium.Stages
                         newCache.IdToHash.Add(id, oldHash);
                     }
                 }
-
+                newCache.Hash = this.Context.GetHashForObject(hashList);
 
 
                 return (result: list.ToImmutable(), cache: newCache);
@@ -144,7 +148,7 @@ namespace Stasistium.Stages
                 }
                 ids.AddRange(performed.cache.Ids1);
 
-                return this.Context.CreateStageResultList(performed.result, hasChanges, ids.ToImmutable(), performed.cache);
+                return this.Context.CreateStageResultList(performed.result, hasChanges, ids.ToImmutable(), performed.cache, performed.cache.Hash);
             }
             else
             {
@@ -155,7 +159,7 @@ namespace Stasistium.Stages
                 var temp = await task;
                 return temp.result;
             });
-            return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutable(), cache);
+            return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutable(), cache, cache.Hash);
         }
     }
 

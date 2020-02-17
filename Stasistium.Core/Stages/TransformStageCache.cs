@@ -14,7 +14,7 @@ namespace Stasistium.Stages
         public string[] OutputIdOrder { get; set; }
         public Dictionary<string, string> Transformed { get; set; }
         public Dictionary<string, string> InputToOutputId { get; set; }
-
+        public string Hash { get; set; }
     }
 #pragma warning restore CA1819 // Properties should not return arrays
 #pragma warning restore CA2227 // Collection properties should be read only

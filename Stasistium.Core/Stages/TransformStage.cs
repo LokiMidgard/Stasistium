@@ -43,7 +43,7 @@ namespace Stasistium.Stages
                         if (cache != null && cache.Transformed.TryGetValue(transformed.Id, out var oldHash))
                             hasChanges = oldHash != transformed.Hash;
 
-                        return (result: this.Context.CreateStageResult(transformed, hasChanges, transformed.Id, transformed.Hash), inputId: subInput.Id, outputHash: transformed.Hash);
+                        return (result: this.Context.CreateStageResult(transformed, hasChanges, transformed.Id, transformed.Hash, transformed.Hash), inputId: subInput.Id);
                     }
                     else
                     {
@@ -57,10 +57,8 @@ namespace Stasistium.Stages
                             var transformed = await this.transform(newSource).ConfigureAwait(false);
 
                             return transformed;
-                        }), false, oldOutputId, oldOutputHash),
-                        inputId: subInput.Id,
-                        outputHash: oldOutputHash
-                        );
+                        }), false, oldOutputId, oldOutputHash, oldOutputHash),
+                        inputId: subInput.Id);
 
                     }
                 })).ConfigureAwait(false);
@@ -70,7 +68,8 @@ namespace Stasistium.Stages
                     InputToOutputId = list.ToDictionary(x => x.inputId, x => x.result.Id),
                     OutputIdOrder = list.Select(x => x.result.Id).ToArray(),
                     ParentCache = input.Cache,
-                    Transformed = list.ToDictionary(x => x.result.Id, x => x.outputHash)
+                    Transformed = list.ToDictionary(x => x.result.Id, x => x.result.Hash),
+                    Hash = this.Context.GetHashForObject(list.Select(x => x.result.Hash))
                 };
                 return (result: list.Select(x => x.result).ToImmutableList(), cache: newCache);
             });
@@ -95,7 +94,7 @@ namespace Stasistium.Stages
                             hasChanges = true;
                     }
                 }
-                return this.Context.CreateStageResultList(list, hasChanges, c.OutputIdOrder.ToImmutableList(), c);
+                return this.Context.CreateStageResultList(list, hasChanges, c.OutputIdOrder.ToImmutableList(), c, c.Hash);
 
             }
 
@@ -105,7 +104,7 @@ namespace Stasistium.Stages
                 return temp.result;
             });
 
-            return this.Context.CreateStageResultList(actualTask, hasChanges, cache.OutputIdOrder.ToImmutableList(), cache);
+            return this.Context.CreateStageResultList(actualTask, hasChanges, cache.OutputIdOrder.ToImmutableList(), cache, cache.Hash);
         }
 
 

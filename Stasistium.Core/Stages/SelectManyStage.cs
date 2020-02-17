@@ -60,7 +60,7 @@ where TInputCache : class
                     }
                     var pipeDone = await pipe.@out.DoIt(lastCache, options).ConfigureAwait(false);
 
-                    var list = new List<(StageResult<TResult, TItemCache> result, string lastItemHash)>();
+                    var list = new List<StageResult<TResult, TItemCache>>();
                     if (pipeDone.HasChanges || cache is null)
                     {
                         var itemResult = await pipeDone.Perform;
@@ -72,7 +72,7 @@ where TInputCache : class
 
                             var performedSingle = await singleResult.Perform;
                             var singlePerformedResult = performedSingle;
-                            list.Add((this.Context.CreateStageResult(singlePerformedResult, singlePerformedResult.Hash != lastItemHash, singlePerformedResult.Id, singleResult.Cache), singlePerformedResult.Hash));
+                            list.Add(this.Context.CreateStageResult(singlePerformedResult, singlePerformedResult.Hash != lastItemHash, singlePerformedResult.Id, singleResult.Cache, singlePerformedResult.Hash));
                         }
                         lastCache = itemCache;
                     }
@@ -95,7 +95,7 @@ where TInputCache : class
                             if (!cache.OutputItemIdToHash.TryGetValue(resultIds[i], out string lastItemHash))
                                 throw this.Context.Exception("Should not happen");
                             var oldItemCache = resultOldCaches[i];
-                            list.Add((result: this.Context.CreateStageResult(subTask, false, resultIds[i], oldItemCache), lastItemHash));
+                            list.Add(this.Context.CreateStageResult(subTask, false, resultIds[i], oldItemCache, lastItemHash));
                         }
                     }
 
@@ -107,16 +107,17 @@ where TInputCache : class
                 var newCache = new SelectManyCache<TInputCache, TItemCache, TCache>()
                 {
                     InputCacheLookup = resultList.ToDictionary(x => x.Id, x => x.lastCache),
-                    InputItemToResultItemIdLookup = resultList.ToDictionary(x => x.Id, x => x.list.Select(x => x.result.Id).ToArray()),
-                    OutputItemIdToHash = resultList.SelectMany(x => x.list).ToDictionary(x => x.result.Id, x => x.lastItemHash),
+                    InputItemToResultItemIdLookup = resultList.ToDictionary(x => x.Id, x => x.list.Select(x => x.Id).ToArray()),
+                    OutputItemIdToHash = resultList.SelectMany(x => x.list).ToDictionary(x => x.Id, x => x.Hash),
 
-                    InputItemToResultItemCacheLookup = resultList.ToDictionary(x => x.Id, x => x.list.Select(x => x.result.Cache).ToArray()),
+                    InputItemToResultItemCacheLookup = resultList.ToDictionary(x => x.Id, x => x.list.Select(x => x.Cache).ToArray()),
 
-                    OutputIdOrder = resultList.SelectMany(x => x.list.Select(y => y.result.Id)).ToArray(),
-                    PreviousCache = inputCache
+                    OutputIdOrder = resultList.SelectMany(x => x.list.Select(y => y.Id)).ToArray(),
+                    PreviousCache = inputCache,
+                    Hash = this.Context.GetHashForObject(resultList.SelectMany(x => x.list).Select(x => x.Hash))
                 };
 
-                return (resultList.SelectMany(x => x.list.Select(y => y.result)).ToImmutableList(), newCache);
+                return (resultList.SelectMany(x => x.list).ToImmutableList(), newCache);
             });
 
             var hasChanges = input.HasChanges;
@@ -131,7 +132,7 @@ where TInputCache : class
                 {
                     hasChanges = !newCache.OutputIdOrder.SequenceEqual(cache.OutputIdOrder) || work.Any(x => x.HasChanges);
                 }
-                return this.Context.CreateStageResultList(work, hasChanges, ids.ToImmutableList(), newCache);
+                return this.Context.CreateStageResultList(work, hasChanges, ids.ToImmutableList(), newCache, newCache.Hash);
 
             }
             else
@@ -141,7 +142,7 @@ where TInputCache : class
                     var temp = await task;
                     return temp.Item1;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutableList(), cache);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutableList(), cache, cache.Hash);
             }
 
         }

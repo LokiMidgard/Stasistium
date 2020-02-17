@@ -24,6 +24,7 @@ namespace Stasistium.Stages
         /// InputId to OutputId
         /// </summary>
         public Dictionary<string, string> InputItemOutputIdLookup { get; set; }
+        public string Hash { get;  set; }
     }
     public class SelectCache<TInputCache1, TInputCache2, TItemCache>
     {

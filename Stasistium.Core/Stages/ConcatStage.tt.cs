@@ -103,12 +103,14 @@ await Task.WhenAll(
                 var list = ImmutableList<StageResult<T, string>>.Empty.ToBuilder();
                 var newCache = new ConcatStageManyCache<TCache1>();
 
+                var hashList = new List<string>();
 
                 if (result1.HasChanges)
                 {
                     var performed = await result1.Perform;
                     newCache.Ids1 = new string[performed.Count];
                     newCache.PreviouseCache1 = result1.Cache;
+
 
                     for (int i = 0; i < performed.Count; i++)
                     {
@@ -123,7 +125,7 @@ await Task.WhenAll(
                                 oldHash = null;
                             var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
+                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash, childPerformed.Hash));
                             newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
@@ -137,11 +139,12 @@ await Task.WhenAll(
                             });
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
-                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash));
+                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
                         newCache.Ids1[i] = child.Id;
+                        hashList.Add(child.Hash);
                     }
 
                 }
@@ -165,7 +168,9 @@ await Task.WhenAll(
                         if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids1[currentIndex], out var oldHash))
                             throw this.Context.Exception("Should Not Happen");
 
-                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids1[currentIndex], oldHash));
+                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids1[currentIndex], oldHash, oldHash));
+                        hashList.Add(oldHash);
+
                     }
                     newCache.PreviouseCache1 = cache.PreviouseCache1;
                     newCache.Ids1 = cache.Ids1;
@@ -177,6 +182,7 @@ await Task.WhenAll(
                     }
                 }
 
+                newCache.Hash = this.Context.GetHashForObject(hashList);
 
                 return (result:list.ToImmutable(),cache: newCache);
             });
@@ -193,7 +199,7 @@ await Task.WhenAll(
                 if (!hasChanges && cache != null)
                     hasChanges = !performed.cache.Ids1.SequenceEqual(cache.Ids1);
                 ids.AddRange(performed.cache.Ids1);
-                return this.Context.CreateStageResultList(performed.result, hasChanges, ids.ToImmutable(), performed.cache);
+                return this.Context.CreateStageResultList(performed.result, hasChanges, ids.ToImmutable(), performed.cache, performed.cache.Hash);
             }
             else
             {
@@ -202,7 +208,7 @@ await Task.WhenAll(
                     var temp = await task;
                 return temp.result;
             });
-            return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutable(), cache);
+            return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutable(), cache, cache.Hash);
             }
         }
     }
@@ -215,6 +221,8 @@ await Task.WhenAll(
         public string[] Ids1 { get; set; }
         public TCache1 PreviouseCache1 { get; set; }
 
+
+        public string Hash {get; set;}
         public Dictionary<string, string> IdToHash { get; set; }
 
         public ConcatStageManyCache()
@@ -256,12 +264,14 @@ await Task.WhenAll(
                 var list = ImmutableList<StageResult<T, string>>.Empty.ToBuilder();
                 var newCache = new ConcatStageManyCache<TCache1, TCache2>();
 
+                var hashList = new List<string>();
 
                 if (result1.HasChanges)
                 {
                     var performed = await result1.Perform;
                     newCache.Ids1 = new string[performed.Count];
                     newCache.PreviouseCache1 = result1.Cache;
+
 
                     for (int i = 0; i < performed.Count; i++)
                     {
@@ -276,7 +286,7 @@ await Task.WhenAll(
                                 oldHash = null;
                             var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
+                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash, childPerformed.Hash));
                             newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
@@ -290,11 +300,12 @@ await Task.WhenAll(
                             });
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
-                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash));
+                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
                         newCache.Ids1[i] = child.Id;
+                        hashList.Add(child.Hash);
                     }
 
                 }
@@ -318,7 +329,9 @@ await Task.WhenAll(
                         if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids1[currentIndex], out var oldHash))
                             throw this.Context.Exception("Should Not Happen");
 
-                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids1[currentIndex], oldHash));
+                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids1[currentIndex], oldHash, oldHash));
+                        hashList.Add(oldHash);
+
                     }
                     newCache.PreviouseCache1 = cache.PreviouseCache1;
                     newCache.Ids1 = cache.Ids1;
@@ -337,6 +350,7 @@ await Task.WhenAll(
                     newCache.Ids2 = new string[performed.Count];
                     newCache.PreviouseCache2 = result2.Cache;
 
+
                     for (int i = 0; i < performed.Count; i++)
                     {
                         var child = performed[i];
@@ -350,7 +364,7 @@ await Task.WhenAll(
                                 oldHash = null;
                             var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
+                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash, childPerformed.Hash));
                             newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
@@ -364,11 +378,12 @@ await Task.WhenAll(
                             });
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
-                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash));
+                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
                         newCache.Ids2[i] = child.Id;
+                        hashList.Add(child.Hash);
                     }
 
                 }
@@ -392,7 +407,9 @@ await Task.WhenAll(
                         if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids2[currentIndex], out var oldHash))
                             throw this.Context.Exception("Should Not Happen");
 
-                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids2[currentIndex], oldHash));
+                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids2[currentIndex], oldHash, oldHash));
+                        hashList.Add(oldHash);
+
                     }
                     newCache.PreviouseCache2 = cache.PreviouseCache2;
                     newCache.Ids2 = cache.Ids2;
@@ -404,6 +421,7 @@ await Task.WhenAll(
                     }
                 }
 
+                newCache.Hash = this.Context.GetHashForObject(hashList);
 
                 return (result:list.ToImmutable(),cache: newCache);
             });
@@ -424,7 +442,7 @@ await Task.WhenAll(
                     hasChanges = !performed.cache.Ids2.SequenceEqual(cache.Ids2);
                 ids.AddRange(performed.cache.Ids1);
                 ids.AddRange(performed.cache.Ids2);
-                return this.Context.CreateStageResultList(performed.result, hasChanges, ids.ToImmutable(), performed.cache);
+                return this.Context.CreateStageResultList(performed.result, hasChanges, ids.ToImmutable(), performed.cache, performed.cache.Hash);
             }
             else
             {
@@ -434,7 +452,7 @@ await Task.WhenAll(
                     var temp = await task;
                 return temp.result;
             });
-            return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutable(), cache);
+            return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutable(), cache, cache.Hash);
             }
         }
     }
@@ -450,6 +468,8 @@ await Task.WhenAll(
         public string[] Ids2 { get; set; }
         public TCache2 PreviouseCache2 { get; set; }
 
+
+        public string Hash {get; set;}
         public Dictionary<string, string> IdToHash { get; set; }
 
         public ConcatStageManyCache()
@@ -498,12 +518,14 @@ await Task.WhenAll(
                 var list = ImmutableList<StageResult<T, string>>.Empty.ToBuilder();
                 var newCache = new ConcatStageManyCache<TCache1, TCache2, TCache3>();
 
+                var hashList = new List<string>();
 
                 if (result1.HasChanges)
                 {
                     var performed = await result1.Perform;
                     newCache.Ids1 = new string[performed.Count];
                     newCache.PreviouseCache1 = result1.Cache;
+
 
                     for (int i = 0; i < performed.Count; i++)
                     {
@@ -518,7 +540,7 @@ await Task.WhenAll(
                                 oldHash = null;
                             var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
+                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash, childPerformed.Hash));
                             newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
@@ -532,11 +554,12 @@ await Task.WhenAll(
                             });
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
-                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash));
+                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
                         newCache.Ids1[i] = child.Id;
+                        hashList.Add(child.Hash);
                     }
 
                 }
@@ -560,7 +583,9 @@ await Task.WhenAll(
                         if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids1[currentIndex], out var oldHash))
                             throw this.Context.Exception("Should Not Happen");
 
-                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids1[currentIndex], oldHash));
+                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids1[currentIndex], oldHash, oldHash));
+                        hashList.Add(oldHash);
+
                     }
                     newCache.PreviouseCache1 = cache.PreviouseCache1;
                     newCache.Ids1 = cache.Ids1;
@@ -579,6 +604,7 @@ await Task.WhenAll(
                     newCache.Ids2 = new string[performed.Count];
                     newCache.PreviouseCache2 = result2.Cache;
 
+
                     for (int i = 0; i < performed.Count; i++)
                     {
                         var child = performed[i];
@@ -592,7 +618,7 @@ await Task.WhenAll(
                                 oldHash = null;
                             var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
+                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash, childPerformed.Hash));
                             newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
@@ -606,11 +632,12 @@ await Task.WhenAll(
                             });
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
-                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash));
+                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
                         newCache.Ids2[i] = child.Id;
+                        hashList.Add(child.Hash);
                     }
 
                 }
@@ -634,7 +661,9 @@ await Task.WhenAll(
                         if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids2[currentIndex], out var oldHash))
                             throw this.Context.Exception("Should Not Happen");
 
-                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids2[currentIndex], oldHash));
+                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids2[currentIndex], oldHash, oldHash));
+                        hashList.Add(oldHash);
+
                     }
                     newCache.PreviouseCache2 = cache.PreviouseCache2;
                     newCache.Ids2 = cache.Ids2;
@@ -653,6 +682,7 @@ await Task.WhenAll(
                     newCache.Ids3 = new string[performed.Count];
                     newCache.PreviouseCache3 = result3.Cache;
 
+
                     for (int i = 0; i < performed.Count; i++)
                     {
                         var child = performed[i];
@@ -666,7 +696,7 @@ await Task.WhenAll(
                                 oldHash = null;
                             var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
+                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash, childPerformed.Hash));
                             newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
@@ -680,11 +710,12 @@ await Task.WhenAll(
                             });
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
-                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash));
+                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
                         newCache.Ids3[i] = child.Id;
+                        hashList.Add(child.Hash);
                     }
 
                 }
@@ -708,7 +739,9 @@ await Task.WhenAll(
                         if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids3[currentIndex], out var oldHash))
                             throw this.Context.Exception("Should Not Happen");
 
-                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids3[currentIndex], oldHash));
+                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids3[currentIndex], oldHash, oldHash));
+                        hashList.Add(oldHash);
+
                     }
                     newCache.PreviouseCache3 = cache.PreviouseCache3;
                     newCache.Ids3 = cache.Ids3;
@@ -720,6 +753,7 @@ await Task.WhenAll(
                     }
                 }
 
+                newCache.Hash = this.Context.GetHashForObject(hashList);
 
                 return (result:list.ToImmutable(),cache: newCache);
             });
@@ -744,7 +778,7 @@ await Task.WhenAll(
                 ids.AddRange(performed.cache.Ids1);
                 ids.AddRange(performed.cache.Ids2);
                 ids.AddRange(performed.cache.Ids3);
-                return this.Context.CreateStageResultList(performed.result, hasChanges, ids.ToImmutable(), performed.cache);
+                return this.Context.CreateStageResultList(performed.result, hasChanges, ids.ToImmutable(), performed.cache, performed.cache.Hash);
             }
             else
             {
@@ -755,7 +789,7 @@ await Task.WhenAll(
                     var temp = await task;
                 return temp.result;
             });
-            return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutable(), cache);
+            return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutable(), cache, cache.Hash);
             }
         }
     }
@@ -774,6 +808,8 @@ await Task.WhenAll(
         public string[] Ids3 { get; set; }
         public TCache3 PreviouseCache3 { get; set; }
 
+
+        public string Hash {get; set;}
         public Dictionary<string, string> IdToHash { get; set; }
 
         public ConcatStageManyCache()
@@ -829,12 +865,14 @@ await Task.WhenAll(
                 var list = ImmutableList<StageResult<T, string>>.Empty.ToBuilder();
                 var newCache = new ConcatStageManyCache<TCache1, TCache2, TCache3, TCache4>();
 
+                var hashList = new List<string>();
 
                 if (result1.HasChanges)
                 {
                     var performed = await result1.Perform;
                     newCache.Ids1 = new string[performed.Count];
                     newCache.PreviouseCache1 = result1.Cache;
+
 
                     for (int i = 0; i < performed.Count; i++)
                     {
@@ -849,7 +887,7 @@ await Task.WhenAll(
                                 oldHash = null;
                             var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
+                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash, childPerformed.Hash));
                             newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
@@ -863,11 +901,12 @@ await Task.WhenAll(
                             });
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
-                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash));
+                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
                         newCache.Ids1[i] = child.Id;
+                        hashList.Add(child.Hash);
                     }
 
                 }
@@ -891,7 +930,9 @@ await Task.WhenAll(
                         if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids1[currentIndex], out var oldHash))
                             throw this.Context.Exception("Should Not Happen");
 
-                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids1[currentIndex], oldHash));
+                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids1[currentIndex], oldHash, oldHash));
+                        hashList.Add(oldHash);
+
                     }
                     newCache.PreviouseCache1 = cache.PreviouseCache1;
                     newCache.Ids1 = cache.Ids1;
@@ -910,6 +951,7 @@ await Task.WhenAll(
                     newCache.Ids2 = new string[performed.Count];
                     newCache.PreviouseCache2 = result2.Cache;
 
+
                     for (int i = 0; i < performed.Count; i++)
                     {
                         var child = performed[i];
@@ -923,7 +965,7 @@ await Task.WhenAll(
                                 oldHash = null;
                             var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
+                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash, childPerformed.Hash));
                             newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
@@ -937,11 +979,12 @@ await Task.WhenAll(
                             });
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
-                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash));
+                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
                         newCache.Ids2[i] = child.Id;
+                        hashList.Add(child.Hash);
                     }
 
                 }
@@ -965,7 +1008,9 @@ await Task.WhenAll(
                         if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids2[currentIndex], out var oldHash))
                             throw this.Context.Exception("Should Not Happen");
 
-                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids2[currentIndex], oldHash));
+                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids2[currentIndex], oldHash, oldHash));
+                        hashList.Add(oldHash);
+
                     }
                     newCache.PreviouseCache2 = cache.PreviouseCache2;
                     newCache.Ids2 = cache.Ids2;
@@ -984,6 +1029,7 @@ await Task.WhenAll(
                     newCache.Ids3 = new string[performed.Count];
                     newCache.PreviouseCache3 = result3.Cache;
 
+
                     for (int i = 0; i < performed.Count; i++)
                     {
                         var child = performed[i];
@@ -997,7 +1043,7 @@ await Task.WhenAll(
                                 oldHash = null;
                             var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
+                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash, childPerformed.Hash));
                             newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
@@ -1011,11 +1057,12 @@ await Task.WhenAll(
                             });
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
-                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash));
+                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
                         newCache.Ids3[i] = child.Id;
+                        hashList.Add(child.Hash);
                     }
 
                 }
@@ -1039,7 +1086,9 @@ await Task.WhenAll(
                         if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids3[currentIndex], out var oldHash))
                             throw this.Context.Exception("Should Not Happen");
 
-                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids3[currentIndex], oldHash));
+                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids3[currentIndex], oldHash, oldHash));
+                        hashList.Add(oldHash);
+
                     }
                     newCache.PreviouseCache3 = cache.PreviouseCache3;
                     newCache.Ids3 = cache.Ids3;
@@ -1058,6 +1107,7 @@ await Task.WhenAll(
                     newCache.Ids4 = new string[performed.Count];
                     newCache.PreviouseCache4 = result4.Cache;
 
+
                     for (int i = 0; i < performed.Count; i++)
                     {
                         var child = performed[i];
@@ -1071,7 +1121,7 @@ await Task.WhenAll(
                                 oldHash = null;
                             var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash));
+                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash, childPerformed.Hash));
                             newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
@@ -1085,11 +1135,12 @@ await Task.WhenAll(
                             });
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
-                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash));
+                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
                         newCache.Ids4[i] = child.Id;
+                        hashList.Add(child.Hash);
                     }
 
                 }
@@ -1113,7 +1164,9 @@ await Task.WhenAll(
                         if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids4[currentIndex], out var oldHash))
                             throw this.Context.Exception("Should Not Happen");
 
-                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids4[currentIndex], oldHash));
+                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids4[currentIndex], oldHash, oldHash));
+                        hashList.Add(oldHash);
+
                     }
                     newCache.PreviouseCache4 = cache.PreviouseCache4;
                     newCache.Ids4 = cache.Ids4;
@@ -1125,6 +1178,7 @@ await Task.WhenAll(
                     }
                 }
 
+                newCache.Hash = this.Context.GetHashForObject(hashList);
 
                 return (result:list.ToImmutable(),cache: newCache);
             });
@@ -1153,7 +1207,7 @@ await Task.WhenAll(
                 ids.AddRange(performed.cache.Ids2);
                 ids.AddRange(performed.cache.Ids3);
                 ids.AddRange(performed.cache.Ids4);
-                return this.Context.CreateStageResultList(performed.result, hasChanges, ids.ToImmutable(), performed.cache);
+                return this.Context.CreateStageResultList(performed.result, hasChanges, ids.ToImmutable(), performed.cache, performed.cache.Hash);
             }
             else
             {
@@ -1165,7 +1219,7 @@ await Task.WhenAll(
                     var temp = await task;
                 return temp.result;
             });
-            return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutable(), cache);
+            return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutable(), cache, cache.Hash);
             }
         }
     }
@@ -1187,6 +1241,8 @@ await Task.WhenAll(
         public string[] Ids4 { get; set; }
         public TCache4 PreviouseCache4 { get; set; }
 
+
+        public string Hash {get; set;}
         public Dictionary<string, string> IdToHash { get; set; }
 
         public ConcatStageManyCache()

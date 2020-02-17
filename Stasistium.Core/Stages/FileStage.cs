@@ -59,7 +59,7 @@ namespace Stasistium.Stages
                 var result = await task;
                 id = result.result.Id;
                 hasChanges = result.result.Hash != cache?.LastHash;
-                return this.Context.CreateStageResult(result.result, hasChanges, id, result.cache);
+                return this.Context.CreateStageResult(result.result, hasChanges, id, result.cache, result.cache.LastHash);
             }
             else
             {
@@ -69,7 +69,7 @@ namespace Stasistium.Stages
                     return temp.result;
                 });
                 id = Path.GetFileName(cache.Path);
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.LastHash);
             }
 
         }

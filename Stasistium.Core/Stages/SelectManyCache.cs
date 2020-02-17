@@ -31,6 +31,6 @@ namespace Stasistium.Stages
         /// InputId to OutputIds
         /// </summary>
         public Dictionary<string, string[]> InputItemToResultItemIdLookup { get; set; }
-
+        public string Hash { get; set; }
     }
 }
