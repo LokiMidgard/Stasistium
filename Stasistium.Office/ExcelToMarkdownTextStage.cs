@@ -36,12 +36,12 @@ namespace Stasistium.Stages
             using (var stream = input.Value)
             using (var excel = new ExcelPackage(stream))
             {
-
+                excel.Compatibility.IsWorksheets1Based = false;
                 if (sheetIndex >= excel.Workbook.Worksheets.Count)
                     throw this.Context.Exception($"Sheet does not exists index: {sheetIndex} count: {excel.Workbook.Worksheets.Count}");
 
                 var sheet = excel.Workbook.Worksheets[sheetIndex];
-
+                
                 var dimension = sheet.Dimension;
 
                 if (dimension is null)
@@ -53,8 +53,8 @@ namespace Stasistium.Stages
 
                 var table = new (string value, TableAlignment alignment)[columnCount, rowCount];
 
-                for (int row = 0; row < rowCount; row++)
-                    for (int colum = 0; colum < columnCount; colum++)
+                for (int row = 1; row <= rowCount; row++)
+                    for (int colum = 1; colum <= columnCount; colum++)
                     {
                         var cell = sheet.Cells[row, colum].FirstOrDefault();
                         var alignment = cell.Style.HorizontalAlignment switch
