@@ -57,7 +57,7 @@ namespace Stasistium.Stages
                     for (int colum = 1; colum <= columnCount; colum++)
                     {
                         var cell = sheet.Cells[row, colum].FirstOrDefault();
-                        var alignment = cell.Style.HorizontalAlignment switch
+                        var alignment = cell?.Style?.HorizontalAlignment switch
                         {
                             OfficeOpenXml.Style.ExcelHorizontalAlignment.Center => TableAlignment.Center,
                             OfficeOpenXml.Style.ExcelHorizontalAlignment.Fill => TableAlignment.Center,
