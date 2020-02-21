@@ -69,7 +69,7 @@ namespace Stasistium.Stages
                             OfficeOpenXml.Style.ExcelHorizontalAlignment.Right => TableAlignment.Right,
                             _ => TableAlignment.Undefined,
                         };
-                        table[colum, row] = (cell.Value?.ToString() ?? "", alignment);
+                        table[colum, row] = (cell?.Value?.ToString() ?? "", alignment);
                     }
 
 
