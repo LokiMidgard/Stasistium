@@ -150,6 +150,19 @@ namespace Stasistium.Stages
 
                 case Blocks.TableBlock table:
                     builder.Append("<table>");
+
+                    for (int i = 0; i < table.Rows.Count; i++)
+                    {
+                        builder.Append("<tr>");
+                        for (int j = 0; j < table.Rows[i].Cells.Count; j++)
+                        {
+                            builder.Append("<td>");
+                            this.Render(builder, table.Rows[i].Cells[j].Inlines);
+                            builder.Append("</td>");
+                        }
+                        builder.Append("</tr>");
+                    }
+
                     builder.Append("</table>");
                     break;
 
