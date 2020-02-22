@@ -20,6 +20,8 @@ namespace Stasistium.Stages
         public string Name { get; }
 
         private readonly IGeneratorContext context;
+        private readonly FileInfo cacehFile;
+        private TPreviousCache? cache;
 
         public PersistStage(MultiStageBase<System.IO.Stream, TPreviousItemCache, TPreviousCache> inputList, DirectoryInfo output, GenerationOptions generatorOptions, IGeneratorContext context, string? name = null)
         {
@@ -30,34 +32,37 @@ namespace Stasistium.Stages
             this.output = output;
             this.Name = name ?? this.GetType().GetGenericTypeDefinition().Name + Guid.NewGuid().ToString();
             this.context = context.ForName(this.Name);
+
+
+            var cacheDir = this.context.ChachDir();
+            this.cacehFile = new FileInfo(Path.Combine(cacheDir.FullName, "cache"));
+            this.context.DisposeOnDispose(new Disposer(this));
         }
 
         public async Task UpdateFiles()
         {
-            var cacheDir = this.context.ChachDir();
-            var cacehFile = new FileInfo(Path.Combine(cacheDir.FullName, "cache"));
+
 
             // Read the old Cache
-            TPreviousCache? cache;
-            if (cacehFile.Exists)
+
+            if (this.cacehFile.Exists && this.cache is null)
             {
 
                 try
                 {
-                    using var stream = cacehFile.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
+                    using var stream = this.cacehFile.Open(FileMode.Open, FileAccess.Read, FileShare.Read);
                     using var compressed = this.generatorOptions.CompressCache ? new System.IO.Compression.GZipStream(stream, System.IO.Compression.CompressionMode.Decompress) as Stream : stream;
-                    cache = await JsonSerelizer.Load<TPreviousCache>(compressed).ConfigureAwait(false);
+                    this.cache = await JsonSerelizer.Load<TPreviousCache>(compressed).ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {
                     this.context.Warning("Problem Reading Cache. Will recreate from scratch.", e);
-                    cache = null;
+                    this.cache = null;
                 }
             }
-            else
-                cache = null;
 
-            var result = await this.inputList.DoIt(cache, this.generatorOptions.Token).ConfigureAwait(false);
+
+            var result = await this.inputList.DoIt(this.cache, this.generatorOptions.Token).ConfigureAwait(false);
             this.context.Logger.Info($"Cache is {(result.HasChanges ? "INVALID" : "valid")}");
             if (result.HasChanges)
             {
@@ -111,15 +116,34 @@ namespace Stasistium.Stages
                 await Task.WhenAll(tasks).ConfigureAwait(false);
 
             }
-            
-            var newCache = result.Cache;
-            // Write new cache
-            using (var stream = cacehFile.Open(FileMode.Create, FileAccess.Write, FileShare.None))
-                using (var compressed = this.generatorOptions.CompressCache ? new System.IO.Compression.GZipStream(stream, System.IO.Compression.CompressionLevel.Fastest) as Stream : stream)
-                    await JsonSerelizer.Write(newCache, compressed, !this.generatorOptions.CompressCache).ConfigureAwait(false);
 
         }
 
+        private class Disposer : IAsyncDisposable
+        {
+
+            private readonly PersistStage<TPreviousItemCache, TPreviousCache> parent;
+
+            public Disposer(PersistStage<TPreviousItemCache, TPreviousCache> parent)
+            {
+                this.parent = parent ?? throw new ArgumentNullException(nameof(parent));
+            }
+
+            public async ValueTask DisposeAsync()
+            {
+                await this.parent.PersistCache().ConfigureAwait(false);
+            }
+        }
+
+        private async Task PersistCache()
+        {
+            if (this.cache is null)
+                return;
+            // Write new cache
+            using var stream = this.cacehFile.Open(FileMode.Create, FileAccess.Write, FileShare.None);
+            using var compressed = this.generatorOptions.CompressCache ? new System.IO.Compression.GZipStream(stream, System.IO.Compression.CompressionLevel.Fastest) as Stream : stream;
+            await JsonSerelizer.Write(this.cache, compressed, !this.generatorOptions.CompressCache).ConfigureAwait(false);
+        }
     }
 
 
