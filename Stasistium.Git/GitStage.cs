@@ -53,7 +53,7 @@ namespace Stasistium.Stages
 
             // for branches we ignore the local ones. we just cloned the repo and the local one is the same as the remote.
             var refs = this.repo.Tags.Select(x => new GitRefStage(x, this.repo)).Concat(this.repo.Branches.Where(x => x.IsRemote).Select(x => new GitRefStage(x, this.repo)))
-                .Select(x => this.Context.Create(x, x.Hash, x.FrindlyName).With(source.Metadata.Add(new GitReposetoryMetadata(x.GetCommits().Select(y => new Commit(y)).ToImmutableList())))).OrderBy(x => x.Id).ToArray();
+                .Select(x => this.Context.CreateDocument(x, x.Hash, x.FrindlyName).With(source.Metadata.Add(new GitReposetoryMetadata(x.GetCommits().Select(y => new Commit(y)).ToImmutableList())))).OrderBy(x => x.Id).ToArray();
             return refs.ToImmutableList();
         }
 

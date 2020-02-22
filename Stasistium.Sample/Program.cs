@@ -11,7 +11,7 @@ namespace Stasistium.Sample
         {
             await using var context = new GeneratorContext();
 
-            var configFile = context.StageFromResult("config.json", x => x)
+            var configFile = context.StageFromResult("config ", "config.json", x => x)
                 .File()
                 .Json()
                 .For<Config>();
@@ -31,7 +31,7 @@ namespace Stasistium.Sample
             };
             var s = System.Diagnostics.Stopwatch.StartNew();
             var files = contentRepo
-                .Where(x=>true)
+                .Where(x => true)
                 .SelectMany(input =>
                     input
                     .Transform(x => x.With(x.Metadata.Add(new GitMetadata() { Name = x.Value.FrindlyName, Type = x.Value.Type })))

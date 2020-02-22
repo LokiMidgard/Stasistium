@@ -30,7 +30,7 @@ namespace Stasistium.Razor
             var provider = new FileProvider(inputList0, this.ProviderId);
 
             var hash = this.Context.GetHashForString(string.Join(",", inputList0.Select(x => x.Hash)));
-            IDocument<IFileProvider> document = this.Context.Create(provider, hash, this.ProviderId);
+            IDocument<IFileProvider> document = this.Context.CreateDocument(provider, hash, this.ProviderId);
             return Task.FromResult(document);
 
         }

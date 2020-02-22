@@ -34,7 +34,7 @@ namespace Stasistium.Test
 
                 var hasChanges = nullable is null
                     || nullable.Value.content != c.content;
-                var document = this.Context.Create(c.content, c.content, c.id);
+                var document = this.Context.CreateDocument(c.content, c.content, c.id);
                 return this.Context.CreateStageResult(document, hasChanges, document.Id, document.Hash, document.Hash);
             }).ToImmutableList();
 

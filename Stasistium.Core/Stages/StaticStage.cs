@@ -11,12 +11,13 @@ namespace Stasistium.Stages
 {
     public class StaticStage<TResult> : StageBase<TResult, string>
     {
-        private readonly string id = Guid.NewGuid().ToString();
+        private readonly string id;
         private readonly Func<TResult, string> hashFunction;
         public TResult Value { get; set; }
 
-        public StaticStage(TResult result, Func<TResult, string> hashFunction, IGeneratorContext context, string? name = null) : base(context, name)
+        public StaticStage(string id, TResult result, Func<TResult, string> hashFunction, IGeneratorContext context, string? name = null) : base(context, name)
         {
+            this.id = id;
             this.Value = result;
             this.hashFunction = hashFunction ?? throw new ArgumentNullException(nameof(hashFunction));
         }
@@ -24,7 +25,7 @@ namespace Stasistium.Stages
         protected override Task<StageResult<TResult, string>> DoInternal([AllowNull] string? cache, OptionToken options)
         {
             var contentHash = this.hashFunction(this.Value);
-            var result = this.Context.Create(this.Value, contentHash, this.id);
+            var result = this.Context.CreateDocument(this.Value, contentHash, this.id);
             return Task.FromResult(this.Context.CreateStageResult(
                 result: result,
                 cache: result.Hash,

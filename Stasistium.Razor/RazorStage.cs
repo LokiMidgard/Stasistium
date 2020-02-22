@@ -34,7 +34,7 @@ namespace Stasistium.Stages
             var render = new RazorProvider(renderer);
             var hash = this.Context.GetHashForString(string.Join(",", inputList0.Select(x => x.Hash)));
 
-            return Task.FromResult(this.Context.Create(render, hash, this.id));
+            return Task.FromResult(this.Context.CreateDocument(render, hash, this.id));
         }
     }
 

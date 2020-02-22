@@ -44,9 +44,9 @@ namespace Stasistium.Documents
             return this.BaseContext.ChachDir();
         }
 
-        public IDocument<T> Create<T>(T value, string contentHash, string id, MetadataContainer? metadata = null)
+        public IDocument<T> CreateDocument<T>(T value, string contentHash, string id, MetadataContainer? metadata = null)
         {
-            return this.BaseContext.Create(value, contentHash, id, metadata);
+            return this.BaseContext.CreateDocument(value, contentHash, id, metadata);
         }
 
         public Exception Exception(string message)
@@ -64,9 +64,9 @@ namespace Stasistium.Documents
             return this.BaseContext.GetHashForString(toHash);
         }
 
-        public StaticStage<TResult> StageFromResult<TResult>(TResult result, Func<TResult, string> hashFunction)
+        public StaticStage<TResult> StageFromResult<TResult>(string id, TResult result, Func<TResult, string> hashFunction)
         {
-            return this.BaseContext.StageFromResult(result, hashFunction);
+            return this.BaseContext.StageFromResult(id, result, hashFunction);
         }
 
         public DirectoryInfo TempDir()
@@ -163,8 +163,8 @@ namespace Stasistium.Documents
             return sb.ToString();
         }
 
-        public Stages.StaticStage<TResult> StageFromResult<TResult>(TResult result, Func<TResult, string> hashFunction)
-    => new Stages.StaticStage<TResult>(result, hashFunction, this);
+        public Stages.StaticStage<TResult> StageFromResult<TResult>(string id, TResult result, Func<TResult, string> hashFunction)
+    => new Stages.StaticStage<TResult>(id, result, hashFunction, this);
 
 
 
@@ -251,7 +251,7 @@ namespace Stasistium.Documents
         }
 
 
-        public IDocument<T> Create<T>(T value, string contentHash, string id, MetadataContainer? metadata = null)
+        public IDocument<T> CreateDocument<T>(T value, string contentHash, string id, MetadataContainer? metadata = null)
         {
             return new Document<T>(value, contentHash, id, metadata, this);
         }

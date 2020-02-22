@@ -12,14 +12,14 @@ namespace Stasistium.Documents
         DirectoryInfo TempFolder { get; }
 
         DirectoryInfo ChachDir();
-        IDocument<T> Create<T>(T value, string contentHash, string id, MetadataContainer? metadata = null);
+        IDocument<T> CreateDocument<T>(T value, string contentHash, string id, MetadataContainer? metadata = null);
         void DisposeOnDispose(IDisposable disposable);
         void DisposeOnDispose(IAsyncDisposable disposable);
         Exception Exception(string message);
         string GetHashForObject(object? value);
         string GetHashForStream(Stream toHash);
         string GetHashForString(string toHash);
-        StaticStage<TResult> StageFromResult<TResult>(TResult result, Func<TResult, string> hashFunction);
+        StaticStage<TResult> StageFromResult<TResult>(string id, TResult result, Func<TResult, string> hashFunction);
         DirectoryInfo TempDir();
         void Warning(string message, Exception? e = null);
 
