@@ -141,12 +141,12 @@ namespace Stasistium.Serelizer
 
                         case DateTime dateTime:
                             valueObject.Add("Kind", scalarKind);
-                            valueObject.Add("value", JValue.CreateString(dateTime.ToString(System.Globalization.CultureInfo.InvariantCulture)));
+                            valueObject.Add("value", JValue.CreateString($"{dateTime.Ticks.ToString(System.Globalization.CultureInfo.InvariantCulture)}|{dateTime.Kind.ToString()}"));
                             break;
 
                         case DateTimeOffset dateTime:
                             valueObject.Add("Kind", scalarKind);
-                            valueObject.Add("value", JValue.CreateString(dateTime.ToString(System.Globalization.CultureInfo.InvariantCulture)));
+                            valueObject.Add("value", JValue.CreateString($"{dateTime.Ticks.ToString(System.Globalization.CultureInfo.InvariantCulture)}|{dateTime.Offset.Ticks.ToString(System.Globalization.CultureInfo.InvariantCulture)}"));
                             break;
 
                         case TimeSpan dateTime:
@@ -266,11 +266,21 @@ namespace Stasistium.Serelizer
                     {
                         if (targetType == typeof(DateTime))
                         {
-                            value = DateTime.Parse((string)valueWrapper.Value, System.Globalization.CultureInfo.InvariantCulture);
+                            var txt = (string)valueWrapper.Value;
+                            var splited = txt.Split('|');
+                            var ticks = long.Parse(splited[0], System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture);
+                            var kind = (DateTimeKind)Enum.Parse(typeof(DateTimeKind), splited[1]);
+                            
+                            value = new DateTime(ticks, kind);
                         }
                         else if (targetType == typeof(DateTimeOffset))
                         {
-                            value = DateTimeOffset.Parse((string)valueWrapper.Value, System.Globalization.CultureInfo.InvariantCulture);
+                            var txt = (string)valueWrapper.Value;
+                            var splited = txt.Split('|');
+                            var ticks = long.Parse(splited[0], System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture);
+                            var offset = long.Parse(splited[1], System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture);
+
+                            value = new DateTimeOffset(ticks, new TimeSpan(offset));
                         }
                         else if (targetType == typeof(TimeSpan))
                         {
