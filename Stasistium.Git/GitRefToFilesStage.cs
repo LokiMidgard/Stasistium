@@ -36,7 +36,7 @@ namespace Stasistium.Stages
                     {
                         case Blob blob:
                             var document = new GitFileDocument(entry.Path, blob, this.Context, null).With(source.Metadata);
-                            document.With(document.Metadata.Add(new Metadata(source.Value.GetCommits(entry.Path).Select(x => new Commit(x)).ToImmutableList())));
+                            document = document.With(document.Metadata.Add(new Metadata(source.Value.GetCommits(entry.Path).Select(x => new Commit(x)).ToImmutableList())));
                             blobs.Add(document);
                             break;
 
