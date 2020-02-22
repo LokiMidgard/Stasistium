@@ -18,7 +18,7 @@ namespace Stasistium.Stages
         {
         }
 
-        protected override Task<ImmutableList<IDocument<Stream>>> Work(IDocument<GitRefStage> source, OptionToken options)
+        protected override async Task<ImmutableList<IDocument<Stream>>> Work(IDocument<GitRefStage> source, OptionToken options)
         {
             if (source is null)
                 throw new ArgumentNullException(nameof(source));
@@ -30,19 +30,18 @@ namespace Stasistium.Stages
 
             while (queue.TryDequeue(out var tree))
             {
-                foreach (var entry in tree)
+                var all = await Task.WhenAll(tree.Select(async entry =>
                 {
                     switch (entry.Target)
                     {
                         case Blob blob:
                             var document = new GitFileDocument(entry.Path, blob, this.Context, null).With(source.Metadata);
-                            document = document.With(document.Metadata.Add(new Metadata(source.Value.GetCommits(entry.Path).Select(x => new Commit(x)).ToImmutableList())));
-                            blobs.Add(document);
-                            break;
+                            var commits = await Task.Run(() => source.Value.GetCommits(entry.Path).Select(x => new Commit(x))).ConfigureAwait(false);
+                            document = document.With(document.Metadata.Add(new GitRefToFilesStage<TPreviousCache>.Metadata(commits.ToImmutableList())));
+                            return document as object;
 
                         case Tree subTree:
-                            queue.Enqueue(subTree);
-                            break;
+                            return subTree as object;
 
                         case GitLink link:
                             throw new NotSupportedException("Git link is not supported at the momtent");
@@ -50,10 +49,15 @@ namespace Stasistium.Stages
                         default:
                             throw new NotSupportedException($"The type {entry.Target?.GetType().FullName ?? "<NULL>"} is not supported as target");
                     }
-                }
+                })).ConfigureAwait(false);
+
+                foreach (var subTree in all.OfType<Tree>())
+                    queue.Enqueue(subTree);
+
+                blobs.AddRange(all.OfType<IDocument<Stream>>());
             }
 
-            return Task.FromResult(blobs.ToImmutable());
+            return blobs.ToImmutable();
         }
 
         public class Metadata
