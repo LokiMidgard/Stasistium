@@ -11,15 +11,15 @@ namespace Stasistium
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
-            return new GitStage<T>(input, input.Context,name);
+            return new GitStage<T>(input, input.Context, name);
         }
 
-        public static GitRefToFilesStage<T> GitRefToFiles<T>(this StageBase<GitRefStage, T> input, string? name = null)
+        public static GitRefToFilesStage<T> GitRefToFiles<T>(this StageBase<GitRefStage, T> input, bool addGitMetadata = false, string? name = null)
             where T : class
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
-            return new GitRefToFilesStage<T>(input, input.Context, name);
+            return new GitRefToFilesStage<T>(input, addGitMetadata, input.Context, name);
         }
     }
 

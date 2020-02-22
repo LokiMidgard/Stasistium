@@ -12,10 +12,11 @@ namespace Stasistium.Stages
     public class GitRefToFilesStage<TPreviousCache> : GeneratedHelper.Multiple.Simple.OutputMultiSimpleInputSingle1List0StageBase<GitRefStage, TPreviousCache, Stream>
         where TPreviousCache : class
     {
+        private readonly bool addGitMetadata;
 
-
-        public GitRefToFilesStage(StageBase<GitRefStage, TPreviousCache> input, IGeneratorContext context, string? name) : base(input, context, name)
+        public GitRefToFilesStage(StageBase<GitRefStage, TPreviousCache> input, bool addGitMetadata, IGeneratorContext context, string? name) : base(input, context, name)
         {
+            this.addGitMetadata = addGitMetadata;
         }
 
         protected override async Task<ImmutableList<IDocument<Stream>>> Work(IDocument<GitRefStage> source, OptionToken options)
@@ -36,8 +37,11 @@ namespace Stasistium.Stages
                     {
                         case Blob blob:
                             var document = new GitFileDocument(entry.Path, blob, this.Context, null).With(source.Metadata);
-                            var commits = await Task.Run(() => source.Value.GetCommits(entry.Path).Select(x => new Commit(x))).ConfigureAwait(false);
-                            document = document.With(document.Metadata.Add(new GitRefToFilesStage<TPreviousCache>.Metadata(commits.ToImmutableList())));
+                            if (addGitMetadata)
+                            {
+                                var commits = await Task.Run(() => source.Value.GetCommits(entry.Path).Select(x => new Commit(x))).ConfigureAwait(false);
+                                document = document.With(document.Metadata.Add(new GitRefToFilesStage<TPreviousCache>.Metadata(commits.ToImmutableList())));
+                            }
                             return document as object;
 
                         case Tree subTree:
