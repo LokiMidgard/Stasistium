@@ -116,7 +116,7 @@ namespace Stasistium.Stages
                 await Task.WhenAll(tasks).ConfigureAwait(false);
 
             }
-
+            this.cache = result.Cache;
         }
 
         private class Disposer : IAsyncDisposable
