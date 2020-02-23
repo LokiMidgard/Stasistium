@@ -11,3 +11,9 @@ dotnet_diagnostic.CA1716.severity = silent
 
 # CA1814: Prefer jagged arrays over multidimensional
 dotnet_diagnostic.CA1814.severity = none
+
+# CA1819: Properties should not return arrays
+dotnet_diagnostic.CA1819.severity = silent
+
+# CA2227: Collection properties should be read only
+dotnet_diagnostic.CA2227.severity = silent

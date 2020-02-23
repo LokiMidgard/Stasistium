@@ -134,14 +134,14 @@ namespace Stasistium.Stages
 
     public class OptionToken : IEquatable<OptionToken>
     {
-        public bool Refresh { get; }
+        public bool RefreshRemoteSources { get; }
         public Guid GenerationId { get; }
 
 
         internal OptionToken(bool refresh)
         {
             this.GenerationId = Guid.NewGuid();
-            this.Refresh = refresh;
+            this.RefreshRemoteSources = refresh;
         }
 
         public override bool Equals(object? obj)

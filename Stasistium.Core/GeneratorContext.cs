@@ -284,36 +284,11 @@ namespace Stasistium.Documents
 
                 this.algorithm.Dispose();
 
-                DeleteReadonly(this.TempFolder.FullName);
+                Helper.Delete.Readonly(this.TempFolder.FullName);
                 await this.logger.DisposeAsync();
                 this.disposedValue = true;
             }
 
-            static void DeleteReadonly(string directoryPath)
-            {
-                if (!Directory.Exists(directoryPath))
-                {
-                    return;
-                }
-
-                var files = Directory.GetFiles(directoryPath);
-                var directories = Directory.GetDirectories(directoryPath);
-
-                foreach (var file in files)
-                {
-                    File.SetAttributes(file, FileAttributes.Normal);
-                    File.Delete(file);
-                }
-
-                foreach (var dir in directories)
-                {
-                    DeleteReadonly(dir);
-                }
-
-                File.SetAttributes(directoryPath, FileAttributes.Normal);
-
-                Directory.Delete(directoryPath, false);
-            }
         }
         #endregion
 
@@ -321,7 +296,7 @@ namespace Stasistium.Documents
         public Exception Exception(string message)
         {
 
-            throw new NotImplementedException(message);
+            return new NotImplementedException(message);
         }
 
         public override int GetHashCode()
@@ -416,3 +391,4 @@ namespace Stasistium.Documents
         }
     }
 }
+

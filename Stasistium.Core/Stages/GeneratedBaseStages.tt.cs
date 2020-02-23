@@ -61,7 +61,7 @@ namespace Single.Simple {
 
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -158,7 +158,7 @@ namespace Multiple.Simple {
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -386,7 +386,7 @@ namespace Single.Simple {
 
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -501,7 +501,7 @@ namespace Multiple.Simple {
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -768,7 +768,7 @@ await Task.WhenAll(
 
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -915,7 +915,7 @@ await Task.WhenAll(
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -1210,7 +1210,7 @@ await Task.WhenAll(
 
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -1378,7 +1378,7 @@ await Task.WhenAll(
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -1701,7 +1701,7 @@ await Task.WhenAll(
 
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -1890,7 +1890,7 @@ await Task.WhenAll(
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -2144,7 +2144,7 @@ namespace Single.Simple {
                 this.Context.Logger.Info($"Found Changes for input with id: {inputSingle0Result.Id}");
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -2253,7 +2253,7 @@ namespace Multiple.Simple {
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -2510,7 +2510,7 @@ namespace Single.Simple {
 
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -2647,7 +2647,7 @@ namespace Multiple.Simple {
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -2935,7 +2935,7 @@ await Task.WhenAll(
 
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -3096,7 +3096,7 @@ await Task.WhenAll(
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -3412,7 +3412,7 @@ await Task.WhenAll(
 
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -3594,7 +3594,7 @@ await Task.WhenAll(
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -3938,7 +3938,7 @@ await Task.WhenAll(
 
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -4141,7 +4141,7 @@ await Task.WhenAll(
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -4424,7 +4424,7 @@ namespace Single.Simple {
                 this.Context.Logger.Info($"Found Changes for input with id: {inputSingle1Result.Id}");
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -4555,7 +4555,7 @@ namespace Multiple.Simple {
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -4833,7 +4833,7 @@ namespace Single.Simple {
 
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -4984,7 +4984,7 @@ namespace Multiple.Simple {
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -5293,7 +5293,7 @@ await Task.WhenAll(
 
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -5468,7 +5468,7 @@ await Task.WhenAll(
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -5805,7 +5805,7 @@ await Task.WhenAll(
 
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -6001,7 +6001,7 @@ await Task.WhenAll(
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -6366,7 +6366,7 @@ await Task.WhenAll(
 
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -6583,7 +6583,7 @@ await Task.WhenAll(
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -6887,7 +6887,7 @@ namespace Single.Simple {
                 this.Context.Logger.Info($"Found Changes for input with id: {inputSingle2Result.Id}");
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -7032,7 +7032,7 @@ namespace Multiple.Simple {
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -7331,7 +7331,7 @@ namespace Single.Simple {
 
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -7496,7 +7496,7 @@ namespace Multiple.Simple {
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -7826,7 +7826,7 @@ await Task.WhenAll(
 
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -8015,7 +8015,7 @@ await Task.WhenAll(
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -8373,7 +8373,7 @@ await Task.WhenAll(
 
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -8583,7 +8583,7 @@ await Task.WhenAll(
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -8969,7 +8969,7 @@ await Task.WhenAll(
 
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -9200,7 +9200,7 @@ await Task.WhenAll(
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -9525,7 +9525,7 @@ namespace Single.Simple {
                 this.Context.Logger.Info($"Found Changes for input with id: {inputSingle3Result.Id}");
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -9684,7 +9684,7 @@ namespace Multiple.Simple {
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -10004,7 +10004,7 @@ namespace Single.Simple {
 
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -10183,7 +10183,7 @@ namespace Multiple.Simple {
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -10534,7 +10534,7 @@ await Task.WhenAll(
 
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -10737,7 +10737,7 @@ await Task.WhenAll(
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -11116,7 +11116,7 @@ await Task.WhenAll(
 
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -11340,7 +11340,7 @@ await Task.WhenAll(
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -11747,7 +11747,7 @@ await Task.WhenAll(
 
 ;
             var id = cache?.Id;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null || id is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null || id is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes
@@ -11992,7 +11992,7 @@ await Task.WhenAll(
 ;
 
             var ids = cache?.Ids;
-            if (hasChanges || (this.updateOnRefresh && options.Refresh) || cache is null)
+            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources) || cache is null)
             {
                 // if we should refresh we need to update the repo or if the previous input was different
                 // we need to perform the network operation to ensure we have no changes

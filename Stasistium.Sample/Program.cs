@@ -17,10 +17,10 @@ namespace Stasistium.Sample
                 .For<Config>();
 
             var contentRepo = configFile.Transform(x => x.With(x.Value.ContentRepo, x.Value.ContentRepo))
-                .GitModul();
+                .GitClone();
 
             var schemaRepo = configFile.Transform(x => x.With(x.Value.SchemaRepo, x.Value.SchemaRepo).With(x.Metadata.Add(new HostMetadata() { Host = x.Value.Host })))
-                .GitModul();
+                .GitClone();
 
             var layoutProvider = configFile.Transform(x => x.With(x.Value.Layouts, x.Value.Layouts)).FileSystem().FileProvider("Layout");
 
