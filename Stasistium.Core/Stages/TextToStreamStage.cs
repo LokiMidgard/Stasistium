@@ -16,7 +16,7 @@ namespace Stasistium.Stages
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
-            var output = input.With(() => new MemoryStream(System.Text.Encoding.UTF8.GetBytes(input.Value)), input.Hash);
+            var output = input.With(() => new MemoryStream(System.Text.Encoding.UTF8.GetBytes(input.Value)), this.Context.GetHashForString(input.Value));
             return Task.FromResult<IDocument<Stream>>(output);
         }
     }
