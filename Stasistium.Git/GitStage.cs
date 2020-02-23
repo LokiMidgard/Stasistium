@@ -34,20 +34,13 @@ namespace Stasistium.Stages
 
                 Repository repo;
                 DirectoryInfo workingDir;
-                DirectoryInfo? oldWorkignDir;
-
-                if (cache?.WorkingDir != null)
-                    oldWorkignDir = new DirectoryInfo(cache.WorkingDir);
-                else
-                    oldWorkignDir = null;
 
 
-
-                if (cache != null && source.Value == cache.PreviousSource && (oldWorkignDir?.Exists ?? false))
+                if (cache != null && source.Value == cache.PreviousSource && cache.Repo != null)
                 {
 
-                    repo = new Repository(oldWorkignDir.FullName);
-                    workingDir = oldWorkignDir;
+                    repo = cache.Repo;
+                    workingDir = new DirectoryInfo(cache.WorkingDir);
                     if (options.RefreshRemoteSources)
                     {
                         // The git library is nor thread save, so we should not paralize this!
@@ -93,7 +86,8 @@ namespace Stasistium.Stages
             bool hasChanges;
             GitCache<T> newCache;
 
-            if (result.HasChanges || cache is null)
+
+            if (result.HasChanges || cache is null || cache.Repo is null)
             {
                 var temp = await task;
                 newCache = temp.newCache;
@@ -137,6 +131,7 @@ namespace Stasistium.Stages
             this.Hash = hash;
             this.Ids = ids ?? throw new ArgumentNullException(nameof(ids));
             this.IdToHash = idToHash ?? throw new ArgumentNullException(nameof(idToHash));
+
 #pragma warning disable CA2000 // Dispose objects before losing scope
             context.DisposeOnDispose(new Disposer(this));
 #pragma warning restore CA2000 // Dispose objects before losing scope
@@ -159,6 +154,7 @@ namespace Stasistium.Stages
                 this.parent.Repo = null;
             }
         }
+
 
         public T PreviousCache { get; set; }
         public string PreviousSource { get; set; }
