@@ -43,7 +43,7 @@ namespace Stasistium.Stages
 
 
 
-                if (cache != null && source.Value == cache.PreviousSource && oldWorkignDir != null)
+                if (cache != null && source.Value == cache.PreviousSource && (oldWorkignDir?.Exists ?? false))
                 {
 
                     repo = new Repository(oldWorkignDir.FullName);
