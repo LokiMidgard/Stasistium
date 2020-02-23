@@ -34,11 +34,20 @@ namespace Stasistium.Stages
 
                 Repository repo;
                 DirectoryInfo workingDir;
-                if (cache != null && source.Value == cache.PreviousSource && cache.Repo != null)
+                DirectoryInfo? oldWorkignDir;
+
+                if (cache?.WorkingDir != null)
+                    oldWorkignDir = new DirectoryInfo(cache.WorkingDir);
+                else
+                    oldWorkignDir = null;
+
+
+
+                if (cache != null && source.Value == cache.PreviousSource && oldWorkignDir != null)
                 {
 
-                    repo = cache.Repo;
-                    workingDir = new DirectoryInfo(cache.WorkingDir ?? throw new InvalidOperationException("the working dir should exist if repo does."));
+                    repo = new Repository(oldWorkignDir.FullName);
+                    workingDir = oldWorkignDir;
                     if (options.RefreshRemoteSources)
                     {
                         // The git library is nor thread save, so we should not paralize this!
@@ -84,8 +93,7 @@ namespace Stasistium.Stages
             bool hasChanges;
             GitCache<T> newCache;
 
-            // we need to update the cache and can't use the old one since wie store the repo in it that will not serelized
-            //if (result.HasChanges || cache is null)
+            if (result.HasChanges || cache is null)
             {
                 var temp = await task;
                 newCache = temp.newCache;
@@ -93,11 +101,11 @@ namespace Stasistium.Stages
                     || cache.Hash != newCache.Hash
                     || temp.result.Any(x => x.HasChanges);
             }
-            //else
-            //{
-            //    hasChanges = false;
-            //    newCache = cache;
-            //}
+            else
+            {
+                hasChanges = false;
+                newCache = cache;
+            }
 
 
             var actualTask = LazyTask.Create(async () => { return (await task).result; });
@@ -108,22 +116,16 @@ namespace Stasistium.Stages
     public class GitCache<T>
         where T : class
     {
-        private readonly string createdBy;
         internal Repository? Repo { get; private set; }
 
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         [Obsolete("Only for Deserialisation", true)]
-        public GitCache()
-        {
-            this.createdBy = "Serelisation";
-        }
+        public GitCache() { }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
 
         public GitCache(Repository repo, T previousCache, string previousSource, string workingDir, string hash, string[] ids, Dictionary<string, string> idToHash, IGeneratorContext context)
         {
-            this.createdBy = "Normal";
-
             if (string.IsNullOrEmpty(hash))
                 throw new ArgumentException("message", nameof(hash));
             if (context is null)
