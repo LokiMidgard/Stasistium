@@ -55,7 +55,7 @@ namespace Stasistium.Stages
 
                 var callculated = list.Select(file =>
                 {
-                    var id = Path.GetRelativePath(root.FullName, file.FullName);
+                    var id = Path.GetRelativePath(root.FullName, file.FullName).Replace('\\', '/');
                     var writeTime = file.LastWriteTimeUtc;
 
                     if (cache is null || !cache.PathToWriteTime.TryGetValue(id, out var lastWriteTime))
