@@ -38,7 +38,7 @@ namespace Stasistium.Stages
                 {
 
                     repo = cache.Repo;
-                    workingDir = cache.WorkingDir ?? throw new InvalidOperationException("the working dir should exist if repo does.");
+                    workingDir = new DirectoryInfo(cache.WorkingDir ?? throw new InvalidOperationException("the working dir should exist if repo does."));
                     if (options.RefreshRemoteSources)
                     {
                         // The git library is nor thread save, so we should not paralize this!
@@ -54,7 +54,7 @@ namespace Stasistium.Stages
                         if (cache.WorkingDir is null)
                             throw new InvalidOperationException("the working dir should exist if repo does.");
                         cache.Repo.Dispose();
-                        Delete.Readonly(cache.WorkingDir.FullName);
+                        Delete.Readonly(cache.WorkingDir);
                     }
 
                     workingDir = this.Context.TempDir();
@@ -76,7 +76,7 @@ namespace Stasistium.Stages
 
                 var hash = this.Context.GetHashForObject(refs.Select(x => x.Hash));
 
-                var newCache = new GitCache<T>(repo, result.Cache, source.Value, workingDir, hash, refs.Select(x => x.Id).ToArray(), refs.ToDictionary(x => x.Id, x => x.Hash), this.Context);
+                var newCache = new GitCache<T>(repo, result.Cache, source.Value, workingDir.FullName, hash, refs.Select(x => x.Id).ToArray(), refs.ToDictionary(x => x.Id, x => x.Hash), this.Context);
 
                 return (result: refs.ToImmutableList(), newCache);
             });
@@ -115,7 +115,7 @@ namespace Stasistium.Stages
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
 
-        public GitCache(Repository repo, T previousCache, string previousSource, DirectoryInfo workingDir, string hash, string[] ids, Dictionary<string, string> idToHash, IGeneratorContext context)
+        public GitCache(Repository repo, T previousCache, string previousSource, string workingDir, string hash, string[] ids, Dictionary<string, string> idToHash, IGeneratorContext context)
         {
             if (string.IsNullOrEmpty(hash))
                 throw new ArgumentException("message", nameof(hash));
@@ -153,7 +153,7 @@ namespace Stasistium.Stages
 
         public T PreviousCache { get; set; }
         public string PreviousSource { get; set; }
-        public DirectoryInfo WorkingDir { get; set; }
+        public string WorkingDir { get; set; }
         public string Hash { get; set; }
         public string[] Ids { get; set; }
         public Dictionary<string, string> IdToHash { get; set; }
