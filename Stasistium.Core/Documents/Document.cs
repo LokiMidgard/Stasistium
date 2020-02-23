@@ -50,9 +50,9 @@ namespace Stasistium.Documents
 
         public IDocument<TNew> With<TNew>(TNew newItem, string newHash) => new Document<TNew>(newItem, newHash, this.Id, this.Metadata, this.Context);
         public IDocument<TNew> With<TNew>(Func<TNew> newItem, string newHash) => new DocumentLazy<TNew>(newItem, newHash, this.Id, this.Metadata, this.Context);
-        public IDocument<T> With(MetadataContainer metadata) => new DocumentLazy<T>(this.valueCallback, this.Hash, this.Id, metadata, this.Context);
+        public IDocument<T> With(MetadataContainer metadata) => new DocumentLazy<T>(this.valueCallback, this.ContentHash, this.Id, metadata, this.Context);
         IDocument IDocument.With(MetadataContainer metadata) => this.With(metadata);
-        public IDocument<T> WithId(string id) => new DocumentLazy<T>(this.valueCallback, this.Hash, id, this.Metadata, this.Context);
+        public IDocument<T> WithId(string id) => new DocumentLazy<T>(this.valueCallback, this.ContentHash, id, this.Metadata, this.Context);
         IDocument IDocument.WithId(string id) => this.WithId(id);
     }
 
@@ -68,9 +68,9 @@ namespace Stasistium.Documents
 
         public IDocument<TNew> With<TNew>(TNew newItem, string newHash) => new Document<TNew>(newItem, newHash, this.Id, this.Metadata, this.Context);
         public IDocument<TNew> With<TNew>(Func<TNew> newItem, string newHash) => new DocumentLazy<TNew>(newItem, newHash, this.Id, this.Metadata, this.Context);
-        public IDocument<T> With(MetadataContainer metadata) => new Document<T>(this.Value, this.Hash, this.Id, metadata, this.Context);
+        public IDocument<T> With(MetadataContainer metadata) => new Document<T>(this.Value, this.ContentHash, this.Id, metadata, this.Context);
         IDocument IDocument.With(MetadataContainer metadata) => this.With(metadata);
-        public IDocument<T> WithId(string id) => new Document<T>(this.Value, this.Hash, id, this.Metadata, this.Context);
+        public IDocument<T> WithId(string id) => new Document<T>(this.Value, this.ContentHash, id, this.Metadata, this.Context);
         IDocument IDocument.WithId(string id) => this.WithId(id);
 
     }
