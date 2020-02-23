@@ -84,7 +84,8 @@ namespace Stasistium.Stages
             bool hasChanges;
             GitCache<T> newCache;
 
-            if (result.HasChanges || cache is null)
+            // we need to update the cache and can't use the old one since wie store the repo in it that will not serelized
+            //if (result.HasChanges || cache is null)
             {
                 var temp = await task;
                 newCache = temp.newCache;
@@ -92,11 +93,11 @@ namespace Stasistium.Stages
                     || cache.Hash != newCache.Hash
                     || temp.result.Any(x => x.HasChanges);
             }
-            else
-            {
-                hasChanges = false;
-                newCache = cache;
-            }
+            //else
+            //{
+            //    hasChanges = false;
+            //    newCache = cache;
+            //}
 
 
             var actualTask = LazyTask.Create(async () => { return (await task).result; });
