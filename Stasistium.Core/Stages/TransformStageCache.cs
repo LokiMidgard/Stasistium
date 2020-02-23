@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Stasistium.Documents;
+using System.Collections.Generic;
 
 namespace Stasistium.Stages
 {
@@ -6,10 +7,10 @@ namespace Stasistium.Stages
 #pragma warning disable CA1819 // Properties should not return arrays
 #pragma warning disable CA2227 // Collection properties should be read only
     [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-    public class TransformStageCache<TInCache>
+    public class TransformStageCache<TInCache>: IHavePreviousCache<TInCache>
         where TInCache : class
     {
-        public TInCache ParentCache { get; set; }
+        public TInCache PreviousCache  { get; set; }
 
         public string[] OutputIdOrder { get; set; }
         public Dictionary<string, string> Transformed { get; set; }

@@ -70,19 +70,7 @@ namespace Stasistium.Stages
                         }
 
                         var pipeDone = await pipe.@out.DoIt(lastCache, options).ConfigureAwait(false);
-
-                        if (pipeDone.HasChanges)
-                        {
-                            var itemResult = await pipeDone.Perform;
-                            var itemCache = pipeDone.Cache;
-
-                            return (result: this.Context.CreateStageResultList(itemResult, true, itemResult.Select(x => x.Id).ToImmutableList(), itemCache, pipeDone.Hash), lastCache: itemCache, key: x.Key);
-                        }
-                        else
-                        {
-                            return (result: this.Context.CreateStageResultList(pipeDone.Perform, false, pipeDone.Ids, pipeDone.Cache, pipeDone.Hash), lastCache: lastCache, key: x.Key);
-
-                        }
+                        return (result: pipeDone, lastCache: pipeDone.Cache, key: x.Key);
                     })).ConfigureAwait(false);
 
 
@@ -123,7 +111,7 @@ namespace Stasistium.Stages
                     hasChanges = true;
                 if (!hasChanges)
                     this.Context.Logger.Info($"No longer has Changes");
-                return this.Context.CreateStageResultList(work, hasChanges, ids, newCache, newCache.Hash);
+                return this.Context.CreateStageResultList(work, hasChanges, ids, newCache, newCache.Hash, input.Cache);
             }
             else
             {
@@ -136,7 +124,7 @@ namespace Stasistium.Stages
                     return temp.finishedList;
                 });
 
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids, cache, cache.Hash);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids, cache, cache.Hash, input.Cache);
             }
         }
 
@@ -184,10 +172,10 @@ namespace Stasistium.Stages
                         {
                             var currentResult = await input.Perform;
                             var currentCache = input.Cache;
-                            return this.Context.CreateStageResult(currentResult, input.HasChanges, currentResult.Id, currentCache, input.Hash);
+                            return input;
                         }
                         else
-                            return this.Context.CreateStageResult(input.Perform, input.HasChanges, input.Id, input.Cache, input.Hash);
+                            return input;
                     })).ConfigureAwait(false);
 
                     var newCache = new StartCache<TInputCache, TKey>()
@@ -216,7 +204,7 @@ namespace Stasistium.Stages
                     if (!hasChanges)
                         this.Context.Logger.Info($"No longer has changes for Key {this.key}");
 
-                    return this.Context.CreateStageResultList(result, hasChanges, ids, newCache, newCache.Hash);
+                    return this.Context.CreateStageResultList(result, hasChanges, ids, newCache, newCache.Hash, input.Cache);
 
                 }
                 else
@@ -227,7 +215,7 @@ namespace Stasistium.Stages
                         var temp = await task;
                         return temp.Item1;
                     });
-                    return this.Context.CreateStageResultList(actualTask, hasChanges, ids, cache, cache.Hash);
+                    return this.Context.CreateStageResultList(actualTask, hasChanges, ids, cache, cache.Hash, input.Cache);
                 }
             }
 
@@ -237,7 +225,7 @@ namespace Stasistium.Stages
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 #pragma warning disable CA2227 // Collection properties should be read only
 #pragma warning disable CA1819 // Properties should not return arrays
-        public class GroupByCache
+        public class GroupByCache : IHavePreviousCache<TInputCache>
         {
             public TInputCache PreviousCache { get; set; }
             /// <summary>
@@ -267,7 +255,8 @@ namespace Stasistium.Stages
 
     }
 
-    public class StartCache<TInputCache, TKey>
+    public class StartCache<TInputCache, TKey> : IHavePreviousCache<TInputCache>
+        where TInputCache : class
     {
         public TInputCache PreviousCache { get; set; }
         public Dictionary<string, TKey> InputIdToKey { get; set; }

@@ -1,10 +1,12 @@
-﻿using Stasistium.Stages;
+﻿using Stasistium.Core;
+using Stasistium.Stages;
 using System;
+using System.Collections.Immutable;
 using System.IO;
 
 namespace Stasistium.Documents
 {
-    public interface IGeneratorContext : IAsyncDisposable, IEquatable<IGeneratorContext>
+    public partial interface IGeneratorContext : IAsyncDisposable, IEquatable<IGeneratorContext>
     {
         DirectoryInfo CacheFolder { get; }
         MetadataContainer EmptyMetadata { get; }
@@ -22,7 +24,7 @@ namespace Stasistium.Documents
         StaticStage<TResult> StageFromResult<TResult>(string id, TResult result, Func<TResult, string> hashFunction);
         DirectoryInfo TempDir();
         void Warning(string message, Exception? e = null);
-
+                
         internal IGeneratorContext ForName(string name)
         {
             if (this is IGeneratorContext context)
@@ -32,4 +34,5 @@ namespace Stasistium.Documents
             throw new NotSupportedException("This Context is not supported.");
         }
     }
+
 }

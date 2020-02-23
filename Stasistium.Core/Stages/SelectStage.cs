@@ -10,13 +10,13 @@ using Stasistium.Stages;
 
 namespace Stasistium.Stages
 {
-    public class SelectStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache> : MultiStageBase<TResult, TItemCache, SelectCache<TInputCache, TItemCache>>
+    public class SelectStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache> : MultiStageBase<TResult, GeneratedHelper.CacheId<string, TItemCache>, SelectCache<TInputCache, TItemCache>>
     where TItemCache : class
     where TInputItemCache : class
     where TInputCache : class
     {
 
-        private readonly System.Collections.Concurrent.ConcurrentDictionary<string, (Start @in, StageBase<TResult, TItemCache> @out)> startLookup = new System.Collections.Concurrent.ConcurrentDictionary<string, (Start @in, StageBase<TResult, TItemCache> @out)>();
+        private readonly System.Collections.Concurrent.ConcurrentDictionary<string, (Start @in, End<TResult, TItemCache> @out)> startLookup = new System.Collections.Concurrent.ConcurrentDictionary<string, (Start @in, End<TResult, TItemCache> @out)>();
 
         private readonly Func<StageBase<TInput, StartCache<TInputCache>>, StageBase<TResult, TItemCache>> createPipline;
 
@@ -28,7 +28,7 @@ namespace Stasistium.Stages
             this.createPipline = createPipline ?? throw new ArgumentNullException(nameof(createPipline));
         }
 
-        protected override async Task<StageResultList<TResult, TItemCache, SelectCache<TInputCache, TItemCache>>> DoInternal([AllowNull] SelectCache<TInputCache, TItemCache>? cache, OptionToken options)
+        protected override async Task<StageResultList<TResult, GeneratedHelper.CacheId<string, TItemCache>, SelectCache<TInputCache, TItemCache>>> DoInternal([AllowNull] SelectCache<TInputCache, TItemCache>? cache, OptionToken options)
         {
             var input = await this.input.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
 
@@ -42,11 +42,11 @@ namespace Stasistium.Stages
                     var pipe = this.startLookup.GetOrAdd(item.Id, id =>
                     {
                         var start = new Start(this, id, this.Context);
-                        var end = this.createPipline(start);
+                        var end = new End<TResult, TItemCache>(this.createPipline(start), this.Context);
                         return (start, end);
                     });
 
-                    if (cache == null || !cache.InputItemCacheLookup.TryGetValue(item.Id, out TItemCache? lastCache) || !cache.InputItemHashLookup.TryGetValue(item.Id, out string? lastHash) || !cache.InputItemOutputIdLookup.TryGetValue(item.Id, out string? lastOutputId))
+                    if (cache == null || !cache.InputItemCacheLookup.TryGetValue(item.Id, out GeneratedHelper.CacheId<string, TItemCache>? lastCache) || !cache.InputItemHashLookup.TryGetValue(item.Id, out string? lastHash) || !cache.InputItemOutputIdLookup.TryGetValue(item.Id, out string? lastOutputId))
                     {
                         lastCache = null;
                         lastHash = null;
@@ -54,20 +54,7 @@ namespace Stasistium.Stages
                     }
                     var pipeDone = await pipe.@out.DoIt(lastCache, options).ConfigureAwait(false);
 
-                    if (pipeDone.HasChanges)
-                    {
-                        var itemResult = await pipeDone.Perform;
-                        var itemCache = pipeDone.Cache;
-                        return (result: this.Context.CreateStageResult(itemResult, itemResult.Hash != lastHash, itemResult.Id, itemCache, pipeDone.Hash), inputId: item.Id);
-                    }
-                    else
-                    {
-                        if (lastOutputId is null)
-                            throw new InvalidOperationException("This should not happen.");
-
-                        return (result: this.Context.CreateStageResult(pipeDone.Perform, false, lastOutputId, pipeDone.Cache, pipeDone.Hash), inputId: item.Id);
-
-                    }
+                    return (result: pipeDone, inputId: item.Id);
                 })).ConfigureAwait(false);
 
 
@@ -99,7 +86,7 @@ namespace Stasistium.Stages
                     hasChanges = !newCache.OutputIdOrder.SequenceEqual(cache.OutputIdOrder) || work.Any(x => x.HasChanges);
                 }
 
-                return this.Context.CreateStageResultList(work, hasChanges, ids.ToImmutableList(), newCache, newCache.Hash);
+                return this.Context.CreateStageResultList(work, hasChanges, ids.ToImmutableList(), newCache, newCache.Hash, input.Cache);
             }
             else
             {
@@ -109,10 +96,22 @@ namespace Stasistium.Stages
                     return temp.Item1;
                 });
 
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutableList(), cache, cache.Hash);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutableList(), cache, cache.Hash, input.Cache);
             }
         }
 
+        private class End<T, TPreviousCache> : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple1List0StageBase<T, TPreviousCache, T>
+            where TPreviousCache : class
+        {
+            public End(StageBase<T, TPreviousCache> inputSingle0, IGeneratorContext context, string? name = null) : base(inputSingle0, context, name)
+            {
+            }
+
+            protected override Task<IDocument<T>> Work(IDocument<T> inputSingle0, OptionToken options)
+            {
+                return Task.FromResult(inputSingle0);
+            }
+        }
         private class Start : StageBase<TInput, StartCache<TInputCache>>
         {
             private readonly SelectStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache> parent;
@@ -158,7 +157,7 @@ namespace Stasistium.Stages
                         var result = await task;
                         id = result.result.Id;
                         hasChanges = cache is null || result.result.Hash != cache.Hash;
-                        return this.Context.CreateStageResult(result.result, hasChanges, id, result.newCache, result.newCache.Hash);
+                        return this.Context.CreateStageResult(result.result, hasChanges, id, result.newCache, result.newCache.Hash, input.Cache);
                     }
                     else
                     {
@@ -180,7 +179,7 @@ namespace Stasistium.Stages
                     return tmep.result;
                 });
 
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Hash);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Hash, input.Cache);
             }
 
 
@@ -191,7 +190,8 @@ namespace Stasistium.Stages
 
 
 
-    public class StartCache<TInputCache>
+    public class StartCache<TInputCache> : IHavePreviousCache<TInputCache>
+        where TInputCache : class
     {
         public TInputCache PreviousCache { get; set; }
         public string Id { get; set; }

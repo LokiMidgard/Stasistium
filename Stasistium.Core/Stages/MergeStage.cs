@@ -31,8 +31,8 @@ namespace Stasistium.Stages
 
         protected override async Task<StageResultList<TOut, string, MergeCache<TInputCache1, TInputCache2>>> DoInternal([AllowNull] MergeCache<TInputCache1, TInputCache2>? cache, OptionToken options)
         {
-            var inputReadyToPerform = await this.input1.DoIt(cache?.Cache1, options).ConfigureAwait(false);
-            var inputSingle = await this.input2.DoIt(cache?.Cache2, options).ConfigureAwait(false);
+            var inputReadyToPerform = await this.input1.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle = await this.input2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
 
             var task = LazyTask.Create(async () =>
             {
@@ -61,7 +61,7 @@ namespace Stasistium.Stages
                         if (cache == null || cache.OutputIdToHash.TryGetValue(currentId, out string? oldHash))
                             oldHash = null;
                         currentItemHashChanges = oldHash != newItemCache;
-                        return (result: this.Context.CreateStageResult(performing, currentItemHashChanges, currentId, newItemCache, newItemCache), inputId: currentItem.Id);
+                        return (result: StageResult.CreateStageResult(this.Context, performing, currentItemHashChanges, currentId, newItemCache, newItemCache), inputId: currentItem.Id);
                     }
                     else
                     {
@@ -72,7 +72,7 @@ namespace Stasistium.Stages
                             var temp = await currentTask;
                             return temp.result;
                         });
-                        return (result: this.Context.CreateStageResult(actualCurrentTask, currentItemHashChanges, currentId, itemHash, itemHash), inputId: currentItem.Id);
+                        return (result: StageResult.CreateStageResult(this.Context, actualCurrentTask, currentItemHashChanges, currentId, itemHash, itemHash), inputId: currentItem.Id);
                     }
 
 
@@ -86,13 +86,13 @@ namespace Stasistium.Stages
                 }
                 else
                 {
-                    singleCache = cache.Cache2;
+                    singleCache = cache.PreviousCache2;
                 }
 
                 var newCache = new MergeCache<TInputCache1, TInputCache2>()
                 {
-                    Cache1 = inputListCache,
-                    Cache2 = singleCache,
+                    PreviousCache = inputListCache,
+                    PreviousCache2 = singleCache,
                     InputIdToOutputId = results.ToDictionary(x => x.inputId, x => x.result.Id),
                     OutputIdToHash = results.ToDictionary(x => x.result.Id, x => x.result.Hash),
                     DocumentIds = results.Select(x => x.result.Id).ToArray(),
@@ -114,7 +114,7 @@ namespace Stasistium.Stages
                     hasChanges = perform.Item1.Any(x => x.HasChanges)
                         || cache.DocumentIds.SequenceEqual(documentIds);
                 }
-                return this.Context.CreateStageResultList(perform.Item1, hasChanges, documentIds, perform.newCache, perform.newCache.Hash);
+                return this.Context.CreateStageResultList(perform.Item1, hasChanges, documentIds, perform.newCache, perform.newCache.Hash, inputReadyToPerform.Cache, inputSingle.Cache);
             }
             else
             {
@@ -125,7 +125,7 @@ namespace Stasistium.Stages
                     return temp.Item1;
                 });
 
-                return this.Context.CreateStageResultList(actualTask, hasChanges, documentIds, cache, cache.Hash);
+                return this.Context.CreateStageResultList(actualTask, hasChanges, documentIds, cache, cache.Hash, inputReadyToPerform.Cache, inputSingle.Cache);
             }
 
         }
@@ -134,10 +134,12 @@ namespace Stasistium.Stages
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 #pragma warning disable CA1819 // Properties should not return arrays
 #pragma warning disable CA2227 // Collection properties should be read only
-    public class MergeCache<TInputCache1, TInputCache2>
+    public class MergeCache<TInputCache1, TInputCache2> : IHavePreviousCache<TInputCache1, TInputCache2>
+        where TInputCache1 : class
+        where TInputCache2 : class
     {
-        public TInputCache1 Cache1 { get; set; }
-        public TInputCache2 Cache2 { get; set; }
+        public TInputCache1 PreviousCache { get; set; }
+        public TInputCache2 PreviousCache2 { get; set; }
 
         public Dictionary<string, string> InputIdToOutputId { get; set; }
         public Dictionary<string, string> OutputIdToHash { get; set; }

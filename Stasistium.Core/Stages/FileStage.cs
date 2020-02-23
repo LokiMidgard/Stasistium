@@ -24,7 +24,7 @@ namespace Stasistium.Stages
         {
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
-            var input = await this.input.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var input = await this.input.DoIt(cache?.PreviousCache , options).ConfigureAwait(false);
 
             var task = LazyTask.Create(async () =>
             {
@@ -38,7 +38,7 @@ namespace Stasistium.Stages
                 var fileStageCache = new FileStageCache<TInCache>()
                 {
                     Path = file.FullName,
-                    PreviousCache = input.Cache,
+                    PreviousCache  = input.Cache,
                     LastWriteTimeUtc = file.LastWriteTimeUtc,
                     LastHash = document.Hash
                 };
@@ -59,7 +59,7 @@ namespace Stasistium.Stages
                 var result = await task;
                 id = result.result.Id;
                 hasChanges = result.result.Hash != cache?.LastHash;
-                return this.Context.CreateStageResult(result.result, hasChanges, id, result.cache, result.cache.LastHash);
+                return this.Context.CreateStageResult(result.result, hasChanges, id, result.cache, result.cache.LastHash, input.Cache);
             }
             else
             {
@@ -69,7 +69,7 @@ namespace Stasistium.Stages
                     return temp.result;
                 });
                 id = Path.GetFileName(cache.Path);
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.LastHash);
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.LastHash, input.Cache);
             }
 
         }
@@ -77,9 +77,10 @@ namespace Stasistium.Stages
     }
 
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-    public class FileStageCache<T>
+    public class FileStageCache<T> : IHavePreviousCache<T>
+        where T : class
     {
-        public T PreviousCache { get; set; }
+        public T PreviousCache  { get; set; }
 
         public DateTime LastWriteTimeUtc { get; set; }
         public string Path { get; set; }

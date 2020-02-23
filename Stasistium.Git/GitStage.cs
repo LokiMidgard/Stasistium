@@ -79,7 +79,7 @@ namespace Stasistium.Stages
                     {
                         if (cache is null || !cache.IdToHash.TryGetValue(x.Id, out string? oldHash))
                             oldHash = null;
-                        return this.Context.CreateStageResult(x, x.Hash != oldHash, x.Id, x.Hash, x.Hash);
+                        return StageResult.CreateStageResult(this.Context, x, x.Hash != oldHash, x.Id, x.Hash, x.Hash);
                     })
                     .ToArray();
 
@@ -109,11 +109,11 @@ namespace Stasistium.Stages
 
 
             var actualTask = LazyTask.Create(async () => { return (await task).result; });
-            return this.Context.CreateStageResultList(actualTask, hasChanges, newCache.Ids.ToImmutableList(), newCache, newCache.Hash);
+            return this.Context.CreateStageResultList(actualTask, hasChanges, newCache.Ids.ToImmutableList(), newCache, newCache.Hash, result.Cache);
         }
     }
 
-    public class GitCache<T>
+    public class GitCache<T> : IHavePreviousCache<T>
         where T : class
     {
         internal Repository? Repo { get; private set; }

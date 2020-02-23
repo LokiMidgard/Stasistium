@@ -27,7 +27,7 @@ namespace Stasistium.Stages
         {
 
 
-            var input = await this.input.DoIt(cache?.ParentCache, options).ConfigureAwait(false);
+            var input = await this.input.DoIt(cache?.PreviousCache , options).ConfigureAwait(false);
 
             var task = LazyTask.Create(async () =>
             {
@@ -65,7 +65,7 @@ namespace Stasistium.Stages
                 var newCache = new WhereStageCache<TInCache>()
                 {
                     OutputIdOrder = list.Select(x => x.Id).ToArray(),
-                    ParentCache = input.Cache,
+                    PreviousCache  = input.Cache,
                     Hash = this.Context.GetHashForObject(list.Select(x => x.Hash))
                 };
                 return (result: list.ToImmutableList(), cache: newCache);
@@ -91,7 +91,7 @@ namespace Stasistium.Stages
                             hasChanges = true;
                     }
                 }
-                return this.Context.CreateStageResultList(list, hasChanges, c.OutputIdOrder.ToImmutableList(), c, this.Context.GetHashForObject(list.Select(x => x.Hash)));
+                return this.Context.CreateStageResultList(list, hasChanges, c.OutputIdOrder.ToImmutableList(), c, this.Context.GetHashForObject(list.Select(x => x.Hash)), input.Cache);
 
             }
             var actualTask = LazyTask.Create(async () =>
@@ -99,7 +99,7 @@ namespace Stasistium.Stages
                 var temp = await task;
                 return temp.result;
             });
-            return this.Context.CreateStageResultList(actualTask, hasChanges, cache.OutputIdOrder.ToImmutableList(), cache, cache.Hash);
+            return this.Context.CreateStageResultList(actualTask, hasChanges, cache.OutputIdOrder.ToImmutableList(), cache, cache.Hash, input.Cache);
         }
 
 
@@ -109,10 +109,10 @@ namespace Stasistium.Stages
 #pragma warning disable CA1819 // Properties should not return arrays
 #pragma warning disable CA2227 // Collection properties should be read only
     [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-    public class WhereStageCache<TInCache>
+    public class WhereStageCache<TInCache> : IHavePreviousCache<TInCache>
         where TInCache : class
     {
-        public TInCache ParentCache { get; set; }
+        public TInCache PreviousCache  { get; set; }
 
         public string[] OutputIdOrder { get; set; }
         public string Hash { get; set; }

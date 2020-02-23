@@ -71,7 +71,7 @@ namespace Stasistium.Stages
 
                         hasChanges = document.Hash != lastHash;
 
-                        return (result: this.Context.CreateStageResult(document as IDocument<Stream>, hasChanges, document.Id, document.Hash, document.Hash), writeTime, hash: document.Hash, id);
+                        return (result: StageResult.CreateStageResult(this.Context, document as IDocument<Stream>, hasChanges, document.Id, document.Hash, document.Hash), writeTime, hash: document.Hash, id);
                     }
                     else
                     {
@@ -84,7 +84,7 @@ namespace Stasistium.Stages
                             return document as IDocument<Stream>;
                         });
 
-                        return (result: this.Context.CreateStageResult(subTask, hasChanges, id, lastHash, lastHash), writeTime, hash: lastHash, id);
+                        return (result: StageResult.CreateStageResult(this.Context, subTask, hasChanges, id, lastHash, lastHash), writeTime, hash: lastHash, id);
                     }
                 }).ToArray();
 
@@ -107,11 +107,12 @@ namespace Stasistium.Stages
                                 || !cache.IdOrder.SequenceEqual(r.newCache.IdOrder);
             var ids = r.newCache.IdOrder.ToImmutableList();
 
-            return this.Context.CreateStageResultList(r.result, hasChanges, ids, r.newCache, r.newCache.Hash);
+            return this.Context.CreateStageResultList(r.result, hasChanges, ids, r.newCache, r.newCache.Hash, result.Cache);
         }
     }
 
-    public class FileSystemCache<T>
+    public class FileSystemCache<T> : IHavePreviousCache<T>
+        where T : class
     {
         public T PreviousCache { get; set; }
         public Dictionary<string, DateTime> PathToWriteTime { get; set; }

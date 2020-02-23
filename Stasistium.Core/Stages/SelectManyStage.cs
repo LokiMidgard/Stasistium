@@ -9,14 +9,14 @@ using Stasistium.Core;
 
 namespace Stasistium.Stages
 {
-    public class SelectManyStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache> : MultiStageBase<TResult, TItemCache, SelectManyCache<TInputCache, TItemCache, TCache>>
+    public class SelectManyStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache> : MultiStageBase<TResult, GeneratedHelper.CacheId<string, GeneratedHelper.CacheId<string, StartCache<TCache>>>, SelectManyCache<TInputCache, TItemCache, TCache>>
 where TItemCache : class
 where TInputItemCache : class
 where TInputCache : class
         where TCache : class
     {
 
-        private readonly Dictionary<string, (Start @in, MultiStageBase<TResult, TItemCache, TCache> @out)> startLookup = new Dictionary<string, (Start @in, MultiStageBase<TResult, TItemCache, TCache> @out)>();
+        private readonly System.Collections.Concurrent.ConcurrentDictionary<string, (Start @in, SelectStage<TResult, TItemCache, TCache, TResult, GeneratedHelper.CacheId<string, StartCache<TCache>>> @out)> startLookup = new System.Collections.Concurrent.ConcurrentDictionary<string, (Start @in, SelectStage<TResult, TItemCache, TCache, TResult, GeneratedHelper.CacheId<string, StartCache<TCache>>> @out)>();
 
         private readonly Func<StageBase<TInput, GeneratedHelper.CacheId<string>>, MultiStageBase<TResult, TItemCache, TCache>> createPipline;
 
@@ -27,8 +27,8 @@ where TInputCache : class
             this.input = input ?? throw new ArgumentNullException(nameof(input));
             this.createPipline = createPipline ?? throw new ArgumentNullException(nameof(createPipline));
         }
-
-        protected override async Task<StageResultList<TResult, TItemCache, SelectManyCache<TInputCache, TItemCache, TCache>>> DoInternal([AllowNull] SelectManyCache<TInputCache, TItemCache, TCache>? cache, OptionToken options)
+        
+        protected override async Task<StageResultList<TResult, GeneratedHelper.CacheId<string, GeneratedHelper.CacheId<string, StartCache<TCache>>>, SelectManyCache<TInputCache, TItemCache, TCache>>> DoInternal([AllowNull] SelectManyCache<TInputCache, TItemCache, TCache>? cache, OptionToken options)
         {
             var input = await this.input.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
 
@@ -40,27 +40,26 @@ where TInputCache : class
                 var resultList = (await Task.WhenAll(inputResult.Select(async item =>
                 {
 
-                    if (this.startLookup.TryGetValue(item.Id, out var pipe))
-                    {
-                        pipe.@in.In = item;
-                    }
-                    else
+                    var pipe = this.startLookup.GetOrAdd(item.Id, key =>
                     {
                         var start = new SelectManyStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache>.Start(item, this.Context);
-                        var end = this.createPipline(start);
-                        pipe = (start, end);
-                        this.startLookup.Add(item.Id, pipe);
-                    }
+                        var end = this.createPipline(start).Select(x => new End(x, x.Context));
+                        return (start, end);
+                    });
 
-                    if (cache == null || !cache.InputCacheLookup.TryGetValue(item.Id, out TCache? lastCache) || !cache.InputItemToResultItemIdLookup.TryGetValue(item.Id, out var resultIds) || !cache.InputItemToResultItemCacheLookup.TryGetValue(item.Id, out var resultOldCaches))
+
+                    if (cache == null
+                        || !cache.InputCacheLookup.TryGetValue(item.Id, out SelectCache<TCache, GeneratedHelper.CacheId<string, StartCache<TCache>>>? lastCache)
+                        || !cache.InputItemToResultItemIdLookup.TryGetValue(item.Id, out var resultIds)
+                        || !cache.InputItemToResultItemCacheLookup.TryGetValue(item.Id, out var resultOldCaches))
                     {
                         lastCache = null;
                         resultIds = Array.Empty<string>();
-                        resultOldCaches = Array.Empty<TItemCache>();
+                        resultOldCaches = Array.Empty<GeneratedHelper.CacheId<string, GeneratedHelper.CacheId<string, StartCache<TCache>>>>();
                     }
                     var pipeDone = await pipe.@out.DoIt(lastCache, options).ConfigureAwait(false);
 
-                    var list = new List<StageResult<TResult, TItemCache>>();
+                    var list = new List<StageResult<TResult, GeneratedHelper.CacheId<string, GeneratedHelper.CacheId<string, StartCache<TCache>>>>>();
                     if (pipeDone.HasChanges || cache is null)
                     {
                         var itemResult = await pipeDone.Perform;
@@ -72,7 +71,7 @@ where TInputCache : class
 
                             var performedSingle = await singleResult.Perform;
                             var singlePerformedResult = performedSingle;
-                            list.Add(this.Context.CreateStageResult(singlePerformedResult, singlePerformedResult.Hash != lastItemHash, singlePerformedResult.Id, singleResult.Cache, singlePerformedResult.Hash));
+                            list.Add(singleResult);
                         }
                         lastCache = itemCache;
                     }
@@ -95,7 +94,8 @@ where TInputCache : class
                             if (!cache.OutputItemIdToHash.TryGetValue(resultIds[i], out string lastItemHash))
                                 throw this.Context.Exception("Should not happen");
                             var oldItemCache = resultOldCaches[i];
-                            list.Add(this.Context.CreateStageResult(subTask, false, resultIds[i], oldItemCache, lastItemHash));
+
+                            list.Add(this.Context.CreateStageResult(subTask, false, resultIds[i], oldItemCache, lastItemHash, pipeDone.Cache.InputItemCacheLookup[resultIds[i]].PreviousCache));
                         }
                     }
 
@@ -132,7 +132,7 @@ where TInputCache : class
                 {
                     hasChanges = !newCache.OutputIdOrder.SequenceEqual(cache.OutputIdOrder) || work.Any(x => x.HasChanges);
                 }
-                return this.Context.CreateStageResultList(work, hasChanges, ids.ToImmutableList(), newCache, newCache.Hash);
+                return this.Context.CreateStageResultList(work, hasChanges, ids.ToImmutableList(), newCache, newCache.Hash, input.Cache);
 
             }
             else
@@ -142,12 +142,24 @@ where TInputCache : class
                     var temp = await task;
                     return temp.Item1;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutableList(), cache, cache.Hash);
+                
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutableList(), cache, cache.Hash, input.Cache);
             }
 
         }
 
 
+        private class End : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple1List0StageBase<TResult, StartCache<TCache>, TResult>
+        {
+            public End(StageBase<TResult, StartCache<TCache>> inputSingle0, IGeneratorContext context, string? name = null) : base(inputSingle0, context, name)
+            {
+            }
+
+            protected override Task<IDocument<TResult>> Work(IDocument<TResult> inputSingle0, OptionToken options)
+            {
+                return Task.FromResult(inputSingle0);
+            }
+        }
 
 
         private class Start : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple0List0StageBase<TInput>

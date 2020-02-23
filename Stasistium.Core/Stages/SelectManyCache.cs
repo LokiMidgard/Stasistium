@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using Stasistium.Documents;
+using System.Collections.Generic;
 
 namespace Stasistium.Stages
 {
-    public class SelectManyCache<TInputCache, TItemCache, TCache>
+    public class SelectManyCache<TInputCache, TItemCache, TCache> : IHavePreviousCache<TInputCache>
         where TInputCache : class
         where TItemCache : class
         where TCache : class
@@ -15,12 +16,12 @@ namespace Stasistium.Stages
         //public Dictionary<string, TItemCache> InputItemCacheLookup { get; set; }
 
         public string[] OutputIdOrder { get; set; }
-        public Dictionary<string, TItemCache[]> InputItemToResultItemCacheLookup { get; set; }
+        public Dictionary<string, GeneratedHelper.CacheId<string, GeneratedHelper.CacheId<string, StartCache<TCache>>>[]> InputItemToResultItemCacheLookup { get; set; }
 
         /// <summary>
         /// InputId to cache
         /// </summary>
-        public Dictionary<string, TCache> InputCacheLookup { get; set; }
+        public Dictionary<string, SelectCache<TCache, GeneratedHelper.CacheId<string, StartCache<TCache>>>> InputCacheLookup { get; set; }
 
         /// <summary>
         /// InputId to OutputHash

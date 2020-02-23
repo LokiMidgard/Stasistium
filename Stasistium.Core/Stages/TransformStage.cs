@@ -24,7 +24,7 @@ namespace Stasistium.Stages
         protected override async Task<StageResultList<TOut, string, TransformStageCache<TInCache>>> DoInternal([AllowNull] TransformStageCache<TInCache>? cache, OptionToken options)
         {
 
-            var input = await this.input.DoIt(cache?.ParentCache, options).ConfigureAwait(false);
+            var input = await this.input.DoIt(cache?.PreviousCache , options).ConfigureAwait(false);
 
             var task = LazyTask.Create(async () =>
             {
@@ -43,21 +43,21 @@ namespace Stasistium.Stages
                         if (cache != null && cache.Transformed.TryGetValue(transformed.Id, out var oldHash))
                             hasChanges = oldHash != transformed.Hash;
 
-                        return (result: this.Context.CreateStageResult(transformed, hasChanges, transformed.Id, transformed.Hash, transformed.Hash), inputId: subInput.Id);
+                        return (result: StageResult.CreateStageResult(this.Context, transformed, hasChanges, transformed.Id, transformed.Hash, transformed.Hash), inputId: subInput.Id);
                     }
                     else
                     {
                         if (cache == null || !cache.InputToOutputId.TryGetValue(subInput.Id, out var oldOutputId) || !cache.Transformed.TryGetValue(oldOutputId, out var oldOutputHash))
                             throw this.Context.Exception("No changes, so old value should be there.");
 
-                        return (result: this.Context.CreateStageResult(LazyTask.Create(async () =>
-                        {
+                        return (result: StageResult.CreateStageResult(this.Context, LazyTask.Create(async () =>
+                         {
 
-                            var newSource = await subInput.Perform;
-                            var transformed = await this.transform(newSource).ConfigureAwait(false);
+                             var newSource = await subInput.Perform;
+                             var transformed = await this.transform(newSource).ConfigureAwait(false);
 
-                            return transformed;
-                        }), false, oldOutputId, oldOutputHash, oldOutputHash),
+                             return transformed;
+                         }), false, oldOutputId, oldOutputHash, oldOutputHash),
                         inputId: subInput.Id);
 
                     }
@@ -67,7 +67,7 @@ namespace Stasistium.Stages
                 {
                     InputToOutputId = list.ToDictionary(x => x.inputId, x => x.result.Id),
                     OutputIdOrder = list.Select(x => x.result.Id).ToArray(),
-                    ParentCache = input.Cache,
+                    PreviousCache  = input.Cache,
                     Transformed = list.ToDictionary(x => x.result.Id, x => x.result.Hash),
                     Hash = this.Context.GetHashForObject(list.Select(x => x.result.Hash))
                 };
@@ -94,7 +94,7 @@ namespace Stasistium.Stages
                             hasChanges = true;
                     }
                 }
-                return this.Context.CreateStageResultList(list, hasChanges, c.OutputIdOrder.ToImmutableList(), c, c.Hash);
+                return this.Context.CreateStageResultList(list, hasChanges, c.OutputIdOrder.ToImmutableList(), c, c.Hash, input.Cache);
 
             }
 
@@ -104,7 +104,7 @@ namespace Stasistium.Stages
                 return temp.result;
             });
 
-            return this.Context.CreateStageResultList(actualTask, hasChanges, cache.OutputIdOrder.ToImmutableList(), cache, cache.Hash);
+            return this.Context.CreateStageResultList(actualTask, hasChanges, cache.OutputIdOrder.ToImmutableList(), cache, cache.Hash, input.Cache);
         }
 
 

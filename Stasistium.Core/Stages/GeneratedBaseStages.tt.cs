@@ -73,15 +73,16 @@ namespace Single.Simple {
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
 
+                return StageResult.CreateStageResult(this.Context, result.work, hasChanges, id, result.cache, result.work.Hash);
             }
             else {
                 var actualTask = LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+             return StageResult.CreateStageResult(this.Context,actualTask, hasChanges, id, cache, cache.Data!);
+
             }
         }
 
@@ -143,7 +144,7 @@ namespace Multiple.Simple {
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -169,14 +170,17 @@ namespace Multiple.Simple {
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+                return StageResultList.CreateStageResultList(this.Context, result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+                return StageResultList.CreateStageResultList(this.Context, actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
             }
         }
 
@@ -266,7 +270,7 @@ namespace Multiple.Simple {
 ////;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -353,7 +357,7 @@ namespace Single.Simple {
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
 
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache , options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -398,7 +402,12 @@ namespace Single.Simple {
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
+
+
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash
+            , inputList0Result.Cache 
+
+                );
 
             }
             else {
@@ -406,7 +415,13 @@ namespace Single.Simple {
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+
+
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!
+            , inputList0Result.Cache 
+
+                );
+
             }
         }
 
@@ -456,7 +471,7 @@ namespace Multiple.Simple {
                 throw new ArgumentNullException(nameof(options));
 
 
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache , options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -482,7 +497,7 @@ namespace Multiple.Simple {
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -512,14 +527,26 @@ namespace Multiple.Simple {
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash))
+            , inputList0Result.Cache 
+
+                
+                );
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash))
+                            , inputList0Result.Cache 
+
+);
+
+
             }
         }
 
@@ -617,7 +644,7 @@ namespace Multiple.Simple {
 //;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -712,12 +739,12 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputList0.DoIt(cache?.PreviousCache0, options),
-                this.inputList1.DoIt(cache?.PreviousCache1, options),
+                this.inputList0.DoIt(cache?.PreviousCache, options),
+                this.inputList1.DoIt(cache?.PreviousCache2, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+                            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -725,8 +752,8 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputList0.DoIt(cache?.PreviousCache0, options),
-                this.inputList1.DoIt(cache?.PreviousCache1, options),
+                this.inputList0.DoIt(cache?.PreviousCache, options),
+                this.inputList1.DoIt(cache?.PreviousCache2, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputList0Performed = await inputList0Result.Perform;
@@ -780,7 +807,14 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
+
+
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+                );
 
             }
             else {
@@ -788,7 +822,15 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+
+
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+                );
+
             }
         }
 
@@ -847,12 +889,12 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputList0.DoIt(cache?.PreviousCache0, options),
-                this.inputList1.DoIt(cache?.PreviousCache1, options),
+                this.inputList0.DoIt(cache?.PreviousCache, options),
+                this.inputList1.DoIt(cache?.PreviousCache2, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+                            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -892,7 +934,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -926,14 +968,30 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash))
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+                
+                );
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash))
+                            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+);
+
+
             }
         }
 
@@ -1039,7 +1097,7 @@ await Task.WhenAll(
 //;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -1141,14 +1199,14 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputList0.DoIt(cache?.PreviousCache0, options),
-                this.inputList1.DoIt(cache?.PreviousCache1, options),
-                this.inputList2.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache, options),
+                this.inputList1.DoIt(cache?.PreviousCache2, options),
+                this.inputList2.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+                            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -1156,9 +1214,9 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputList0.DoIt(cache?.PreviousCache0, options),
-                this.inputList1.DoIt(cache?.PreviousCache1, options),
-                this.inputList2.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache, options),
+                this.inputList1.DoIt(cache?.PreviousCache2, options),
+                this.inputList2.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputList0Performed = await inputList0Result.Perform;
@@ -1222,7 +1280,16 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
+
+
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+                );
 
             }
             else {
@@ -1230,7 +1297,17 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+
+
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+                );
+
             }
         }
 
@@ -1297,14 +1374,14 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputList0.DoIt(cache?.PreviousCache0, options),
-                this.inputList1.DoIt(cache?.PreviousCache1, options),
-                this.inputList2.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache, options),
+                this.inputList1.DoIt(cache?.PreviousCache2, options),
+                this.inputList2.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+                            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -1351,7 +1428,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -1389,14 +1466,34 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash))
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+                
+                );
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash))
+                            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+);
+
+
             }
         }
 
@@ -1510,7 +1607,7 @@ await Task.WhenAll(
 //;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -1619,16 +1716,16 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputList0.DoIt(cache?.PreviousCache0, options),
-                this.inputList1.DoIt(cache?.PreviousCache1, options),
-                this.inputList2.DoIt(cache?.PreviousCache2, options),
-                this.inputList3.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache, options),
+                this.inputList1.DoIt(cache?.PreviousCache2, options),
+                this.inputList2.DoIt(cache?.PreviousCache3, options),
+                this.inputList3.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+                            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -1636,10 +1733,10 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputList0.DoIt(cache?.PreviousCache0, options),
-                this.inputList1.DoIt(cache?.PreviousCache1, options),
-                this.inputList2.DoIt(cache?.PreviousCache2, options),
-                this.inputList3.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache, options),
+                this.inputList1.DoIt(cache?.PreviousCache2, options),
+                this.inputList2.DoIt(cache?.PreviousCache3, options),
+                this.inputList3.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputList0Performed = await inputList0Result.Perform;
@@ -1713,7 +1810,18 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
+
+
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+            , inputList3Result.Cache 
+
+                );
 
             }
             else {
@@ -1721,7 +1829,19 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+
+
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+            , inputList3Result.Cache 
+
+                );
+
             }
         }
 
@@ -1796,16 +1916,16 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputList0.DoIt(cache?.PreviousCache0, options),
-                this.inputList1.DoIt(cache?.PreviousCache1, options),
-                this.inputList2.DoIt(cache?.PreviousCache2, options),
-                this.inputList3.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache, options),
+                this.inputList1.DoIt(cache?.PreviousCache2, options),
+                this.inputList2.DoIt(cache?.PreviousCache3, options),
+                this.inputList3.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+                            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -1859,7 +1979,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -1901,14 +2021,38 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash))
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+            , inputList3Result.Cache 
+
+                
+                );
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash))
+                            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+            , inputList3Result.Cache 
+
+);
+
+
             }
         }
 
@@ -2030,7 +2174,7 @@ await Task.WhenAll(
 //;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -2115,7 +2259,7 @@ namespace Single.Simple {
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
 
-            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache , options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -2156,7 +2300,11 @@ namespace Single.Simple {
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
+
+
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash
+            , inputSingle0Result.Cache
+                );
 
             }
             else {
@@ -2164,7 +2312,12 @@ namespace Single.Simple {
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+
+
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!
+            , inputSingle0Result.Cache
+                );
+
             }
         }
 
@@ -2212,7 +2365,7 @@ namespace Multiple.Simple {
                 throw new ArgumentNullException(nameof(options));
 
 
-            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
+            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache , options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -2235,7 +2388,7 @@ namespace Multiple.Simple {
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -2264,14 +2417,24 @@ namespace Multiple.Simple {
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash))
+            , inputSingle0Result.Cache
+                
+                );
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash))
+                            , inputSingle0Result.Cache
+);
+
+
             }
         }
 
@@ -2369,7 +2532,7 @@ namespace Multiple.Simple {
 ////;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -2462,12 +2625,12 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputList0.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputList0.DoIt(cache?.PreviousCache2, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -2475,8 +2638,8 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputList0.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputList0.DoIt(cache?.PreviousCache2, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -2522,7 +2685,13 @@ namespace Single.Simple {
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
+
+
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash
+            , inputSingle0Result.Cache
+            , inputList0Result.Cache 
+
+                );
 
             }
             else {
@@ -2530,7 +2699,14 @@ namespace Single.Simple {
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+
+
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!
+            , inputSingle0Result.Cache
+            , inputList0Result.Cache 
+
+                );
+
             }
         }
 
@@ -2587,12 +2763,12 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputList0.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputList0.DoIt(cache?.PreviousCache2, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -2625,7 +2801,7 @@ namespace Multiple.Simple {
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -2658,14 +2834,28 @@ namespace Multiple.Simple {
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash))
+            , inputSingle0Result.Cache
+            , inputList0Result.Cache 
+
+                
+                );
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash))
+                            , inputSingle0Result.Cache
+            , inputList0Result.Cache 
+
+);
+
+
             }
         }
 
@@ -2771,7 +2961,7 @@ namespace Multiple.Simple {
 //;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -2871,14 +3061,14 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputList0.DoIt(cache?.PreviousCache1, options),
-                this.inputList1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputList0.DoIt(cache?.PreviousCache2, options),
+                this.inputList1.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -2886,9 +3076,9 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputList0.DoIt(cache?.PreviousCache1, options),
-                this.inputList1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputList0.DoIt(cache?.PreviousCache2, options),
+                this.inputList1.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -2947,7 +3137,15 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
+
+
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash
+            , inputSingle0Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+                );
 
             }
             else {
@@ -2955,7 +3153,16 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+
+
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!
+            , inputSingle0Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+                );
+
             }
         }
 
@@ -3020,14 +3227,14 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputList0.DoIt(cache?.PreviousCache1, options),
-                this.inputList1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputList0.DoIt(cache?.PreviousCache2, options),
+                this.inputList1.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -3070,7 +3277,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -3107,14 +3314,32 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash))
+            , inputSingle0Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+                
+                );
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash))
+                            , inputSingle0Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+);
+
+
             }
         }
 
@@ -3228,7 +3453,7 @@ await Task.WhenAll(
 //;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -3335,16 +3560,16 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputList0.DoIt(cache?.PreviousCache1, options),
-                this.inputList1.DoIt(cache?.PreviousCache2, options),
-                this.inputList2.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputList0.DoIt(cache?.PreviousCache2, options),
+                this.inputList1.DoIt(cache?.PreviousCache3, options),
+                this.inputList2.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -3352,10 +3577,10 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputList0.DoIt(cache?.PreviousCache1, options),
-                this.inputList1.DoIt(cache?.PreviousCache2, options),
-                this.inputList2.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputList0.DoIt(cache?.PreviousCache2, options),
+                this.inputList1.DoIt(cache?.PreviousCache3, options),
+                this.inputList2.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -3424,7 +3649,17 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
+
+
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash
+            , inputSingle0Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+                );
 
             }
             else {
@@ -3432,7 +3667,18 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+
+
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!
+            , inputSingle0Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+                );
+
             }
         }
 
@@ -3505,16 +3751,16 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputList0.DoIt(cache?.PreviousCache1, options),
-                this.inputList1.DoIt(cache?.PreviousCache2, options),
-                this.inputList2.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputList0.DoIt(cache?.PreviousCache2, options),
+                this.inputList1.DoIt(cache?.PreviousCache3, options),
+                this.inputList2.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -3564,7 +3810,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -3605,14 +3851,36 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash))
+            , inputSingle0Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+                
+                );
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash))
+                            , inputSingle0Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+);
+
+
             }
         }
 
@@ -3734,7 +4002,7 @@ await Task.WhenAll(
 //;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -3848,18 +4116,18 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputList0.DoIt(cache?.PreviousCache1, options),
-                this.inputList1.DoIt(cache?.PreviousCache2, options),
-                this.inputList2.DoIt(cache?.PreviousCache3, options),
-                this.inputList3.DoIt(cache?.PreviousCache4, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputList0.DoIt(cache?.PreviousCache2, options),
+                this.inputList1.DoIt(cache?.PreviousCache3, options),
+                this.inputList2.DoIt(cache?.PreviousCache4, options),
+                this.inputList3.DoIt(cache?.PreviousCache5, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -3867,11 +4135,11 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputList0.DoIt(cache?.PreviousCache1, options),
-                this.inputList1.DoIt(cache?.PreviousCache2, options),
-                this.inputList2.DoIt(cache?.PreviousCache3, options),
-                this.inputList3.DoIt(cache?.PreviousCache4, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputList0.DoIt(cache?.PreviousCache2, options),
+                this.inputList1.DoIt(cache?.PreviousCache3, options),
+                this.inputList2.DoIt(cache?.PreviousCache4, options),
+                this.inputList3.DoIt(cache?.PreviousCache5, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -3950,7 +4218,19 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
+
+
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash
+            , inputSingle0Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+            , inputList3Result.Cache 
+
+                );
 
             }
             else {
@@ -3958,7 +4238,20 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+
+
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!
+            , inputSingle0Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+            , inputList3Result.Cache 
+
+                );
+
             }
         }
 
@@ -4039,18 +4332,18 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputList0.DoIt(cache?.PreviousCache1, options),
-                this.inputList1.DoIt(cache?.PreviousCache2, options),
-                this.inputList2.DoIt(cache?.PreviousCache3, options),
-                this.inputList3.DoIt(cache?.PreviousCache4, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputList0.DoIt(cache?.PreviousCache2, options),
+                this.inputList1.DoIt(cache?.PreviousCache3, options),
+                this.inputList2.DoIt(cache?.PreviousCache4, options),
+                this.inputList3.DoIt(cache?.PreviousCache5, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -4107,7 +4400,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -4152,14 +4445,40 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash))
+            , inputSingle0Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+            , inputList3Result.Cache 
+
+                
+                );
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash))
+                            , inputSingle0Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+            , inputList3Result.Cache 
+
+);
+
+
             }
         }
 
@@ -4289,7 +4608,7 @@ await Task.WhenAll(
 //;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -4380,12 +4699,12 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -4393,8 +4712,8 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -4436,7 +4755,12 @@ namespace Single.Simple {
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
+
+
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+                );
 
             }
             else {
@@ -4444,7 +4768,13 @@ namespace Single.Simple {
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+
+
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+                );
+
             }
         }
 
@@ -4499,12 +4829,12 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -4534,7 +4864,7 @@ namespace Multiple.Simple {
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -4566,14 +4896,26 @@ namespace Multiple.Simple {
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash))
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+                
+                );
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash))
+                            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+);
+
+
             }
         }
 
@@ -4679,7 +5021,7 @@ namespace Multiple.Simple {
 ////;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -4777,14 +5119,14 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputList0.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -4792,9 +5134,9 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputList0.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -4845,7 +5187,14 @@ namespace Single.Simple {
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
+
+
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputList0Result.Cache 
+
+                );
 
             }
             else {
@@ -4853,7 +5202,15 @@ namespace Single.Simple {
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+
+
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputList0Result.Cache 
+
+                );
+
             }
         }
 
@@ -4916,14 +5273,14 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputList0.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -4959,7 +5316,7 @@ namespace Multiple.Simple {
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -4995,14 +5352,30 @@ namespace Multiple.Simple {
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash))
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputList0Result.Cache 
+
+                
+                );
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash))
+                            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputList0Result.Cache 
+
+);
+
+
             }
         }
 
@@ -5116,7 +5489,7 @@ namespace Multiple.Simple {
 //;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -5221,16 +5594,16 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputList0.DoIt(cache?.PreviousCache2, options),
-                this.inputList1.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache3, options),
+                this.inputList1.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -5238,10 +5611,10 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputList0.DoIt(cache?.PreviousCache2, options),
-                this.inputList1.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache3, options),
+                this.inputList1.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -5305,7 +5678,16 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
+
+
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+                );
 
             }
             else {
@@ -5313,7 +5695,17 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+
+
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+                );
+
             }
         }
 
@@ -5384,16 +5776,16 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputList0.DoIt(cache?.PreviousCache2, options),
-                this.inputList1.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache3, options),
+                this.inputList1.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -5439,7 +5831,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -5479,14 +5871,34 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash))
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+                
+                );
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash))
+                            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+);
+
+
             }
         }
 
@@ -5608,7 +6020,7 @@ await Task.WhenAll(
 //;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -5720,18 +6132,18 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputList0.DoIt(cache?.PreviousCache2, options),
-                this.inputList1.DoIt(cache?.PreviousCache3, options),
-                this.inputList2.DoIt(cache?.PreviousCache4, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache3, options),
+                this.inputList1.DoIt(cache?.PreviousCache4, options),
+                this.inputList2.DoIt(cache?.PreviousCache5, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -5739,11 +6151,11 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputList0.DoIt(cache?.PreviousCache2, options),
-                this.inputList1.DoIt(cache?.PreviousCache3, options),
-                this.inputList2.DoIt(cache?.PreviousCache4, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache3, options),
+                this.inputList1.DoIt(cache?.PreviousCache4, options),
+                this.inputList2.DoIt(cache?.PreviousCache5, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -5817,7 +6229,18 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
+
+
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+                );
 
             }
             else {
@@ -5825,7 +6248,19 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+
+
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+                );
+
             }
         }
 
@@ -5904,18 +6339,18 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputList0.DoIt(cache?.PreviousCache2, options),
-                this.inputList1.DoIt(cache?.PreviousCache3, options),
-                this.inputList2.DoIt(cache?.PreviousCache4, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache3, options),
+                this.inputList1.DoIt(cache?.PreviousCache4, options),
+                this.inputList2.DoIt(cache?.PreviousCache5, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -5968,7 +6403,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -6012,14 +6447,38 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash))
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+                
+                );
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash))
+                            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+);
+
+
             }
         }
 
@@ -6149,7 +6608,7 @@ await Task.WhenAll(
 //;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -6268,20 +6727,20 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputList0.DoIt(cache?.PreviousCache2, options),
-                this.inputList1.DoIt(cache?.PreviousCache3, options),
-                this.inputList2.DoIt(cache?.PreviousCache4, options),
-                this.inputList3.DoIt(cache?.PreviousCache5, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache3, options),
+                this.inputList1.DoIt(cache?.PreviousCache4, options),
+                this.inputList2.DoIt(cache?.PreviousCache5, options),
+                this.inputList3.DoIt(cache?.PreviousCache6, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
-            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
+            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache6, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -6289,12 +6748,12 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputList0.DoIt(cache?.PreviousCache2, options),
-                this.inputList1.DoIt(cache?.PreviousCache3, options),
-                this.inputList2.DoIt(cache?.PreviousCache4, options),
-                this.inputList3.DoIt(cache?.PreviousCache5, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache3, options),
+                this.inputList1.DoIt(cache?.PreviousCache4, options),
+                this.inputList2.DoIt(cache?.PreviousCache5, options),
+                this.inputList3.DoIt(cache?.PreviousCache6, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -6378,7 +6837,20 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
+
+
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+            , inputList3Result.Cache 
+
+                );
 
             }
             else {
@@ -6386,7 +6858,21 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+
+
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+            , inputList3Result.Cache 
+
+                );
+
             }
         }
 
@@ -6473,20 +6959,20 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputList0.DoIt(cache?.PreviousCache2, options),
-                this.inputList1.DoIt(cache?.PreviousCache3, options),
-                this.inputList2.DoIt(cache?.PreviousCache4, options),
-                this.inputList3.DoIt(cache?.PreviousCache5, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputList0.DoIt(cache?.PreviousCache3, options),
+                this.inputList1.DoIt(cache?.PreviousCache4, options),
+                this.inputList2.DoIt(cache?.PreviousCache5, options),
+                this.inputList3.DoIt(cache?.PreviousCache6, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
-            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
+            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache6, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -6546,7 +7032,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -6594,14 +7080,42 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash))
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+            , inputList3Result.Cache 
+
+                
+                );
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash))
+                            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+            , inputList3Result.Cache 
+
+);
+
+
             }
         }
 
@@ -6739,7 +7253,7 @@ await Task.WhenAll(
 //;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -6835,14 +7349,14 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -6850,9 +7364,9 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -6899,7 +7413,13 @@ namespace Single.Simple {
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
+
+
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+                );
 
             }
             else {
@@ -6907,7 +7427,14 @@ namespace Single.Simple {
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+
+
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+                );
+
             }
         }
 
@@ -6968,14 +7495,14 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -7008,7 +7535,7 @@ namespace Multiple.Simple {
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -7043,14 +7570,28 @@ namespace Multiple.Simple {
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash))
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+                
+                );
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash))
+                            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+);
+
+
             }
         }
 
@@ -7164,7 +7705,7 @@ namespace Multiple.Simple {
 ////;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -7267,16 +7808,16 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputList0.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -7284,10 +7825,10 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputList0.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -7343,7 +7884,15 @@ namespace Single.Simple {
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
+
+
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputList0Result.Cache 
+
+                );
 
             }
             else {
@@ -7351,7 +7900,16 @@ namespace Single.Simple {
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+
+
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputList0Result.Cache 
+
+                );
+
             }
         }
 
@@ -7420,16 +7978,16 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputList0.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -7468,7 +8026,7 @@ namespace Multiple.Simple {
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -7507,14 +8065,32 @@ namespace Multiple.Simple {
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash))
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputList0Result.Cache 
+
+                
+                );
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash))
+                            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputList0Result.Cache 
+
+);
+
+
             }
         }
 
@@ -7636,7 +8212,7 @@ namespace Multiple.Simple {
 //;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -7746,18 +8322,18 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputList0.DoIt(cache?.PreviousCache3, options),
-                this.inputList1.DoIt(cache?.PreviousCache4, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache4, options),
+                this.inputList1.DoIt(cache?.PreviousCache5, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -7765,11 +8341,11 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputList0.DoIt(cache?.PreviousCache3, options),
-                this.inputList1.DoIt(cache?.PreviousCache4, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache4, options),
+                this.inputList1.DoIt(cache?.PreviousCache5, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -7838,7 +8414,17 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
+
+
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+                );
 
             }
             else {
@@ -7846,7 +8432,18 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+
+
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+                );
+
             }
         }
 
@@ -7923,18 +8520,18 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputList0.DoIt(cache?.PreviousCache3, options),
-                this.inputList1.DoIt(cache?.PreviousCache4, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache4, options),
+                this.inputList1.DoIt(cache?.PreviousCache5, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -7983,7 +8580,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -8026,14 +8623,36 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash))
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+                
+                );
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash))
+                            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+);
+
+
             }
         }
 
@@ -8163,7 +8782,7 @@ await Task.WhenAll(
 //;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -8280,20 +8899,20 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputList0.DoIt(cache?.PreviousCache3, options),
-                this.inputList1.DoIt(cache?.PreviousCache4, options),
-                this.inputList2.DoIt(cache?.PreviousCache5, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache4, options),
+                this.inputList1.DoIt(cache?.PreviousCache5, options),
+                this.inputList2.DoIt(cache?.PreviousCache6, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache6, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -8301,12 +8920,12 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputList0.DoIt(cache?.PreviousCache3, options),
-                this.inputList1.DoIt(cache?.PreviousCache4, options),
-                this.inputList2.DoIt(cache?.PreviousCache5, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache4, options),
+                this.inputList1.DoIt(cache?.PreviousCache5, options),
+                this.inputList2.DoIt(cache?.PreviousCache6, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -8385,7 +9004,19 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
+
+
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+                );
 
             }
             else {
@@ -8393,7 +9024,20 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+
+
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+                );
+
             }
         }
 
@@ -8478,20 +9122,20 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputList0.DoIt(cache?.PreviousCache3, options),
-                this.inputList1.DoIt(cache?.PreviousCache4, options),
-                this.inputList2.DoIt(cache?.PreviousCache5, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache4, options),
+                this.inputList1.DoIt(cache?.PreviousCache5, options),
+                this.inputList2.DoIt(cache?.PreviousCache6, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache6, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -8547,7 +9191,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -8594,14 +9238,40 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash))
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+                
+                );
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash))
+                            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+);
+
+
             }
         }
 
@@ -8739,7 +9409,7 @@ await Task.WhenAll(
 //;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -8863,22 +9533,22 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputList0.DoIt(cache?.PreviousCache3, options),
-                this.inputList1.DoIt(cache?.PreviousCache4, options),
-                this.inputList2.DoIt(cache?.PreviousCache5, options),
-                this.inputList3.DoIt(cache?.PreviousCache6, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache4, options),
+                this.inputList1.DoIt(cache?.PreviousCache5, options),
+                this.inputList2.DoIt(cache?.PreviousCache6, options),
+                this.inputList3.DoIt(cache?.PreviousCache7, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
-            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache6, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache6, options).ConfigureAwait(false);
+            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache7, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -8886,13 +9556,13 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputList0.DoIt(cache?.PreviousCache3, options),
-                this.inputList1.DoIt(cache?.PreviousCache4, options),
-                this.inputList2.DoIt(cache?.PreviousCache5, options),
-                this.inputList3.DoIt(cache?.PreviousCache6, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache4, options),
+                this.inputList1.DoIt(cache?.PreviousCache5, options),
+                this.inputList2.DoIt(cache?.PreviousCache6, options),
+                this.inputList3.DoIt(cache?.PreviousCache7, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -8981,7 +9651,21 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
+
+
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+            , inputList3Result.Cache 
+
+                );
 
             }
             else {
@@ -8989,7 +9673,22 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+
+
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+            , inputList3Result.Cache 
+
+                );
+
             }
         }
 
@@ -9082,22 +9781,22 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputList0.DoIt(cache?.PreviousCache3, options),
-                this.inputList1.DoIt(cache?.PreviousCache4, options),
-                this.inputList2.DoIt(cache?.PreviousCache5, options),
-                this.inputList3.DoIt(cache?.PreviousCache6, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputList0.DoIt(cache?.PreviousCache4, options),
+                this.inputList1.DoIt(cache?.PreviousCache5, options),
+                this.inputList2.DoIt(cache?.PreviousCache6, options),
+                this.inputList3.DoIt(cache?.PreviousCache7, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
-            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache6, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache6, options).ConfigureAwait(false);
+            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache7, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -9160,7 +9859,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -9211,14 +9910,44 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash))
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+            , inputList3Result.Cache 
+
+                
+                );
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash))
+                            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+            , inputList3Result.Cache 
+
+);
+
+
             }
         }
 
@@ -9364,7 +10093,7 @@ await Task.WhenAll(
 //;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -9465,16 +10194,16 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -9482,10 +10211,10 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -9537,7 +10266,14 @@ namespace Single.Simple {
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
+
+
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputSingle3Result.Cache
+                );
 
             }
             else {
@@ -9545,7 +10281,15 @@ namespace Single.Simple {
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+
+
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputSingle3Result.Cache
+                );
+
             }
         }
 
@@ -9612,16 +10356,16 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache4, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -9657,7 +10401,7 @@ namespace Multiple.Simple {
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -9695,14 +10439,30 @@ namespace Multiple.Simple {
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash))
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputSingle3Result.Cache
+                
+                );
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash))
+                            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputSingle3Result.Cache
+);
+
+
             }
         }
 
@@ -9824,7 +10584,7 @@ namespace Multiple.Simple {
 ////;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -9932,18 +10692,18 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
-                this.inputList0.DoIt(cache?.PreviousCache4, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache4, options),
+                this.inputList0.DoIt(cache?.PreviousCache5, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -9951,11 +10711,11 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
-                this.inputList0.DoIt(cache?.PreviousCache4, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache4, options),
+                this.inputList0.DoIt(cache?.PreviousCache5, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -10016,7 +10776,16 @@ namespace Single.Simple {
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
+
+
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputSingle3Result.Cache
+            , inputList0Result.Cache 
+
+                );
 
             }
             else {
@@ -10024,7 +10793,17 @@ namespace Single.Simple {
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+
+
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputSingle3Result.Cache
+            , inputList0Result.Cache 
+
+                );
+
             }
         }
 
@@ -10099,18 +10878,18 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
-                this.inputList0.DoIt(cache?.PreviousCache4, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache4, options),
+                this.inputList0.DoIt(cache?.PreviousCache5, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -10152,7 +10931,7 @@ namespace Multiple.Simple {
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -10194,14 +10973,34 @@ namespace Multiple.Simple {
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash))
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputSingle3Result.Cache
+            , inputList0Result.Cache 
+
+                
+                );
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash))
+                            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputSingle3Result.Cache
+            , inputList0Result.Cache 
+
+);
+
+
             }
         }
 
@@ -10331,7 +11130,7 @@ namespace Multiple.Simple {
 //;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -10446,20 +11245,20 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
-                this.inputList0.DoIt(cache?.PreviousCache4, options),
-                this.inputList1.DoIt(cache?.PreviousCache5, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache4, options),
+                this.inputList0.DoIt(cache?.PreviousCache5, options),
+                this.inputList1.DoIt(cache?.PreviousCache6, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache6, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -10467,12 +11266,12 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
-                this.inputList0.DoIt(cache?.PreviousCache4, options),
-                this.inputList1.DoIt(cache?.PreviousCache5, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache4, options),
+                this.inputList0.DoIt(cache?.PreviousCache5, options),
+                this.inputList1.DoIt(cache?.PreviousCache6, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -10546,7 +11345,18 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
+
+
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputSingle3Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+                );
 
             }
             else {
@@ -10554,7 +11364,19 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+
+
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputSingle3Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+                );
+
             }
         }
 
@@ -10637,20 +11459,20 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
-                this.inputList0.DoIt(cache?.PreviousCache4, options),
-                this.inputList1.DoIt(cache?.PreviousCache5, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache4, options),
+                this.inputList0.DoIt(cache?.PreviousCache5, options),
+                this.inputList1.DoIt(cache?.PreviousCache6, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache6, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -10702,7 +11524,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -10748,14 +11570,38 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash))
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputSingle3Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+                
+                );
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash))
+                            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputSingle3Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+);
+
+
             }
         }
 
@@ -10893,7 +11739,7 @@ await Task.WhenAll(
 //;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -11015,22 +11861,22 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
-                this.inputList0.DoIt(cache?.PreviousCache4, options),
-                this.inputList1.DoIt(cache?.PreviousCache5, options),
-                this.inputList2.DoIt(cache?.PreviousCache6, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache4, options),
+                this.inputList0.DoIt(cache?.PreviousCache5, options),
+                this.inputList1.DoIt(cache?.PreviousCache6, options),
+                this.inputList2.DoIt(cache?.PreviousCache7, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache6, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache6, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache7, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -11038,13 +11884,13 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
-                this.inputList0.DoIt(cache?.PreviousCache4, options),
-                this.inputList1.DoIt(cache?.PreviousCache5, options),
-                this.inputList2.DoIt(cache?.PreviousCache6, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache4, options),
+                this.inputList0.DoIt(cache?.PreviousCache5, options),
+                this.inputList1.DoIt(cache?.PreviousCache6, options),
+                this.inputList2.DoIt(cache?.PreviousCache7, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -11128,7 +11974,20 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
+
+
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputSingle3Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+                );
 
             }
             else {
@@ -11136,7 +11995,21 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+
+
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputSingle3Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+                );
+
             }
         }
 
@@ -11227,22 +12100,22 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
-                this.inputList0.DoIt(cache?.PreviousCache4, options),
-                this.inputList1.DoIt(cache?.PreviousCache5, options),
-                this.inputList2.DoIt(cache?.PreviousCache6, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache4, options),
+                this.inputList0.DoIt(cache?.PreviousCache5, options),
+                this.inputList1.DoIt(cache?.PreviousCache6, options),
+                this.inputList2.DoIt(cache?.PreviousCache7, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache6, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache6, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache7, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -11301,7 +12174,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -11351,14 +12224,42 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash))
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputSingle3Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+                
+                );
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash))
+                            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputSingle3Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+);
+
+
             }
         }
 
@@ -11504,7 +12405,7 @@ await Task.WhenAll(
 //;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -11633,24 +12534,24 @@ namespace Single.Simple {
                 throw new ArgumentNullException(nameof(options));
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
-                this.inputList0.DoIt(cache?.PreviousCache4, options),
-                this.inputList1.DoIt(cache?.PreviousCache5, options),
-                this.inputList2.DoIt(cache?.PreviousCache6, options),
-                this.inputList3.DoIt(cache?.PreviousCache7, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache4, options),
+                this.inputList0.DoIt(cache?.PreviousCache5, options),
+                this.inputList1.DoIt(cache?.PreviousCache6, options),
+                this.inputList2.DoIt(cache?.PreviousCache7, options),
+                this.inputList3.DoIt(cache?.PreviousCache8, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache6, options).ConfigureAwait(false);
-            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache7, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache6, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache7, options).ConfigureAwait(false);
+            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache8, options).ConfigureAwait(false);
 
 
             var task = LazyTask.Create(async () =>
@@ -11658,14 +12559,14 @@ namespace Single.Simple {
 
         
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
-                this.inputList0.DoIt(cache?.PreviousCache4, options),
-                this.inputList1.DoIt(cache?.PreviousCache5, options),
-                this.inputList2.DoIt(cache?.PreviousCache6, options),
-                this.inputList3.DoIt(cache?.PreviousCache7, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache4, options),
+                this.inputList0.DoIt(cache?.PreviousCache5, options),
+                this.inputList1.DoIt(cache?.PreviousCache6, options),
+                this.inputList2.DoIt(cache?.PreviousCache7, options),
+                this.inputList3.DoIt(cache?.PreviousCache8, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
                             var inputSingle0Performed = await inputSingle0Result.Perform;
@@ -11759,7 +12660,22 @@ await Task.WhenAll(
 
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
-                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash);
+
+
+                return this.Context.CreateStageResult(result.work, hasChanges, id, result.cache, result.work.Hash
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputSingle3Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+            , inputList3Result.Cache 
+
+                );
 
             }
             else {
@@ -11767,7 +12683,23 @@ await Task.WhenAll(
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!);
+
+
+                return this.Context.CreateStageResult(actualTask, hasChanges, id, cache, cache.Data!
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputSingle3Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+            , inputList3Result.Cache 
+
+                );
+
             }
         }
 
@@ -11866,24 +12798,24 @@ namespace Multiple.Simple {
 
 
             await Task.WhenAll(
-                this.inputSingle0.DoIt(cache?.PreviousCache0, options),
-                this.inputSingle1.DoIt(cache?.PreviousCache1, options),
-                this.inputSingle2.DoIt(cache?.PreviousCache2, options),
-                this.inputSingle3.DoIt(cache?.PreviousCache3, options),
-                this.inputList0.DoIt(cache?.PreviousCache4, options),
-                this.inputList1.DoIt(cache?.PreviousCache5, options),
-                this.inputList2.DoIt(cache?.PreviousCache6, options),
-                this.inputList3.DoIt(cache?.PreviousCache7, options),
+                this.inputSingle0.DoIt(cache?.PreviousCache, options),
+                this.inputSingle1.DoIt(cache?.PreviousCache2, options),
+                this.inputSingle2.DoIt(cache?.PreviousCache3, options),
+                this.inputSingle3.DoIt(cache?.PreviousCache4, options),
+                this.inputList0.DoIt(cache?.PreviousCache5, options),
+                this.inputList1.DoIt(cache?.PreviousCache6, options),
+                this.inputList2.DoIt(cache?.PreviousCache7, options),
+                this.inputList3.DoIt(cache?.PreviousCache8, options),
                 Task.CompletedTask
             ).ConfigureAwait(false);
-                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache0, options).ConfigureAwait(false);
-            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache1, options).ConfigureAwait(false);
-            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
-            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
-            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
-            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
-            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache6, options).ConfigureAwait(false);
-            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache7, options).ConfigureAwait(false);
+                            var inputSingle0Result = await this.inputSingle0.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            var inputSingle1Result = await this.inputSingle1.DoIt(cache?.PreviousCache2, options).ConfigureAwait(false);
+            var inputSingle2Result = await this.inputSingle2.DoIt(cache?.PreviousCache3, options).ConfigureAwait(false);
+            var inputSingle3Result = await this.inputSingle3.DoIt(cache?.PreviousCache4, options).ConfigureAwait(false);
+            var inputList0Result = await this.inputList0.DoIt(cache?.PreviousCache5, options).ConfigureAwait(false);
+            var inputList1Result = await this.inputList1.DoIt(cache?.PreviousCache6, options).ConfigureAwait(false);
+            var inputList2Result = await this.inputList2.DoIt(cache?.PreviousCache7, options).ConfigureAwait(false);
+            var inputList3Result = await this.inputList3.DoIt(cache?.PreviousCache8, options).ConfigureAwait(false);
              
             var task = LazyTask.Create(async () =>
             {
@@ -11949,7 +12881,7 @@ await Task.WhenAll(
                     var hasChanges =true;
                     if(oldChildCaches !=null && oldChildCaches.TryGetValue(x.Id, out var oldHash))
                         hasChanges = x.Hash != oldHash;
-                    return (result: this.Context.CreateStageResult( x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
+                    return (result: StageResult.CreateStageResult(this.Context, x,hasChanges,x.Id, x.Hash, x.Hash), hash: x.Hash);
                 
                 }).ToArray();
 
@@ -12003,14 +12935,46 @@ await Task.WhenAll(
                 if(!hasChanges)
                     this.Context.Logger.Info($"Output will not have changes.");
 
-                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash)));
+
+                return this.Context.CreateStageResultList(result.work, hasChanges, ids.Select(x=>x.id).ToImmutableList(), result.cache, this.Context.GetHashForObject(result.cache.Ids.Select(x=>x.hash))
+            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputSingle3Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+            , inputList3Result.Cache 
+
+                
+                );
             }
             else{
                 var actualTask= LazyTask.Create(async ()=>{
                     var temp = await task;
                     return temp.work;
                 });
-                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash)));
+
+
+                return this.Context.CreateStageResultList(actualTask, hasChanges, ids.Select(x=>x.id).ToImmutableList(), cache, this.Context.GetHashForObject(cache.Ids.Select(x=>x.hash))
+                            , inputSingle0Result.Cache
+            , inputSingle1Result.Cache
+            , inputSingle2Result.Cache
+            , inputSingle3Result.Cache
+            , inputList0Result.Cache 
+
+            , inputList1Result.Cache 
+
+            , inputList2Result.Cache 
+
+            , inputList3Result.Cache 
+
+);
+
+
             }
         }
 
@@ -12164,7 +13128,7 @@ await Task.WhenAll(
 //;
 //            System.Diagnostics.Debug.Assert(cache != null || hasChanges);
 //
-//            if (hasChanges || (this.updateOnRefresh && options.Refresh))
+//            if (hasChanges || (this.updateOnRefresh && options.RefreshRemoteSources))
 //            {
 //                // if we should refresh we need to update the repo or if the previous input was different
 //                // we need to perform the network operation to ensure we have no changes
@@ -12242,7 +13206,7 @@ public static  partial class CacheIds{
 
 
     public class CacheId<TCache>
-        where TCache : class
+            where TCache : class
     {
 
 
@@ -12252,6 +13216,7 @@ public static  partial class CacheIds{
     }
 
         public class CacheIds<TCache>
+   
         where TCache : class
     {
     
@@ -12275,14 +13240,18 @@ public   partial class CachelessIds{
 
 
 
-    public partial class CachelessId    {
+    public partial class CachelessId
+   
+
+    {
 
 
 
         public string Id { get; set; }
     }
 
-        public partial class CachelessIds    {
+        public partial class CachelessIds   
+    {
     
 
         public (string id, string hash)[] Ids { get; set; }
@@ -12297,25 +13266,30 @@ public static partial class CacheId{
     public static CacheId<TCache, TPreview0> Create<TCache, TPreview0>(string id, TCache cache, TPreview0 preview0) 
         where TCache : class
         where TPreview0 : class
- => new CacheId<TCache, TPreview0>(){ Id = id, Data = cache, PreviousCache0 = preview0};
+ => new CacheId<TCache, TPreview0>(){ Id = id, Data = cache, PreviousCache  = preview0};
 }
 
 public static  partial class CacheIds{
 
     public static CacheIds<TCache, TPreview0> Create<TCache, TPreview0>((string id, string hash)[] ids, TCache cache, TPreview0 preview0) 
         where TCache : class
+
+
+
         where TPreview0 : class
- => new CacheIds<TCache, TPreview0>(){ Ids = ids, Data = cache, PreviousCache0 = preview0};
+ => new CacheIds<TCache, TPreview0>(){ Ids = ids, Data = cache, PreviousCache  = preview0};
 }
 
 
 
     public class CacheId<TCache, TPreview0>
-        where TCache : class
+        : IHavePreviousCache<
+     TPreview0    >
+            where TCache : class
         where TPreview0 : class
     {
 
-        public TPreview0? PreviousCache0 {get;set;}
+        public TPreview0? PreviousCache  { get; set; } 
 
         public TCache? Data { get; set; }
 
@@ -12323,10 +13297,13 @@ public static  partial class CacheIds{
     }
 
         public class CacheIds<TCache, TPreview0>
+       : IHavePreviousCache<
+     TPreview0    >
+    
         where TCache : class
         where TPreview0 : class
     {
-            public TPreview0? PreviousCache0 {get;set;}
+            public TPreview0? PreviousCache  { get; set; } 
 
         public TCache? Data { get; set; }
 
@@ -12338,30 +13315,38 @@ public  partial class CachelessId{
 
     public static CachelessId< TPreview0> Create< TPreview0>(string id, TPreview0 preview0) 
         where TPreview0 : class
- => new CachelessId< TPreview0>(){ Id = id, PreviousCache0 = preview0};
+ => new CachelessId< TPreview0>(){ Id = id, PreviousCache  = preview0};
 }
 
 public   partial class CachelessIds{
 
     public static CachelessIds< TPreview0> Create< TPreview0>((string id, string hash)[] ids, TPreview0 preview0) 
         where TPreview0 : class
- => new CachelessIds< TPreview0>(){ Ids = ids, PreviousCache0 = preview0};
+ => new CachelessIds< TPreview0>(){ Ids = ids, PreviousCache  = preview0};
 }
 
 
 
-    public partial class CachelessId< TPreview0>        where TPreview0 : class
+    public partial class CachelessId< TPreview0>
+       : IHavePreviousCache<
+     TPreview0    >
+    
+
+        where TPreview0 : class
     {
 
-        public TPreview0? PreviousCache0 {get;set;}
+        public TPreview0? PreviousCache  { get; set; } 
 
 
         public string Id { get; set; }
     }
 
-        public partial class CachelessIds< TPreview0>        where TPreview0 : class
+        public partial class CachelessIds< TPreview0>       : IHavePreviousCache<
+     TPreview0    >
+    
+        where TPreview0 : class
     {
-            public TPreview0? PreviousCache0 {get;set;}
+            public TPreview0? PreviousCache  { get; set; } 
 
 
         public (string id, string hash)[] Ids { get; set; }
@@ -12377,28 +13362,36 @@ public static partial class CacheId{
         where TCache : class
         where TPreview0 : class
         where TPreview1 : class
- => new CacheId<TCache, TPreview0, TPreview1>(){ Id = id, Data = cache, PreviousCache0 = preview0, PreviousCache1 = preview1};
+ => new CacheId<TCache, TPreview0, TPreview1>(){ Id = id, Data = cache, PreviousCache = preview0, PreviousCache2 = preview1};
 }
 
 public static  partial class CacheIds{
 
     public static CacheIds<TCache, TPreview0, TPreview1> Create<TCache, TPreview0, TPreview1>((string id, string hash)[] ids, TCache cache, TPreview0 preview0, TPreview1 preview1) 
         where TCache : class
+
+
+
         where TPreview0 : class
+
+
+
         where TPreview1 : class
- => new CacheIds<TCache, TPreview0, TPreview1>(){ Ids = ids, Data = cache, PreviousCache0 = preview0, PreviousCache1 = preview1};
+ => new CacheIds<TCache, TPreview0, TPreview1>(){ Ids = ids, Data = cache, PreviousCache = preview0, PreviousCache2 = preview1};
 }
 
 
 
     public class CacheId<TCache, TPreview0, TPreview1>
-        where TCache : class
+        : IHavePreviousCache<
+     TPreview0 , TPreview1    >
+            where TCache : class
         where TPreview0 : class
         where TPreview1 : class
     {
 
-        public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
+        public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
 
         public TCache? Data { get; set; }
 
@@ -12406,12 +13399,15 @@ public static  partial class CacheIds{
     }
 
         public class CacheIds<TCache, TPreview0, TPreview1>
+       : IHavePreviousCache<
+     TPreview0 , TPreview1    >
+    
         where TCache : class
         where TPreview0 : class
         where TPreview1 : class
     {
-            public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
+            public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
 
         public TCache? Data { get; set; }
 
@@ -12424,7 +13420,7 @@ public  partial class CachelessId{
     public static CachelessId< TPreview0 , TPreview1> Create< TPreview0 , TPreview1>(string id, TPreview0 preview0, TPreview1 preview1) 
         where TPreview0 : class
         where TPreview1 : class
- => new CachelessId< TPreview0 , TPreview1>(){ Id = id, PreviousCache0 = preview0, PreviousCache1 = preview1};
+ => new CachelessId< TPreview0 , TPreview1>(){ Id = id, PreviousCache = preview0, PreviousCache2 = preview1};
 }
 
 public   partial class CachelessIds{
@@ -12432,27 +13428,35 @@ public   partial class CachelessIds{
     public static CachelessIds< TPreview0 , TPreview1> Create< TPreview0 , TPreview1>((string id, string hash)[] ids, TPreview0 preview0, TPreview1 preview1) 
         where TPreview0 : class
         where TPreview1 : class
- => new CachelessIds< TPreview0 , TPreview1>(){ Ids = ids, PreviousCache0 = preview0, PreviousCache1 = preview1};
+ => new CachelessIds< TPreview0 , TPreview1>(){ Ids = ids, PreviousCache = preview0, PreviousCache2 = preview1};
 }
 
 
 
-    public partial class CachelessId< TPreview0 , TPreview1>        where TPreview0 : class
+    public partial class CachelessId< TPreview0 , TPreview1>
+       : IHavePreviousCache<
+     TPreview0 , TPreview1    >
+    
+
+        where TPreview0 : class
         where TPreview1 : class
     {
 
-        public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
+        public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
 
 
         public string Id { get; set; }
     }
 
-        public partial class CachelessIds< TPreview0 , TPreview1>        where TPreview0 : class
+        public partial class CachelessIds< TPreview0 , TPreview1>       : IHavePreviousCache<
+     TPreview0 , TPreview1    >
+    
+        where TPreview0 : class
         where TPreview1 : class
     {
-            public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
+            public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
 
 
         public (string id, string hash)[] Ids { get; set; }
@@ -12469,31 +13473,42 @@ public static partial class CacheId{
         where TPreview0 : class
         where TPreview1 : class
         where TPreview2 : class
- => new CacheId<TCache, TPreview0, TPreview1, TPreview2>(){ Id = id, Data = cache, PreviousCache0 = preview0, PreviousCache1 = preview1, PreviousCache2 = preview2};
+ => new CacheId<TCache, TPreview0, TPreview1, TPreview2>(){ Id = id, Data = cache, PreviousCache = preview0, PreviousCache2 = preview1, PreviousCache3 = preview2};
 }
 
 public static  partial class CacheIds{
 
     public static CacheIds<TCache, TPreview0, TPreview1, TPreview2> Create<TCache, TPreview0, TPreview1, TPreview2>((string id, string hash)[] ids, TCache cache, TPreview0 preview0, TPreview1 preview1, TPreview2 preview2) 
         where TCache : class
+
+
+
         where TPreview0 : class
+
+
+
         where TPreview1 : class
+
+
+
         where TPreview2 : class
- => new CacheIds<TCache, TPreview0, TPreview1, TPreview2>(){ Ids = ids, Data = cache, PreviousCache0 = preview0, PreviousCache1 = preview1, PreviousCache2 = preview2};
+ => new CacheIds<TCache, TPreview0, TPreview1, TPreview2>(){ Ids = ids, Data = cache, PreviousCache = preview0, PreviousCache2 = preview1, PreviousCache3 = preview2};
 }
 
 
 
     public class CacheId<TCache, TPreview0, TPreview1, TPreview2>
-        where TCache : class
+        : IHavePreviousCache<
+     TPreview0 , TPreview1 , TPreview2    >
+            where TCache : class
         where TPreview0 : class
         where TPreview1 : class
         where TPreview2 : class
     {
 
-        public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
-        public TPreview2? PreviousCache2 {get;set;}
+        public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
+        public TPreview2? PreviousCache3 { get; set; } 
 
         public TCache? Data { get; set; }
 
@@ -12501,14 +13516,17 @@ public static  partial class CacheIds{
     }
 
         public class CacheIds<TCache, TPreview0, TPreview1, TPreview2>
+       : IHavePreviousCache<
+     TPreview0 , TPreview1 , TPreview2    >
+    
         where TCache : class
         where TPreview0 : class
         where TPreview1 : class
         where TPreview2 : class
     {
-            public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
-        public TPreview2? PreviousCache2 {get;set;}
+            public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
+        public TPreview2? PreviousCache3 { get; set; } 
 
         public TCache? Data { get; set; }
 
@@ -12522,7 +13540,7 @@ public  partial class CachelessId{
         where TPreview0 : class
         where TPreview1 : class
         where TPreview2 : class
- => new CachelessId< TPreview0 , TPreview1 , TPreview2>(){ Id = id, PreviousCache0 = preview0, PreviousCache1 = preview1, PreviousCache2 = preview2};
+ => new CachelessId< TPreview0 , TPreview1 , TPreview2>(){ Id = id, PreviousCache = preview0, PreviousCache2 = preview1, PreviousCache3 = preview2};
 }
 
 public   partial class CachelessIds{
@@ -12531,31 +13549,39 @@ public   partial class CachelessIds{
         where TPreview0 : class
         where TPreview1 : class
         where TPreview2 : class
- => new CachelessIds< TPreview0 , TPreview1 , TPreview2>(){ Ids = ids, PreviousCache0 = preview0, PreviousCache1 = preview1, PreviousCache2 = preview2};
+ => new CachelessIds< TPreview0 , TPreview1 , TPreview2>(){ Ids = ids, PreviousCache = preview0, PreviousCache2 = preview1, PreviousCache3 = preview2};
 }
 
 
 
-    public partial class CachelessId< TPreview0 , TPreview1 , TPreview2>        where TPreview0 : class
+    public partial class CachelessId< TPreview0 , TPreview1 , TPreview2>
+       : IHavePreviousCache<
+     TPreview0 , TPreview1 , TPreview2    >
+    
+
+        where TPreview0 : class
         where TPreview1 : class
         where TPreview2 : class
     {
 
-        public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
-        public TPreview2? PreviousCache2 {get;set;}
+        public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
+        public TPreview2? PreviousCache3 { get; set; } 
 
 
         public string Id { get; set; }
     }
 
-        public partial class CachelessIds< TPreview0 , TPreview1 , TPreview2>        where TPreview0 : class
+        public partial class CachelessIds< TPreview0 , TPreview1 , TPreview2>       : IHavePreviousCache<
+     TPreview0 , TPreview1 , TPreview2    >
+    
+        where TPreview0 : class
         where TPreview1 : class
         where TPreview2 : class
     {
-            public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
-        public TPreview2? PreviousCache2 {get;set;}
+            public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
+        public TPreview2? PreviousCache3 { get; set; } 
 
 
         public (string id, string hash)[] Ids { get; set; }
@@ -12573,34 +13599,48 @@ public static partial class CacheId{
         where TPreview1 : class
         where TPreview2 : class
         where TPreview3 : class
- => new CacheId<TCache, TPreview0, TPreview1, TPreview2, TPreview3>(){ Id = id, Data = cache, PreviousCache0 = preview0, PreviousCache1 = preview1, PreviousCache2 = preview2, PreviousCache3 = preview3};
+ => new CacheId<TCache, TPreview0, TPreview1, TPreview2, TPreview3>(){ Id = id, Data = cache, PreviousCache = preview0, PreviousCache2 = preview1, PreviousCache3 = preview2, PreviousCache4 = preview3};
 }
 
 public static  partial class CacheIds{
 
     public static CacheIds<TCache, TPreview0, TPreview1, TPreview2, TPreview3> Create<TCache, TPreview0, TPreview1, TPreview2, TPreview3>((string id, string hash)[] ids, TCache cache, TPreview0 preview0, TPreview1 preview1, TPreview2 preview2, TPreview3 preview3) 
         where TCache : class
+
+
+
         where TPreview0 : class
+
+
+
         where TPreview1 : class
+
+
+
         where TPreview2 : class
+
+
+
         where TPreview3 : class
- => new CacheIds<TCache, TPreview0, TPreview1, TPreview2, TPreview3>(){ Ids = ids, Data = cache, PreviousCache0 = preview0, PreviousCache1 = preview1, PreviousCache2 = preview2, PreviousCache3 = preview3};
+ => new CacheIds<TCache, TPreview0, TPreview1, TPreview2, TPreview3>(){ Ids = ids, Data = cache, PreviousCache = preview0, PreviousCache2 = preview1, PreviousCache3 = preview2, PreviousCache4 = preview3};
 }
 
 
 
     public class CacheId<TCache, TPreview0, TPreview1, TPreview2, TPreview3>
-        where TCache : class
+        : IHavePreviousCache<
+     TPreview0 , TPreview1 , TPreview2 , TPreview3    >
+            where TCache : class
         where TPreview0 : class
         where TPreview1 : class
         where TPreview2 : class
         where TPreview3 : class
     {
 
-        public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
-        public TPreview2? PreviousCache2 {get;set;}
-        public TPreview3? PreviousCache3 {get;set;}
+        public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
+        public TPreview2? PreviousCache3 { get; set; } 
+        public TPreview3? PreviousCache4 { get; set; } 
 
         public TCache? Data { get; set; }
 
@@ -12608,16 +13648,19 @@ public static  partial class CacheIds{
     }
 
         public class CacheIds<TCache, TPreview0, TPreview1, TPreview2, TPreview3>
+       : IHavePreviousCache<
+     TPreview0 , TPreview1 , TPreview2 , TPreview3    >
+    
         where TCache : class
         where TPreview0 : class
         where TPreview1 : class
         where TPreview2 : class
         where TPreview3 : class
     {
-            public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
-        public TPreview2? PreviousCache2 {get;set;}
-        public TPreview3? PreviousCache3 {get;set;}
+            public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
+        public TPreview2? PreviousCache3 { get; set; } 
+        public TPreview3? PreviousCache4 { get; set; } 
 
         public TCache? Data { get; set; }
 
@@ -12632,7 +13675,7 @@ public  partial class CachelessId{
         where TPreview1 : class
         where TPreview2 : class
         where TPreview3 : class
- => new CachelessId< TPreview0 , TPreview1 , TPreview2 , TPreview3>(){ Id = id, PreviousCache0 = preview0, PreviousCache1 = preview1, PreviousCache2 = preview2, PreviousCache3 = preview3};
+ => new CachelessId< TPreview0 , TPreview1 , TPreview2 , TPreview3>(){ Id = id, PreviousCache = preview0, PreviousCache2 = preview1, PreviousCache3 = preview2, PreviousCache4 = preview3};
 }
 
 public   partial class CachelessIds{
@@ -12642,35 +13685,43 @@ public   partial class CachelessIds{
         where TPreview1 : class
         where TPreview2 : class
         where TPreview3 : class
- => new CachelessIds< TPreview0 , TPreview1 , TPreview2 , TPreview3>(){ Ids = ids, PreviousCache0 = preview0, PreviousCache1 = preview1, PreviousCache2 = preview2, PreviousCache3 = preview3};
+ => new CachelessIds< TPreview0 , TPreview1 , TPreview2 , TPreview3>(){ Ids = ids, PreviousCache = preview0, PreviousCache2 = preview1, PreviousCache3 = preview2, PreviousCache4 = preview3};
 }
 
 
 
-    public partial class CachelessId< TPreview0 , TPreview1 , TPreview2 , TPreview3>        where TPreview0 : class
+    public partial class CachelessId< TPreview0 , TPreview1 , TPreview2 , TPreview3>
+       : IHavePreviousCache<
+     TPreview0 , TPreview1 , TPreview2 , TPreview3    >
+    
+
+        where TPreview0 : class
         where TPreview1 : class
         where TPreview2 : class
         where TPreview3 : class
     {
 
-        public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
-        public TPreview2? PreviousCache2 {get;set;}
-        public TPreview3? PreviousCache3 {get;set;}
+        public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
+        public TPreview2? PreviousCache3 { get; set; } 
+        public TPreview3? PreviousCache4 { get; set; } 
 
 
         public string Id { get; set; }
     }
 
-        public partial class CachelessIds< TPreview0 , TPreview1 , TPreview2 , TPreview3>        where TPreview0 : class
+        public partial class CachelessIds< TPreview0 , TPreview1 , TPreview2 , TPreview3>       : IHavePreviousCache<
+     TPreview0 , TPreview1 , TPreview2 , TPreview3    >
+    
+        where TPreview0 : class
         where TPreview1 : class
         where TPreview2 : class
         where TPreview3 : class
     {
-            public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
-        public TPreview2? PreviousCache2 {get;set;}
-        public TPreview3? PreviousCache3 {get;set;}
+            public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
+        public TPreview2? PreviousCache3 { get; set; } 
+        public TPreview3? PreviousCache4 { get; set; } 
 
 
         public (string id, string hash)[] Ids { get; set; }
@@ -12689,25 +13740,42 @@ public static partial class CacheId{
         where TPreview2 : class
         where TPreview3 : class
         where TPreview4 : class
- => new CacheId<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4>(){ Id = id, Data = cache, PreviousCache0 = preview0, PreviousCache1 = preview1, PreviousCache2 = preview2, PreviousCache3 = preview3, PreviousCache4 = preview4};
+ => new CacheId<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4>(){ Id = id, Data = cache, PreviousCache = preview0, PreviousCache2 = preview1, PreviousCache3 = preview2, PreviousCache4 = preview3, PreviousCache5 = preview4};
 }
 
 public static  partial class CacheIds{
 
     public static CacheIds<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4> Create<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4>((string id, string hash)[] ids, TCache cache, TPreview0 preview0, TPreview1 preview1, TPreview2 preview2, TPreview3 preview3, TPreview4 preview4) 
         where TCache : class
+
+
+
         where TPreview0 : class
+
+
+
         where TPreview1 : class
+
+
+
         where TPreview2 : class
+
+
+
         where TPreview3 : class
+
+
+
         where TPreview4 : class
- => new CacheIds<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4>(){ Ids = ids, Data = cache, PreviousCache0 = preview0, PreviousCache1 = preview1, PreviousCache2 = preview2, PreviousCache3 = preview3, PreviousCache4 = preview4};
+ => new CacheIds<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4>(){ Ids = ids, Data = cache, PreviousCache = preview0, PreviousCache2 = preview1, PreviousCache3 = preview2, PreviousCache4 = preview3, PreviousCache5 = preview4};
 }
 
 
 
     public class CacheId<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4>
-        where TCache : class
+        : IHavePreviousCache<
+     TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4    >
+            where TCache : class
         where TPreview0 : class
         where TPreview1 : class
         where TPreview2 : class
@@ -12715,11 +13783,11 @@ public static  partial class CacheIds{
         where TPreview4 : class
     {
 
-        public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
-        public TPreview2? PreviousCache2 {get;set;}
-        public TPreview3? PreviousCache3 {get;set;}
-        public TPreview4? PreviousCache4 {get;set;}
+        public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
+        public TPreview2? PreviousCache3 { get; set; } 
+        public TPreview3? PreviousCache4 { get; set; } 
+        public TPreview4? PreviousCache5 { get; set; } 
 
         public TCache? Data { get; set; }
 
@@ -12727,6 +13795,9 @@ public static  partial class CacheIds{
     }
 
         public class CacheIds<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4>
+       : IHavePreviousCache<
+     TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4    >
+    
         where TCache : class
         where TPreview0 : class
         where TPreview1 : class
@@ -12734,11 +13805,11 @@ public static  partial class CacheIds{
         where TPreview3 : class
         where TPreview4 : class
     {
-            public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
-        public TPreview2? PreviousCache2 {get;set;}
-        public TPreview3? PreviousCache3 {get;set;}
-        public TPreview4? PreviousCache4 {get;set;}
+            public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
+        public TPreview2? PreviousCache3 { get; set; } 
+        public TPreview3? PreviousCache4 { get; set; } 
+        public TPreview4? PreviousCache5 { get; set; } 
 
         public TCache? Data { get; set; }
 
@@ -12754,7 +13825,7 @@ public  partial class CachelessId{
         where TPreview2 : class
         where TPreview3 : class
         where TPreview4 : class
- => new CachelessId< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4>(){ Id = id, PreviousCache0 = preview0, PreviousCache1 = preview1, PreviousCache2 = preview2, PreviousCache3 = preview3, PreviousCache4 = preview4};
+ => new CachelessId< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4>(){ Id = id, PreviousCache = preview0, PreviousCache2 = preview1, PreviousCache3 = preview2, PreviousCache4 = preview3, PreviousCache5 = preview4};
 }
 
 public   partial class CachelessIds{
@@ -12765,39 +13836,47 @@ public   partial class CachelessIds{
         where TPreview2 : class
         where TPreview3 : class
         where TPreview4 : class
- => new CachelessIds< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4>(){ Ids = ids, PreviousCache0 = preview0, PreviousCache1 = preview1, PreviousCache2 = preview2, PreviousCache3 = preview3, PreviousCache4 = preview4};
+ => new CachelessIds< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4>(){ Ids = ids, PreviousCache = preview0, PreviousCache2 = preview1, PreviousCache3 = preview2, PreviousCache4 = preview3, PreviousCache5 = preview4};
 }
 
 
 
-    public partial class CachelessId< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4>        where TPreview0 : class
+    public partial class CachelessId< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4>
+       : IHavePreviousCache<
+     TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4    >
+    
+
+        where TPreview0 : class
         where TPreview1 : class
         where TPreview2 : class
         where TPreview3 : class
         where TPreview4 : class
     {
 
-        public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
-        public TPreview2? PreviousCache2 {get;set;}
-        public TPreview3? PreviousCache3 {get;set;}
-        public TPreview4? PreviousCache4 {get;set;}
+        public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
+        public TPreview2? PreviousCache3 { get; set; } 
+        public TPreview3? PreviousCache4 { get; set; } 
+        public TPreview4? PreviousCache5 { get; set; } 
 
 
         public string Id { get; set; }
     }
 
-        public partial class CachelessIds< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4>        where TPreview0 : class
+        public partial class CachelessIds< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4>       : IHavePreviousCache<
+     TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4    >
+    
+        where TPreview0 : class
         where TPreview1 : class
         where TPreview2 : class
         where TPreview3 : class
         where TPreview4 : class
     {
-            public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
-        public TPreview2? PreviousCache2 {get;set;}
-        public TPreview3? PreviousCache3 {get;set;}
-        public TPreview4? PreviousCache4 {get;set;}
+            public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
+        public TPreview2? PreviousCache3 { get; set; } 
+        public TPreview3? PreviousCache4 { get; set; } 
+        public TPreview4? PreviousCache5 { get; set; } 
 
 
         public (string id, string hash)[] Ids { get; set; }
@@ -12817,26 +13896,46 @@ public static partial class CacheId{
         where TPreview3 : class
         where TPreview4 : class
         where TPreview5 : class
- => new CacheId<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4, TPreview5>(){ Id = id, Data = cache, PreviousCache0 = preview0, PreviousCache1 = preview1, PreviousCache2 = preview2, PreviousCache3 = preview3, PreviousCache4 = preview4, PreviousCache5 = preview5};
+ => new CacheId<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4, TPreview5>(){ Id = id, Data = cache, PreviousCache = preview0, PreviousCache2 = preview1, PreviousCache3 = preview2, PreviousCache4 = preview3, PreviousCache5 = preview4, PreviousCache6 = preview5};
 }
 
 public static  partial class CacheIds{
 
     public static CacheIds<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4, TPreview5> Create<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4, TPreview5>((string id, string hash)[] ids, TCache cache, TPreview0 preview0, TPreview1 preview1, TPreview2 preview2, TPreview3 preview3, TPreview4 preview4, TPreview5 preview5) 
         where TCache : class
+
+
+
         where TPreview0 : class
+
+
+
         where TPreview1 : class
+
+
+
         where TPreview2 : class
+
+
+
         where TPreview3 : class
+
+
+
         where TPreview4 : class
+
+
+
         where TPreview5 : class
- => new CacheIds<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4, TPreview5>(){ Ids = ids, Data = cache, PreviousCache0 = preview0, PreviousCache1 = preview1, PreviousCache2 = preview2, PreviousCache3 = preview3, PreviousCache4 = preview4, PreviousCache5 = preview5};
+ => new CacheIds<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4, TPreview5>(){ Ids = ids, Data = cache, PreviousCache = preview0, PreviousCache2 = preview1, PreviousCache3 = preview2, PreviousCache4 = preview3, PreviousCache5 = preview4, PreviousCache6 = preview5};
 }
 
 
 
     public class CacheId<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4, TPreview5>
-        where TCache : class
+        : IHavePreviousCache<
+     TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5    >
+            where TCache : class
         where TPreview0 : class
         where TPreview1 : class
         where TPreview2 : class
@@ -12845,12 +13944,12 @@ public static  partial class CacheIds{
         where TPreview5 : class
     {
 
-        public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
-        public TPreview2? PreviousCache2 {get;set;}
-        public TPreview3? PreviousCache3 {get;set;}
-        public TPreview4? PreviousCache4 {get;set;}
-        public TPreview5? PreviousCache5 {get;set;}
+        public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
+        public TPreview2? PreviousCache3 { get; set; } 
+        public TPreview3? PreviousCache4 { get; set; } 
+        public TPreview4? PreviousCache5 { get; set; } 
+        public TPreview5? PreviousCache6 { get; set; } 
 
         public TCache? Data { get; set; }
 
@@ -12858,6 +13957,9 @@ public static  partial class CacheIds{
     }
 
         public class CacheIds<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4, TPreview5>
+       : IHavePreviousCache<
+     TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5    >
+    
         where TCache : class
         where TPreview0 : class
         where TPreview1 : class
@@ -12866,12 +13968,12 @@ public static  partial class CacheIds{
         where TPreview4 : class
         where TPreview5 : class
     {
-            public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
-        public TPreview2? PreviousCache2 {get;set;}
-        public TPreview3? PreviousCache3 {get;set;}
-        public TPreview4? PreviousCache4 {get;set;}
-        public TPreview5? PreviousCache5 {get;set;}
+            public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
+        public TPreview2? PreviousCache3 { get; set; } 
+        public TPreview3? PreviousCache4 { get; set; } 
+        public TPreview4? PreviousCache5 { get; set; } 
+        public TPreview5? PreviousCache6 { get; set; } 
 
         public TCache? Data { get; set; }
 
@@ -12888,7 +13990,7 @@ public  partial class CachelessId{
         where TPreview3 : class
         where TPreview4 : class
         where TPreview5 : class
- => new CachelessId< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5>(){ Id = id, PreviousCache0 = preview0, PreviousCache1 = preview1, PreviousCache2 = preview2, PreviousCache3 = preview3, PreviousCache4 = preview4, PreviousCache5 = preview5};
+ => new CachelessId< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5>(){ Id = id, PreviousCache = preview0, PreviousCache2 = preview1, PreviousCache3 = preview2, PreviousCache4 = preview3, PreviousCache5 = preview4, PreviousCache6 = preview5};
 }
 
 public   partial class CachelessIds{
@@ -12900,12 +14002,17 @@ public   partial class CachelessIds{
         where TPreview3 : class
         where TPreview4 : class
         where TPreview5 : class
- => new CachelessIds< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5>(){ Ids = ids, PreviousCache0 = preview0, PreviousCache1 = preview1, PreviousCache2 = preview2, PreviousCache3 = preview3, PreviousCache4 = preview4, PreviousCache5 = preview5};
+ => new CachelessIds< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5>(){ Ids = ids, PreviousCache = preview0, PreviousCache2 = preview1, PreviousCache3 = preview2, PreviousCache4 = preview3, PreviousCache5 = preview4, PreviousCache6 = preview5};
 }
 
 
 
-    public partial class CachelessId< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5>        where TPreview0 : class
+    public partial class CachelessId< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5>
+       : IHavePreviousCache<
+     TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5    >
+    
+
+        where TPreview0 : class
         where TPreview1 : class
         where TPreview2 : class
         where TPreview3 : class
@@ -12913,30 +14020,33 @@ public   partial class CachelessIds{
         where TPreview5 : class
     {
 
-        public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
-        public TPreview2? PreviousCache2 {get;set;}
-        public TPreview3? PreviousCache3 {get;set;}
-        public TPreview4? PreviousCache4 {get;set;}
-        public TPreview5? PreviousCache5 {get;set;}
+        public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
+        public TPreview2? PreviousCache3 { get; set; } 
+        public TPreview3? PreviousCache4 { get; set; } 
+        public TPreview4? PreviousCache5 { get; set; } 
+        public TPreview5? PreviousCache6 { get; set; } 
 
 
         public string Id { get; set; }
     }
 
-        public partial class CachelessIds< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5>        where TPreview0 : class
+        public partial class CachelessIds< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5>       : IHavePreviousCache<
+     TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5    >
+    
+        where TPreview0 : class
         where TPreview1 : class
         where TPreview2 : class
         where TPreview3 : class
         where TPreview4 : class
         where TPreview5 : class
     {
-            public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
-        public TPreview2? PreviousCache2 {get;set;}
-        public TPreview3? PreviousCache3 {get;set;}
-        public TPreview4? PreviousCache4 {get;set;}
-        public TPreview5? PreviousCache5 {get;set;}
+            public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
+        public TPreview2? PreviousCache3 { get; set; } 
+        public TPreview3? PreviousCache4 { get; set; } 
+        public TPreview4? PreviousCache5 { get; set; } 
+        public TPreview5? PreviousCache6 { get; set; } 
 
 
         public (string id, string hash)[] Ids { get; set; }
@@ -12957,27 +14067,50 @@ public static partial class CacheId{
         where TPreview4 : class
         where TPreview5 : class
         where TPreview6 : class
- => new CacheId<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4, TPreview5, TPreview6>(){ Id = id, Data = cache, PreviousCache0 = preview0, PreviousCache1 = preview1, PreviousCache2 = preview2, PreviousCache3 = preview3, PreviousCache4 = preview4, PreviousCache5 = preview5, PreviousCache6 = preview6};
+ => new CacheId<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4, TPreview5, TPreview6>(){ Id = id, Data = cache, PreviousCache = preview0, PreviousCache2 = preview1, PreviousCache3 = preview2, PreviousCache4 = preview3, PreviousCache5 = preview4, PreviousCache6 = preview5, PreviousCache7 = preview6};
 }
 
 public static  partial class CacheIds{
 
     public static CacheIds<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4, TPreview5, TPreview6> Create<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4, TPreview5, TPreview6>((string id, string hash)[] ids, TCache cache, TPreview0 preview0, TPreview1 preview1, TPreview2 preview2, TPreview3 preview3, TPreview4 preview4, TPreview5 preview5, TPreview6 preview6) 
         where TCache : class
+
+
+
         where TPreview0 : class
+
+
+
         where TPreview1 : class
+
+
+
         where TPreview2 : class
+
+
+
         where TPreview3 : class
+
+
+
         where TPreview4 : class
+
+
+
         where TPreview5 : class
+
+
+
         where TPreview6 : class
- => new CacheIds<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4, TPreview5, TPreview6>(){ Ids = ids, Data = cache, PreviousCache0 = preview0, PreviousCache1 = preview1, PreviousCache2 = preview2, PreviousCache3 = preview3, PreviousCache4 = preview4, PreviousCache5 = preview5, PreviousCache6 = preview6};
+ => new CacheIds<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4, TPreview5, TPreview6>(){ Ids = ids, Data = cache, PreviousCache = preview0, PreviousCache2 = preview1, PreviousCache3 = preview2, PreviousCache4 = preview3, PreviousCache5 = preview4, PreviousCache6 = preview5, PreviousCache7 = preview6};
 }
 
 
 
     public class CacheId<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4, TPreview5, TPreview6>
-        where TCache : class
+        : IHavePreviousCache<
+     TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5 , TPreview6    >
+            where TCache : class
         where TPreview0 : class
         where TPreview1 : class
         where TPreview2 : class
@@ -12987,13 +14120,13 @@ public static  partial class CacheIds{
         where TPreview6 : class
     {
 
-        public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
-        public TPreview2? PreviousCache2 {get;set;}
-        public TPreview3? PreviousCache3 {get;set;}
-        public TPreview4? PreviousCache4 {get;set;}
-        public TPreview5? PreviousCache5 {get;set;}
-        public TPreview6? PreviousCache6 {get;set;}
+        public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
+        public TPreview2? PreviousCache3 { get; set; } 
+        public TPreview3? PreviousCache4 { get; set; } 
+        public TPreview4? PreviousCache5 { get; set; } 
+        public TPreview5? PreviousCache6 { get; set; } 
+        public TPreview6? PreviousCache7 { get; set; } 
 
         public TCache? Data { get; set; }
 
@@ -13001,6 +14134,9 @@ public static  partial class CacheIds{
     }
 
         public class CacheIds<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4, TPreview5, TPreview6>
+       : IHavePreviousCache<
+     TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5 , TPreview6    >
+    
         where TCache : class
         where TPreview0 : class
         where TPreview1 : class
@@ -13010,13 +14146,13 @@ public static  partial class CacheIds{
         where TPreview5 : class
         where TPreview6 : class
     {
-            public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
-        public TPreview2? PreviousCache2 {get;set;}
-        public TPreview3? PreviousCache3 {get;set;}
-        public TPreview4? PreviousCache4 {get;set;}
-        public TPreview5? PreviousCache5 {get;set;}
-        public TPreview6? PreviousCache6 {get;set;}
+            public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
+        public TPreview2? PreviousCache3 { get; set; } 
+        public TPreview3? PreviousCache4 { get; set; } 
+        public TPreview4? PreviousCache5 { get; set; } 
+        public TPreview5? PreviousCache6 { get; set; } 
+        public TPreview6? PreviousCache7 { get; set; } 
 
         public TCache? Data { get; set; }
 
@@ -13034,7 +14170,7 @@ public  partial class CachelessId{
         where TPreview4 : class
         where TPreview5 : class
         where TPreview6 : class
- => new CachelessId< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5 , TPreview6>(){ Id = id, PreviousCache0 = preview0, PreviousCache1 = preview1, PreviousCache2 = preview2, PreviousCache3 = preview3, PreviousCache4 = preview4, PreviousCache5 = preview5, PreviousCache6 = preview6};
+ => new CachelessId< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5 , TPreview6>(){ Id = id, PreviousCache = preview0, PreviousCache2 = preview1, PreviousCache3 = preview2, PreviousCache4 = preview3, PreviousCache5 = preview4, PreviousCache6 = preview5, PreviousCache7 = preview6};
 }
 
 public   partial class CachelessIds{
@@ -13047,12 +14183,17 @@ public   partial class CachelessIds{
         where TPreview4 : class
         where TPreview5 : class
         where TPreview6 : class
- => new CachelessIds< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5 , TPreview6>(){ Ids = ids, PreviousCache0 = preview0, PreviousCache1 = preview1, PreviousCache2 = preview2, PreviousCache3 = preview3, PreviousCache4 = preview4, PreviousCache5 = preview5, PreviousCache6 = preview6};
+ => new CachelessIds< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5 , TPreview6>(){ Ids = ids, PreviousCache = preview0, PreviousCache2 = preview1, PreviousCache3 = preview2, PreviousCache4 = preview3, PreviousCache5 = preview4, PreviousCache6 = preview5, PreviousCache7 = preview6};
 }
 
 
 
-    public partial class CachelessId< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5 , TPreview6>        where TPreview0 : class
+    public partial class CachelessId< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5 , TPreview6>
+       : IHavePreviousCache<
+     TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5 , TPreview6    >
+    
+
+        where TPreview0 : class
         where TPreview1 : class
         where TPreview2 : class
         where TPreview3 : class
@@ -13061,19 +14202,22 @@ public   partial class CachelessIds{
         where TPreview6 : class
     {
 
-        public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
-        public TPreview2? PreviousCache2 {get;set;}
-        public TPreview3? PreviousCache3 {get;set;}
-        public TPreview4? PreviousCache4 {get;set;}
-        public TPreview5? PreviousCache5 {get;set;}
-        public TPreview6? PreviousCache6 {get;set;}
+        public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
+        public TPreview2? PreviousCache3 { get; set; } 
+        public TPreview3? PreviousCache4 { get; set; } 
+        public TPreview4? PreviousCache5 { get; set; } 
+        public TPreview5? PreviousCache6 { get; set; } 
+        public TPreview6? PreviousCache7 { get; set; } 
 
 
         public string Id { get; set; }
     }
 
-        public partial class CachelessIds< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5 , TPreview6>        where TPreview0 : class
+        public partial class CachelessIds< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5 , TPreview6>       : IHavePreviousCache<
+     TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5 , TPreview6    >
+    
+        where TPreview0 : class
         where TPreview1 : class
         where TPreview2 : class
         where TPreview3 : class
@@ -13081,13 +14225,13 @@ public   partial class CachelessIds{
         where TPreview5 : class
         where TPreview6 : class
     {
-            public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
-        public TPreview2? PreviousCache2 {get;set;}
-        public TPreview3? PreviousCache3 {get;set;}
-        public TPreview4? PreviousCache4 {get;set;}
-        public TPreview5? PreviousCache5 {get;set;}
-        public TPreview6? PreviousCache6 {get;set;}
+            public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
+        public TPreview2? PreviousCache3 { get; set; } 
+        public TPreview3? PreviousCache4 { get; set; } 
+        public TPreview4? PreviousCache5 { get; set; } 
+        public TPreview5? PreviousCache6 { get; set; } 
+        public TPreview6? PreviousCache7 { get; set; } 
 
 
         public (string id, string hash)[] Ids { get; set; }
@@ -13109,28 +14253,54 @@ public static partial class CacheId{
         where TPreview5 : class
         where TPreview6 : class
         where TPreview7 : class
- => new CacheId<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4, TPreview5, TPreview6, TPreview7>(){ Id = id, Data = cache, PreviousCache0 = preview0, PreviousCache1 = preview1, PreviousCache2 = preview2, PreviousCache3 = preview3, PreviousCache4 = preview4, PreviousCache5 = preview5, PreviousCache6 = preview6, PreviousCache7 = preview7};
+ => new CacheId<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4, TPreview5, TPreview6, TPreview7>(){ Id = id, Data = cache, PreviousCache = preview0, PreviousCache2 = preview1, PreviousCache3 = preview2, PreviousCache4 = preview3, PreviousCache5 = preview4, PreviousCache6 = preview5, PreviousCache7 = preview6, PreviousCache8 = preview7};
 }
 
 public static  partial class CacheIds{
 
     public static CacheIds<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4, TPreview5, TPreview6, TPreview7> Create<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4, TPreview5, TPreview6, TPreview7>((string id, string hash)[] ids, TCache cache, TPreview0 preview0, TPreview1 preview1, TPreview2 preview2, TPreview3 preview3, TPreview4 preview4, TPreview5 preview5, TPreview6 preview6, TPreview7 preview7) 
         where TCache : class
+
+
+
         where TPreview0 : class
+
+
+
         where TPreview1 : class
+
+
+
         where TPreview2 : class
+
+
+
         where TPreview3 : class
+
+
+
         where TPreview4 : class
+
+
+
         where TPreview5 : class
+
+
+
         where TPreview6 : class
+
+
+
         where TPreview7 : class
- => new CacheIds<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4, TPreview5, TPreview6, TPreview7>(){ Ids = ids, Data = cache, PreviousCache0 = preview0, PreviousCache1 = preview1, PreviousCache2 = preview2, PreviousCache3 = preview3, PreviousCache4 = preview4, PreviousCache5 = preview5, PreviousCache6 = preview6, PreviousCache7 = preview7};
+ => new CacheIds<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4, TPreview5, TPreview6, TPreview7>(){ Ids = ids, Data = cache, PreviousCache = preview0, PreviousCache2 = preview1, PreviousCache3 = preview2, PreviousCache4 = preview3, PreviousCache5 = preview4, PreviousCache6 = preview5, PreviousCache7 = preview6, PreviousCache8 = preview7};
 }
 
 
 
     public class CacheId<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4, TPreview5, TPreview6, TPreview7>
-        where TCache : class
+        : IHavePreviousCache<
+     TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5 , TPreview6 , TPreview7    >
+            where TCache : class
         where TPreview0 : class
         where TPreview1 : class
         where TPreview2 : class
@@ -13141,14 +14311,14 @@ public static  partial class CacheIds{
         where TPreview7 : class
     {
 
-        public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
-        public TPreview2? PreviousCache2 {get;set;}
-        public TPreview3? PreviousCache3 {get;set;}
-        public TPreview4? PreviousCache4 {get;set;}
-        public TPreview5? PreviousCache5 {get;set;}
-        public TPreview6? PreviousCache6 {get;set;}
-        public TPreview7? PreviousCache7 {get;set;}
+        public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
+        public TPreview2? PreviousCache3 { get; set; } 
+        public TPreview3? PreviousCache4 { get; set; } 
+        public TPreview4? PreviousCache5 { get; set; } 
+        public TPreview5? PreviousCache6 { get; set; } 
+        public TPreview6? PreviousCache7 { get; set; } 
+        public TPreview7? PreviousCache8 { get; set; } 
 
         public TCache? Data { get; set; }
 
@@ -13156,6 +14326,9 @@ public static  partial class CacheIds{
     }
 
         public class CacheIds<TCache, TPreview0, TPreview1, TPreview2, TPreview3, TPreview4, TPreview5, TPreview6, TPreview7>
+       : IHavePreviousCache<
+     TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5 , TPreview6 , TPreview7    >
+    
         where TCache : class
         where TPreview0 : class
         where TPreview1 : class
@@ -13166,14 +14339,14 @@ public static  partial class CacheIds{
         where TPreview6 : class
         where TPreview7 : class
     {
-            public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
-        public TPreview2? PreviousCache2 {get;set;}
-        public TPreview3? PreviousCache3 {get;set;}
-        public TPreview4? PreviousCache4 {get;set;}
-        public TPreview5? PreviousCache5 {get;set;}
-        public TPreview6? PreviousCache6 {get;set;}
-        public TPreview7? PreviousCache7 {get;set;}
+            public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
+        public TPreview2? PreviousCache3 { get; set; } 
+        public TPreview3? PreviousCache4 { get; set; } 
+        public TPreview4? PreviousCache5 { get; set; } 
+        public TPreview5? PreviousCache6 { get; set; } 
+        public TPreview6? PreviousCache7 { get; set; } 
+        public TPreview7? PreviousCache8 { get; set; } 
 
         public TCache? Data { get; set; }
 
@@ -13192,7 +14365,7 @@ public  partial class CachelessId{
         where TPreview5 : class
         where TPreview6 : class
         where TPreview7 : class
- => new CachelessId< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5 , TPreview6 , TPreview7>(){ Id = id, PreviousCache0 = preview0, PreviousCache1 = preview1, PreviousCache2 = preview2, PreviousCache3 = preview3, PreviousCache4 = preview4, PreviousCache5 = preview5, PreviousCache6 = preview6, PreviousCache7 = preview7};
+ => new CachelessId< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5 , TPreview6 , TPreview7>(){ Id = id, PreviousCache = preview0, PreviousCache2 = preview1, PreviousCache3 = preview2, PreviousCache4 = preview3, PreviousCache5 = preview4, PreviousCache6 = preview5, PreviousCache7 = preview6, PreviousCache8 = preview7};
 }
 
 public   partial class CachelessIds{
@@ -13206,12 +14379,17 @@ public   partial class CachelessIds{
         where TPreview5 : class
         where TPreview6 : class
         where TPreview7 : class
- => new CachelessIds< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5 , TPreview6 , TPreview7>(){ Ids = ids, PreviousCache0 = preview0, PreviousCache1 = preview1, PreviousCache2 = preview2, PreviousCache3 = preview3, PreviousCache4 = preview4, PreviousCache5 = preview5, PreviousCache6 = preview6, PreviousCache7 = preview7};
+ => new CachelessIds< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5 , TPreview6 , TPreview7>(){ Ids = ids, PreviousCache = preview0, PreviousCache2 = preview1, PreviousCache3 = preview2, PreviousCache4 = preview3, PreviousCache5 = preview4, PreviousCache6 = preview5, PreviousCache7 = preview6, PreviousCache8 = preview7};
 }
 
 
 
-    public partial class CachelessId< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5 , TPreview6 , TPreview7>        where TPreview0 : class
+    public partial class CachelessId< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5 , TPreview6 , TPreview7>
+       : IHavePreviousCache<
+     TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5 , TPreview6 , TPreview7    >
+    
+
+        where TPreview0 : class
         where TPreview1 : class
         where TPreview2 : class
         where TPreview3 : class
@@ -13221,20 +14399,23 @@ public   partial class CachelessIds{
         where TPreview7 : class
     {
 
-        public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
-        public TPreview2? PreviousCache2 {get;set;}
-        public TPreview3? PreviousCache3 {get;set;}
-        public TPreview4? PreviousCache4 {get;set;}
-        public TPreview5? PreviousCache5 {get;set;}
-        public TPreview6? PreviousCache6 {get;set;}
-        public TPreview7? PreviousCache7 {get;set;}
+        public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
+        public TPreview2? PreviousCache3 { get; set; } 
+        public TPreview3? PreviousCache4 { get; set; } 
+        public TPreview4? PreviousCache5 { get; set; } 
+        public TPreview5? PreviousCache6 { get; set; } 
+        public TPreview6? PreviousCache7 { get; set; } 
+        public TPreview7? PreviousCache8 { get; set; } 
 
 
         public string Id { get; set; }
     }
 
-        public partial class CachelessIds< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5 , TPreview6 , TPreview7>        where TPreview0 : class
+        public partial class CachelessIds< TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5 , TPreview6 , TPreview7>       : IHavePreviousCache<
+     TPreview0 , TPreview1 , TPreview2 , TPreview3 , TPreview4 , TPreview5 , TPreview6 , TPreview7    >
+    
+        where TPreview0 : class
         where TPreview1 : class
         where TPreview2 : class
         where TPreview3 : class
@@ -13243,14 +14424,14 @@ public   partial class CachelessIds{
         where TPreview6 : class
         where TPreview7 : class
     {
-            public TPreview0? PreviousCache0 {get;set;}
-        public TPreview1? PreviousCache1 {get;set;}
-        public TPreview2? PreviousCache2 {get;set;}
-        public TPreview3? PreviousCache3 {get;set;}
-        public TPreview4? PreviousCache4 {get;set;}
-        public TPreview5? PreviousCache5 {get;set;}
-        public TPreview6? PreviousCache6 {get;set;}
-        public TPreview7? PreviousCache7 {get;set;}
+            public TPreview0? PreviousCache { get; set; } 
+        public TPreview1? PreviousCache2 { get; set; } 
+        public TPreview2? PreviousCache3 { get; set; } 
+        public TPreview3? PreviousCache4 { get; set; } 
+        public TPreview4? PreviousCache5 { get; set; } 
+        public TPreview5? PreviousCache6 { get; set; } 
+        public TPreview6? PreviousCache7 { get; set; } 
+        public TPreview7? PreviousCache8 { get; set; } 
 
 
         public (string id, string hash)[] Ids { get; set; }
@@ -13264,3 +14445,1031 @@ public   partial class CachelessIds{
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
 }
+
+
+
+
+namespace Stasistium.Documents
+{
+    public partial interface IGeneratorContext 
+    {
+        StageResult<TResult, TCache> CreateStageResult<TResult, TCache, TPreviousCache1>(LazyTask<IDocument<TResult>> perform, bool hasChanges, string documentId, TCache cache, string hash, TPreviousCache1 previousCache1)
+                where TCache : class, IHavePreviousCache<TPreviousCache1>
+                where TPreviousCache1 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache  = previousCache1;
+            return StageResult.CreateStageResult(this, perform, hasChanges, documentId, cache, hash);
+        }
+
+        public StageResult<TResult, TCache> CreateStageResult<TResult, TCache, TPreviousCache1>(IDocument<TResult> result, bool hasChanges, string documentId, TCache cache, string hash, TPreviousCache1 previousCache1)
+                where TCache : class, IHavePreviousCache<TPreviousCache1>
+                where TPreviousCache1 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache  = previousCache1;
+            return StageResult.CreateStageResult(this, result, hasChanges, documentId, cache, hash);
+        }
+
+        public StageResultList<TResult, TResultCache, TCache> CreateStageResultList<TResult, TResultCache, TCache, TPreviousCache1>(LazyTask<ImmutableList<StageResult<TResult, TResultCache>>> perform, bool hasChanges, ImmutableList<string> documentId, TCache cache, string hash, TPreviousCache1 previousCache1)
+            where TResultCache : class
+                where TCache : class, IHavePreviousCache<TPreviousCache1>
+                where TPreviousCache1 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache  = previousCache1;
+            return StageResultList.CreateStageResultList(this, perform, hasChanges, documentId, cache, hash);
+        }
+
+        public StageResultList<TResult, TResultCache, TCache> CreateStageResultList<TResult, TResultCache, TCache, TPreviousCache1>(ImmutableList<StageResult<TResult, TResultCache>> result, bool hasChanges, ImmutableList<string> documentId, TCache cache, string hash, TPreviousCache1 previousCache1)
+            where TResultCache : class
+                where TCache : class, IHavePreviousCache<TPreviousCache1>
+                where TPreviousCache1 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache  = previousCache1;
+            return StageResultList.CreateStageResultList(this, LazyTask.Create(() => result), hasChanges, documentId, cache, hash);
+        }
+    }
+
+    public interface IHavePreviousCache<TPreviousCache1>
+        where TPreviousCache1 : class
+    {
+
+        public TPreviousCache1 PreviousCache  { get; set; }
+
+
+
+    }
+
+
+    public partial interface IGeneratorContext 
+    {
+        StageResult<TResult, TCache> CreateStageResult<TResult, TCache, TPreviousCache1, TPreviousCache2>(LazyTask<IDocument<TResult>> perform, bool hasChanges, string documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2)
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            return StageResult.CreateStageResult(this, perform, hasChanges, documentId, cache, hash);
+        }
+
+        public StageResult<TResult, TCache> CreateStageResult<TResult, TCache, TPreviousCache1, TPreviousCache2>(IDocument<TResult> result, bool hasChanges, string documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2)
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            return StageResult.CreateStageResult(this, result, hasChanges, documentId, cache, hash);
+        }
+
+        public StageResultList<TResult, TResultCache, TCache> CreateStageResultList<TResult, TResultCache, TCache, TPreviousCache1, TPreviousCache2>(LazyTask<ImmutableList<StageResult<TResult, TResultCache>>> perform, bool hasChanges, ImmutableList<string> documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2)
+            where TResultCache : class
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            return StageResultList.CreateStageResultList(this, perform, hasChanges, documentId, cache, hash);
+        }
+
+        public StageResultList<TResult, TResultCache, TCache> CreateStageResultList<TResult, TResultCache, TCache, TPreviousCache1, TPreviousCache2>(ImmutableList<StageResult<TResult, TResultCache>> result, bool hasChanges, ImmutableList<string> documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2)
+            where TResultCache : class
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            return StageResultList.CreateStageResultList(this, LazyTask.Create(() => result), hasChanges, documentId, cache, hash);
+        }
+    }
+
+    public interface IHavePreviousCache<TPreviousCache1, TPreviousCache2>
+        where TPreviousCache1 : class
+            where TPreviousCache2 : class
+    {
+
+        public TPreviousCache1 PreviousCache { get; set; }
+        public TPreviousCache2 PreviousCache2 { get; set; }
+
+
+
+    }
+
+
+    public partial interface IGeneratorContext 
+    {
+        StageResult<TResult, TCache> CreateStageResult<TResult, TCache, TPreviousCache1, TPreviousCache2, TPreviousCache3>(LazyTask<IDocument<TResult>> perform, bool hasChanges, string documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2, TPreviousCache3 previousCache3)
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            if (previousCache3 is null)
+                throw new ArgumentNullException(nameof(previousCache3));
+            cache.PreviousCache3 = previousCache3;
+            return StageResult.CreateStageResult(this, perform, hasChanges, documentId, cache, hash);
+        }
+
+        public StageResult<TResult, TCache> CreateStageResult<TResult, TCache, TPreviousCache1, TPreviousCache2, TPreviousCache3>(IDocument<TResult> result, bool hasChanges, string documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2, TPreviousCache3 previousCache3)
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            if (previousCache3 is null)
+                throw new ArgumentNullException(nameof(previousCache3));
+            cache.PreviousCache3 = previousCache3;
+            return StageResult.CreateStageResult(this, result, hasChanges, documentId, cache, hash);
+        }
+
+        public StageResultList<TResult, TResultCache, TCache> CreateStageResultList<TResult, TResultCache, TCache, TPreviousCache1, TPreviousCache2, TPreviousCache3>(LazyTask<ImmutableList<StageResult<TResult, TResultCache>>> perform, bool hasChanges, ImmutableList<string> documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2, TPreviousCache3 previousCache3)
+            where TResultCache : class
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            if (previousCache3 is null)
+                throw new ArgumentNullException(nameof(previousCache3));
+            cache.PreviousCache3 = previousCache3;
+            return StageResultList.CreateStageResultList(this, perform, hasChanges, documentId, cache, hash);
+        }
+
+        public StageResultList<TResult, TResultCache, TCache> CreateStageResultList<TResult, TResultCache, TCache, TPreviousCache1, TPreviousCache2, TPreviousCache3>(ImmutableList<StageResult<TResult, TResultCache>> result, bool hasChanges, ImmutableList<string> documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2, TPreviousCache3 previousCache3)
+            where TResultCache : class
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            if (previousCache3 is null)
+                throw new ArgumentNullException(nameof(previousCache3));
+            cache.PreviousCache3 = previousCache3;
+            return StageResultList.CreateStageResultList(this, LazyTask.Create(() => result), hasChanges, documentId, cache, hash);
+        }
+    }
+
+    public interface IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3>
+        where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+    {
+
+        public TPreviousCache1 PreviousCache { get; set; }
+        public TPreviousCache2 PreviousCache2 { get; set; }
+        public TPreviousCache3 PreviousCache3 { get; set; }
+
+
+
+    }
+
+
+    public partial interface IGeneratorContext 
+    {
+        StageResult<TResult, TCache> CreateStageResult<TResult, TCache, TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4>(LazyTask<IDocument<TResult>> perform, bool hasChanges, string documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2, TPreviousCache3 previousCache3, TPreviousCache4 previousCache4)
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            if (previousCache3 is null)
+                throw new ArgumentNullException(nameof(previousCache3));
+            cache.PreviousCache3 = previousCache3;
+            if (previousCache4 is null)
+                throw new ArgumentNullException(nameof(previousCache4));
+            cache.PreviousCache4 = previousCache4;
+            return StageResult.CreateStageResult(this, perform, hasChanges, documentId, cache, hash);
+        }
+
+        public StageResult<TResult, TCache> CreateStageResult<TResult, TCache, TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4>(IDocument<TResult> result, bool hasChanges, string documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2, TPreviousCache3 previousCache3, TPreviousCache4 previousCache4)
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            if (previousCache3 is null)
+                throw new ArgumentNullException(nameof(previousCache3));
+            cache.PreviousCache3 = previousCache3;
+            if (previousCache4 is null)
+                throw new ArgumentNullException(nameof(previousCache4));
+            cache.PreviousCache4 = previousCache4;
+            return StageResult.CreateStageResult(this, result, hasChanges, documentId, cache, hash);
+        }
+
+        public StageResultList<TResult, TResultCache, TCache> CreateStageResultList<TResult, TResultCache, TCache, TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4>(LazyTask<ImmutableList<StageResult<TResult, TResultCache>>> perform, bool hasChanges, ImmutableList<string> documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2, TPreviousCache3 previousCache3, TPreviousCache4 previousCache4)
+            where TResultCache : class
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            if (previousCache3 is null)
+                throw new ArgumentNullException(nameof(previousCache3));
+            cache.PreviousCache3 = previousCache3;
+            if (previousCache4 is null)
+                throw new ArgumentNullException(nameof(previousCache4));
+            cache.PreviousCache4 = previousCache4;
+            return StageResultList.CreateStageResultList(this, perform, hasChanges, documentId, cache, hash);
+        }
+
+        public StageResultList<TResult, TResultCache, TCache> CreateStageResultList<TResult, TResultCache, TCache, TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4>(ImmutableList<StageResult<TResult, TResultCache>> result, bool hasChanges, ImmutableList<string> documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2, TPreviousCache3 previousCache3, TPreviousCache4 previousCache4)
+            where TResultCache : class
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            if (previousCache3 is null)
+                throw new ArgumentNullException(nameof(previousCache3));
+            cache.PreviousCache3 = previousCache3;
+            if (previousCache4 is null)
+                throw new ArgumentNullException(nameof(previousCache4));
+            cache.PreviousCache4 = previousCache4;
+            return StageResultList.CreateStageResultList(this, LazyTask.Create(() => result), hasChanges, documentId, cache, hash);
+        }
+    }
+
+    public interface IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4>
+        where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+    {
+
+        public TPreviousCache1 PreviousCache { get; set; }
+        public TPreviousCache2 PreviousCache2 { get; set; }
+        public TPreviousCache3 PreviousCache3 { get; set; }
+        public TPreviousCache4 PreviousCache4 { get; set; }
+
+
+
+    }
+
+
+    public partial interface IGeneratorContext 
+    {
+        StageResult<TResult, TCache> CreateStageResult<TResult, TCache, TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5>(LazyTask<IDocument<TResult>> perform, bool hasChanges, string documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2, TPreviousCache3 previousCache3, TPreviousCache4 previousCache4, TPreviousCache5 previousCache5)
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+            where TPreviousCache5 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            if (previousCache3 is null)
+                throw new ArgumentNullException(nameof(previousCache3));
+            cache.PreviousCache3 = previousCache3;
+            if (previousCache4 is null)
+                throw new ArgumentNullException(nameof(previousCache4));
+            cache.PreviousCache4 = previousCache4;
+            if (previousCache5 is null)
+                throw new ArgumentNullException(nameof(previousCache5));
+            cache.PreviousCache5 = previousCache5;
+            return StageResult.CreateStageResult(this, perform, hasChanges, documentId, cache, hash);
+        }
+
+        public StageResult<TResult, TCache> CreateStageResult<TResult, TCache, TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5>(IDocument<TResult> result, bool hasChanges, string documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2, TPreviousCache3 previousCache3, TPreviousCache4 previousCache4, TPreviousCache5 previousCache5)
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+            where TPreviousCache5 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            if (previousCache3 is null)
+                throw new ArgumentNullException(nameof(previousCache3));
+            cache.PreviousCache3 = previousCache3;
+            if (previousCache4 is null)
+                throw new ArgumentNullException(nameof(previousCache4));
+            cache.PreviousCache4 = previousCache4;
+            if (previousCache5 is null)
+                throw new ArgumentNullException(nameof(previousCache5));
+            cache.PreviousCache5 = previousCache5;
+            return StageResult.CreateStageResult(this, result, hasChanges, documentId, cache, hash);
+        }
+
+        public StageResultList<TResult, TResultCache, TCache> CreateStageResultList<TResult, TResultCache, TCache, TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5>(LazyTask<ImmutableList<StageResult<TResult, TResultCache>>> perform, bool hasChanges, ImmutableList<string> documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2, TPreviousCache3 previousCache3, TPreviousCache4 previousCache4, TPreviousCache5 previousCache5)
+            where TResultCache : class
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+            where TPreviousCache5 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            if (previousCache3 is null)
+                throw new ArgumentNullException(nameof(previousCache3));
+            cache.PreviousCache3 = previousCache3;
+            if (previousCache4 is null)
+                throw new ArgumentNullException(nameof(previousCache4));
+            cache.PreviousCache4 = previousCache4;
+            if (previousCache5 is null)
+                throw new ArgumentNullException(nameof(previousCache5));
+            cache.PreviousCache5 = previousCache5;
+            return StageResultList.CreateStageResultList(this, perform, hasChanges, documentId, cache, hash);
+        }
+
+        public StageResultList<TResult, TResultCache, TCache> CreateStageResultList<TResult, TResultCache, TCache, TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5>(ImmutableList<StageResult<TResult, TResultCache>> result, bool hasChanges, ImmutableList<string> documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2, TPreviousCache3 previousCache3, TPreviousCache4 previousCache4, TPreviousCache5 previousCache5)
+            where TResultCache : class
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+            where TPreviousCache5 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            if (previousCache3 is null)
+                throw new ArgumentNullException(nameof(previousCache3));
+            cache.PreviousCache3 = previousCache3;
+            if (previousCache4 is null)
+                throw new ArgumentNullException(nameof(previousCache4));
+            cache.PreviousCache4 = previousCache4;
+            if (previousCache5 is null)
+                throw new ArgumentNullException(nameof(previousCache5));
+            cache.PreviousCache5 = previousCache5;
+            return StageResultList.CreateStageResultList(this, LazyTask.Create(() => result), hasChanges, documentId, cache, hash);
+        }
+    }
+
+    public interface IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5>
+        where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+            where TPreviousCache5 : class
+    {
+
+        public TPreviousCache1 PreviousCache { get; set; }
+        public TPreviousCache2 PreviousCache2 { get; set; }
+        public TPreviousCache3 PreviousCache3 { get; set; }
+        public TPreviousCache4 PreviousCache4 { get; set; }
+        public TPreviousCache5 PreviousCache5 { get; set; }
+
+
+
+    }
+
+
+    public partial interface IGeneratorContext 
+    {
+        StageResult<TResult, TCache> CreateStageResult<TResult, TCache, TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6>(LazyTask<IDocument<TResult>> perform, bool hasChanges, string documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2, TPreviousCache3 previousCache3, TPreviousCache4 previousCache4, TPreviousCache5 previousCache5, TPreviousCache6 previousCache6)
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+            where TPreviousCache5 : class
+            where TPreviousCache6 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            if (previousCache3 is null)
+                throw new ArgumentNullException(nameof(previousCache3));
+            cache.PreviousCache3 = previousCache3;
+            if (previousCache4 is null)
+                throw new ArgumentNullException(nameof(previousCache4));
+            cache.PreviousCache4 = previousCache4;
+            if (previousCache5 is null)
+                throw new ArgumentNullException(nameof(previousCache5));
+            cache.PreviousCache5 = previousCache5;
+            if (previousCache6 is null)
+                throw new ArgumentNullException(nameof(previousCache6));
+            cache.PreviousCache6 = previousCache6;
+            return StageResult.CreateStageResult(this, perform, hasChanges, documentId, cache, hash);
+        }
+
+        public StageResult<TResult, TCache> CreateStageResult<TResult, TCache, TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6>(IDocument<TResult> result, bool hasChanges, string documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2, TPreviousCache3 previousCache3, TPreviousCache4 previousCache4, TPreviousCache5 previousCache5, TPreviousCache6 previousCache6)
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+            where TPreviousCache5 : class
+            where TPreviousCache6 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            if (previousCache3 is null)
+                throw new ArgumentNullException(nameof(previousCache3));
+            cache.PreviousCache3 = previousCache3;
+            if (previousCache4 is null)
+                throw new ArgumentNullException(nameof(previousCache4));
+            cache.PreviousCache4 = previousCache4;
+            if (previousCache5 is null)
+                throw new ArgumentNullException(nameof(previousCache5));
+            cache.PreviousCache5 = previousCache5;
+            if (previousCache6 is null)
+                throw new ArgumentNullException(nameof(previousCache6));
+            cache.PreviousCache6 = previousCache6;
+            return StageResult.CreateStageResult(this, result, hasChanges, documentId, cache, hash);
+        }
+
+        public StageResultList<TResult, TResultCache, TCache> CreateStageResultList<TResult, TResultCache, TCache, TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6>(LazyTask<ImmutableList<StageResult<TResult, TResultCache>>> perform, bool hasChanges, ImmutableList<string> documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2, TPreviousCache3 previousCache3, TPreviousCache4 previousCache4, TPreviousCache5 previousCache5, TPreviousCache6 previousCache6)
+            where TResultCache : class
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+            where TPreviousCache5 : class
+            where TPreviousCache6 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            if (previousCache3 is null)
+                throw new ArgumentNullException(nameof(previousCache3));
+            cache.PreviousCache3 = previousCache3;
+            if (previousCache4 is null)
+                throw new ArgumentNullException(nameof(previousCache4));
+            cache.PreviousCache4 = previousCache4;
+            if (previousCache5 is null)
+                throw new ArgumentNullException(nameof(previousCache5));
+            cache.PreviousCache5 = previousCache5;
+            if (previousCache6 is null)
+                throw new ArgumentNullException(nameof(previousCache6));
+            cache.PreviousCache6 = previousCache6;
+            return StageResultList.CreateStageResultList(this, perform, hasChanges, documentId, cache, hash);
+        }
+
+        public StageResultList<TResult, TResultCache, TCache> CreateStageResultList<TResult, TResultCache, TCache, TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6>(ImmutableList<StageResult<TResult, TResultCache>> result, bool hasChanges, ImmutableList<string> documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2, TPreviousCache3 previousCache3, TPreviousCache4 previousCache4, TPreviousCache5 previousCache5, TPreviousCache6 previousCache6)
+            where TResultCache : class
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+            where TPreviousCache5 : class
+            where TPreviousCache6 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            if (previousCache3 is null)
+                throw new ArgumentNullException(nameof(previousCache3));
+            cache.PreviousCache3 = previousCache3;
+            if (previousCache4 is null)
+                throw new ArgumentNullException(nameof(previousCache4));
+            cache.PreviousCache4 = previousCache4;
+            if (previousCache5 is null)
+                throw new ArgumentNullException(nameof(previousCache5));
+            cache.PreviousCache5 = previousCache5;
+            if (previousCache6 is null)
+                throw new ArgumentNullException(nameof(previousCache6));
+            cache.PreviousCache6 = previousCache6;
+            return StageResultList.CreateStageResultList(this, LazyTask.Create(() => result), hasChanges, documentId, cache, hash);
+        }
+    }
+
+    public interface IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6>
+        where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+            where TPreviousCache5 : class
+            where TPreviousCache6 : class
+    {
+
+        public TPreviousCache1 PreviousCache { get; set; }
+        public TPreviousCache2 PreviousCache2 { get; set; }
+        public TPreviousCache3 PreviousCache3 { get; set; }
+        public TPreviousCache4 PreviousCache4 { get; set; }
+        public TPreviousCache5 PreviousCache5 { get; set; }
+        public TPreviousCache6 PreviousCache6 { get; set; }
+
+
+
+    }
+
+
+    public partial interface IGeneratorContext 
+    {
+        StageResult<TResult, TCache> CreateStageResult<TResult, TCache, TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6, TPreviousCache7>(LazyTask<IDocument<TResult>> perform, bool hasChanges, string documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2, TPreviousCache3 previousCache3, TPreviousCache4 previousCache4, TPreviousCache5 previousCache5, TPreviousCache6 previousCache6, TPreviousCache7 previousCache7)
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6, TPreviousCache7>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+            where TPreviousCache5 : class
+            where TPreviousCache6 : class
+            where TPreviousCache7 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            if (previousCache3 is null)
+                throw new ArgumentNullException(nameof(previousCache3));
+            cache.PreviousCache3 = previousCache3;
+            if (previousCache4 is null)
+                throw new ArgumentNullException(nameof(previousCache4));
+            cache.PreviousCache4 = previousCache4;
+            if (previousCache5 is null)
+                throw new ArgumentNullException(nameof(previousCache5));
+            cache.PreviousCache5 = previousCache5;
+            if (previousCache6 is null)
+                throw new ArgumentNullException(nameof(previousCache6));
+            cache.PreviousCache6 = previousCache6;
+            if (previousCache7 is null)
+                throw new ArgumentNullException(nameof(previousCache7));
+            cache.PreviousCache7 = previousCache7;
+            return StageResult.CreateStageResult(this, perform, hasChanges, documentId, cache, hash);
+        }
+
+        public StageResult<TResult, TCache> CreateStageResult<TResult, TCache, TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6, TPreviousCache7>(IDocument<TResult> result, bool hasChanges, string documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2, TPreviousCache3 previousCache3, TPreviousCache4 previousCache4, TPreviousCache5 previousCache5, TPreviousCache6 previousCache6, TPreviousCache7 previousCache7)
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6, TPreviousCache7>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+            where TPreviousCache5 : class
+            where TPreviousCache6 : class
+            where TPreviousCache7 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            if (previousCache3 is null)
+                throw new ArgumentNullException(nameof(previousCache3));
+            cache.PreviousCache3 = previousCache3;
+            if (previousCache4 is null)
+                throw new ArgumentNullException(nameof(previousCache4));
+            cache.PreviousCache4 = previousCache4;
+            if (previousCache5 is null)
+                throw new ArgumentNullException(nameof(previousCache5));
+            cache.PreviousCache5 = previousCache5;
+            if (previousCache6 is null)
+                throw new ArgumentNullException(nameof(previousCache6));
+            cache.PreviousCache6 = previousCache6;
+            if (previousCache7 is null)
+                throw new ArgumentNullException(nameof(previousCache7));
+            cache.PreviousCache7 = previousCache7;
+            return StageResult.CreateStageResult(this, result, hasChanges, documentId, cache, hash);
+        }
+
+        public StageResultList<TResult, TResultCache, TCache> CreateStageResultList<TResult, TResultCache, TCache, TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6, TPreviousCache7>(LazyTask<ImmutableList<StageResult<TResult, TResultCache>>> perform, bool hasChanges, ImmutableList<string> documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2, TPreviousCache3 previousCache3, TPreviousCache4 previousCache4, TPreviousCache5 previousCache5, TPreviousCache6 previousCache6, TPreviousCache7 previousCache7)
+            where TResultCache : class
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6, TPreviousCache7>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+            where TPreviousCache5 : class
+            where TPreviousCache6 : class
+            where TPreviousCache7 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            if (previousCache3 is null)
+                throw new ArgumentNullException(nameof(previousCache3));
+            cache.PreviousCache3 = previousCache3;
+            if (previousCache4 is null)
+                throw new ArgumentNullException(nameof(previousCache4));
+            cache.PreviousCache4 = previousCache4;
+            if (previousCache5 is null)
+                throw new ArgumentNullException(nameof(previousCache5));
+            cache.PreviousCache5 = previousCache5;
+            if (previousCache6 is null)
+                throw new ArgumentNullException(nameof(previousCache6));
+            cache.PreviousCache6 = previousCache6;
+            if (previousCache7 is null)
+                throw new ArgumentNullException(nameof(previousCache7));
+            cache.PreviousCache7 = previousCache7;
+            return StageResultList.CreateStageResultList(this, perform, hasChanges, documentId, cache, hash);
+        }
+
+        public StageResultList<TResult, TResultCache, TCache> CreateStageResultList<TResult, TResultCache, TCache, TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6, TPreviousCache7>(ImmutableList<StageResult<TResult, TResultCache>> result, bool hasChanges, ImmutableList<string> documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2, TPreviousCache3 previousCache3, TPreviousCache4 previousCache4, TPreviousCache5 previousCache5, TPreviousCache6 previousCache6, TPreviousCache7 previousCache7)
+            where TResultCache : class
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6, TPreviousCache7>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+            where TPreviousCache5 : class
+            where TPreviousCache6 : class
+            where TPreviousCache7 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            if (previousCache3 is null)
+                throw new ArgumentNullException(nameof(previousCache3));
+            cache.PreviousCache3 = previousCache3;
+            if (previousCache4 is null)
+                throw new ArgumentNullException(nameof(previousCache4));
+            cache.PreviousCache4 = previousCache4;
+            if (previousCache5 is null)
+                throw new ArgumentNullException(nameof(previousCache5));
+            cache.PreviousCache5 = previousCache5;
+            if (previousCache6 is null)
+                throw new ArgumentNullException(nameof(previousCache6));
+            cache.PreviousCache6 = previousCache6;
+            if (previousCache7 is null)
+                throw new ArgumentNullException(nameof(previousCache7));
+            cache.PreviousCache7 = previousCache7;
+            return StageResultList.CreateStageResultList(this, LazyTask.Create(() => result), hasChanges, documentId, cache, hash);
+        }
+    }
+
+    public interface IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6, TPreviousCache7>
+        where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+            where TPreviousCache5 : class
+            where TPreviousCache6 : class
+            where TPreviousCache7 : class
+    {
+
+        public TPreviousCache1 PreviousCache { get; set; }
+        public TPreviousCache2 PreviousCache2 { get; set; }
+        public TPreviousCache3 PreviousCache3 { get; set; }
+        public TPreviousCache4 PreviousCache4 { get; set; }
+        public TPreviousCache5 PreviousCache5 { get; set; }
+        public TPreviousCache6 PreviousCache6 { get; set; }
+        public TPreviousCache7 PreviousCache7 { get; set; }
+
+
+
+    }
+
+
+    public partial interface IGeneratorContext 
+    {
+        StageResult<TResult, TCache> CreateStageResult<TResult, TCache, TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6, TPreviousCache7, TPreviousCache8>(LazyTask<IDocument<TResult>> perform, bool hasChanges, string documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2, TPreviousCache3 previousCache3, TPreviousCache4 previousCache4, TPreviousCache5 previousCache5, TPreviousCache6 previousCache6, TPreviousCache7 previousCache7, TPreviousCache8 previousCache8)
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6, TPreviousCache7, TPreviousCache8>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+            where TPreviousCache5 : class
+            where TPreviousCache6 : class
+            where TPreviousCache7 : class
+            where TPreviousCache8 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            if (previousCache3 is null)
+                throw new ArgumentNullException(nameof(previousCache3));
+            cache.PreviousCache3 = previousCache3;
+            if (previousCache4 is null)
+                throw new ArgumentNullException(nameof(previousCache4));
+            cache.PreviousCache4 = previousCache4;
+            if (previousCache5 is null)
+                throw new ArgumentNullException(nameof(previousCache5));
+            cache.PreviousCache5 = previousCache5;
+            if (previousCache6 is null)
+                throw new ArgumentNullException(nameof(previousCache6));
+            cache.PreviousCache6 = previousCache6;
+            if (previousCache7 is null)
+                throw new ArgumentNullException(nameof(previousCache7));
+            cache.PreviousCache7 = previousCache7;
+            if (previousCache8 is null)
+                throw new ArgumentNullException(nameof(previousCache8));
+            cache.PreviousCache8 = previousCache8;
+            return StageResult.CreateStageResult(this, perform, hasChanges, documentId, cache, hash);
+        }
+
+        public StageResult<TResult, TCache> CreateStageResult<TResult, TCache, TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6, TPreviousCache7, TPreviousCache8>(IDocument<TResult> result, bool hasChanges, string documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2, TPreviousCache3 previousCache3, TPreviousCache4 previousCache4, TPreviousCache5 previousCache5, TPreviousCache6 previousCache6, TPreviousCache7 previousCache7, TPreviousCache8 previousCache8)
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6, TPreviousCache7, TPreviousCache8>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+            where TPreviousCache5 : class
+            where TPreviousCache6 : class
+            where TPreviousCache7 : class
+            where TPreviousCache8 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            if (previousCache3 is null)
+                throw new ArgumentNullException(nameof(previousCache3));
+            cache.PreviousCache3 = previousCache3;
+            if (previousCache4 is null)
+                throw new ArgumentNullException(nameof(previousCache4));
+            cache.PreviousCache4 = previousCache4;
+            if (previousCache5 is null)
+                throw new ArgumentNullException(nameof(previousCache5));
+            cache.PreviousCache5 = previousCache5;
+            if (previousCache6 is null)
+                throw new ArgumentNullException(nameof(previousCache6));
+            cache.PreviousCache6 = previousCache6;
+            if (previousCache7 is null)
+                throw new ArgumentNullException(nameof(previousCache7));
+            cache.PreviousCache7 = previousCache7;
+            if (previousCache8 is null)
+                throw new ArgumentNullException(nameof(previousCache8));
+            cache.PreviousCache8 = previousCache8;
+            return StageResult.CreateStageResult(this, result, hasChanges, documentId, cache, hash);
+        }
+
+        public StageResultList<TResult, TResultCache, TCache> CreateStageResultList<TResult, TResultCache, TCache, TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6, TPreviousCache7, TPreviousCache8>(LazyTask<ImmutableList<StageResult<TResult, TResultCache>>> perform, bool hasChanges, ImmutableList<string> documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2, TPreviousCache3 previousCache3, TPreviousCache4 previousCache4, TPreviousCache5 previousCache5, TPreviousCache6 previousCache6, TPreviousCache7 previousCache7, TPreviousCache8 previousCache8)
+            where TResultCache : class
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6, TPreviousCache7, TPreviousCache8>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+            where TPreviousCache5 : class
+            where TPreviousCache6 : class
+            where TPreviousCache7 : class
+            where TPreviousCache8 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            if (previousCache3 is null)
+                throw new ArgumentNullException(nameof(previousCache3));
+            cache.PreviousCache3 = previousCache3;
+            if (previousCache4 is null)
+                throw new ArgumentNullException(nameof(previousCache4));
+            cache.PreviousCache4 = previousCache4;
+            if (previousCache5 is null)
+                throw new ArgumentNullException(nameof(previousCache5));
+            cache.PreviousCache5 = previousCache5;
+            if (previousCache6 is null)
+                throw new ArgumentNullException(nameof(previousCache6));
+            cache.PreviousCache6 = previousCache6;
+            if (previousCache7 is null)
+                throw new ArgumentNullException(nameof(previousCache7));
+            cache.PreviousCache7 = previousCache7;
+            if (previousCache8 is null)
+                throw new ArgumentNullException(nameof(previousCache8));
+            cache.PreviousCache8 = previousCache8;
+            return StageResultList.CreateStageResultList(this, perform, hasChanges, documentId, cache, hash);
+        }
+
+        public StageResultList<TResult, TResultCache, TCache> CreateStageResultList<TResult, TResultCache, TCache, TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6, TPreviousCache7, TPreviousCache8>(ImmutableList<StageResult<TResult, TResultCache>> result, bool hasChanges, ImmutableList<string> documentId, TCache cache, string hash, TPreviousCache1 previousCache1, TPreviousCache2 previousCache2, TPreviousCache3 previousCache3, TPreviousCache4 previousCache4, TPreviousCache5 previousCache5, TPreviousCache6 previousCache6, TPreviousCache7 previousCache7, TPreviousCache8 previousCache8)
+            where TResultCache : class
+                where TCache : class, IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6, TPreviousCache7, TPreviousCache8>
+                where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+            where TPreviousCache5 : class
+            where TPreviousCache6 : class
+            where TPreviousCache7 : class
+            where TPreviousCache8 : class
+        {
+            if (cache is null)
+                throw new ArgumentNullException(nameof(cache));
+            if (previousCache1 is null)
+                throw new ArgumentNullException(nameof(previousCache1));
+            cache.PreviousCache = previousCache1;
+            if (previousCache2 is null)
+                throw new ArgumentNullException(nameof(previousCache2));
+            cache.PreviousCache2 = previousCache2;
+            if (previousCache3 is null)
+                throw new ArgumentNullException(nameof(previousCache3));
+            cache.PreviousCache3 = previousCache3;
+            if (previousCache4 is null)
+                throw new ArgumentNullException(nameof(previousCache4));
+            cache.PreviousCache4 = previousCache4;
+            if (previousCache5 is null)
+                throw new ArgumentNullException(nameof(previousCache5));
+            cache.PreviousCache5 = previousCache5;
+            if (previousCache6 is null)
+                throw new ArgumentNullException(nameof(previousCache6));
+            cache.PreviousCache6 = previousCache6;
+            if (previousCache7 is null)
+                throw new ArgumentNullException(nameof(previousCache7));
+            cache.PreviousCache7 = previousCache7;
+            if (previousCache8 is null)
+                throw new ArgumentNullException(nameof(previousCache8));
+            cache.PreviousCache8 = previousCache8;
+            return StageResultList.CreateStageResultList(this, LazyTask.Create(() => result), hasChanges, documentId, cache, hash);
+        }
+    }
+
+    public interface IHavePreviousCache<TPreviousCache1, TPreviousCache2, TPreviousCache3, TPreviousCache4, TPreviousCache5, TPreviousCache6, TPreviousCache7, TPreviousCache8>
+        where TPreviousCache1 : class
+            where TPreviousCache2 : class
+            where TPreviousCache3 : class
+            where TPreviousCache4 : class
+            where TPreviousCache5 : class
+            where TPreviousCache6 : class
+            where TPreviousCache7 : class
+            where TPreviousCache8 : class
+    {
+
+        public TPreviousCache1 PreviousCache { get; set; }
+        public TPreviousCache2 PreviousCache2 { get; set; }
+        public TPreviousCache3 PreviousCache3 { get; set; }
+        public TPreviousCache4 PreviousCache4 { get; set; }
+        public TPreviousCache5 PreviousCache5 { get; set; }
+        public TPreviousCache6 PreviousCache6 { get; set; }
+        public TPreviousCache7 PreviousCache7 { get; set; }
+        public TPreviousCache8 PreviousCache8 { get; set; }
+
+
+
+    }
+
+
+}
+
+
+
+
+

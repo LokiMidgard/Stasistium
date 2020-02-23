@@ -102,8 +102,9 @@ for (int j = 1; j <= i; j++)
 <#
 for (int j = 1; j <= i; j++)
 {
+var postFix= j>1 ? j.ToString() : string.Empty;
 #>
-            var resultTask<#= j #> = this.input<#= j #>.DoIt(cache?.PreviouseCache<#= j #>, options);
+            var resultTask<#= j #> = this.input<#= j #>.DoIt(cache?.PreviousCache<#= postFix #>, options);
 <#
 }
 #>
@@ -134,13 +135,14 @@ for (int j = 1; j <= i; j++)
 <#
 for (int j = 1; j <= i; j++)
 {
+var postFix= j>1 ? j.ToString() : string.Empty;
 #>
 
                 if (result<#= j #>.HasChanges)
                 {
                     var performed = await result<#= j #>.Perform;
-                    newCache.Ids<#= j #> = new string[performed.Count];
-                    newCache.PreviouseCache<#= j #> = result<#= j #>.Cache;
+                    newCache.Ids<#= postFix #> = new string[performed.Count];
+                    newCache.PreviousCache<#= postFix #> = result<#= j #>.Cache;
 
 
                     for (int i = 0; i < performed.Count; i++)
@@ -156,7 +158,7 @@ for (int j = 1; j <= i; j++)
                                 oldHash = null;
                             var childHashChanges = oldHash != childPerformed.Hash;
 
-                            list.Add(this.Context.CreateStageResult(childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash, childPerformed.Hash));
+                            list.Add(StageResult.CreateStageResult(this.Context, childPerformed, childHashChanges, childPerformed.Id, childPerformed.Hash, childPerformed.Hash));
                             newCache.IdToHash.Add(child.Id, childPerformed.Id);
 
                         }
@@ -170,11 +172,11 @@ for (int j = 1; j <= i; j++)
                             });
                             if (cache is null || !cache.IdToHash.TryGetValue(child.Id, out var oldHash))
                                 throw this.Context.Exception("Should Not Happen");
-                            list.Add(this.Context.CreateStageResult(childTask, false, child.Id, oldHash, oldHash));
+                            list.Add(StageResult.CreateStageResult(this.Context, childTask, false, child.Id, oldHash, oldHash));
                             newCache.IdToHash.Add(child.Id, oldHash);
 
                         }
-                        newCache.Ids<#= j #>[i] = child.Id;
+                        newCache.Ids<#= postFix #>[i] = child.Id;
                         hashList.Add(child.Hash);
                     }
 
@@ -183,7 +185,7 @@ for (int j = 1; j <= i; j++)
                 {
                     if (cache is null)
                         throw this.Context.Exception("Should Not Happen");
-                    for (int i = 0; i < cache.Ids<#= j #>.Length; i++)
+                    for (int i = 0; i < cache.Ids<#= postFix #>.Length; i++)
                     {
                         var currentIndex = i;
                         var childTask = LazyTask.Create(async () =>
@@ -196,16 +198,16 @@ for (int j = 1; j <= i; j++)
 
                             return childPerform;
                         });
-                        if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids<#= j #>[currentIndex], out var oldHash))
+                        if (cache is null || !cache.IdToHash.TryGetValue(cache.Ids<#= postFix #>[currentIndex], out var oldHash))
                             throw this.Context.Exception("Should Not Happen");
 
-                        list.Add(this.Context.CreateStageResult(childTask, false, cache.Ids<#= j #>[currentIndex], oldHash, oldHash));
+                        list.Add(StageResult.CreateStageResult(this.Context, childTask, false, cache.Ids<#= postFix #>[currentIndex], oldHash, oldHash));
                         hashList.Add(oldHash);
 
                     }
-                    newCache.PreviouseCache<#= j #> = cache.PreviouseCache<#= j #>;
-                    newCache.Ids<#= j #> = cache.Ids<#= j #>;
-                    foreach (var id in newCache.Ids<#= j #>)
+                    newCache.PreviousCache<#= postFix #> = cache.PreviousCache<#= postFix #>;
+                    newCache.Ids<#= postFix #> = cache.Ids<#= postFix #>;
+                    foreach (var id in newCache.Ids<#= postFix #>)
                     {
                         if (!cache.IdToHash.TryGetValue(id, out var oldHash))
                             throw this.Context.Exception("Should Not Happen");
@@ -239,28 +241,41 @@ for (int j = 1; j <= i; j++)
 <#
 for (int j = 1; j <= i; j++)
 {
+var postFix= j>1 ? j.ToString() : string.Empty;
 #>                if (!hasChanges && cache != null)
-                    hasChanges = !performed.cache.Ids<#= j #>.SequenceEqual(cache.Ids<#= j #>);
+                    hasChanges = !performed.cache.Ids<#= postFix #>.SequenceEqual(cache.Ids<#= postFix #>);
 <#
 }
 #>
 <#
 for (int j = 1; j <= i; j++)
 {
+var postFix= j>1 ? j.ToString() : string.Empty;
 #>
-                ids.AddRange(performed.cache.Ids<#= j #>);
+                ids.AddRange(performed.cache.Ids<#= postFix #>);
 <#
 }
 #>
-                return this.Context.CreateStageResultList(performed.result, hasChanges, ids.ToImmutable(), performed.cache, performed.cache.Hash);
+                return this.Context.CreateStageResultList(performed.result, hasChanges, ids.ToImmutable(), performed.cache, performed.cache.Hash
+<#
+for (int j = 1; j <= i; j++)
+{
+#>
+
+                ,result<#= j #>.Cache
+<#
+}
+#>
+                );
             }
             else
             {
 <#
 for (int j = 1; j <= i; j++)
 {
+var postFix= j>1 ? j.ToString() : string.Empty;
 #>
-                ids.AddRange(cache.Ids<#= j #>);
+                ids.AddRange(cache.Ids<#= postFix #>);
 <#
 }
 #>
@@ -268,7 +283,19 @@ for (int j = 1; j <= i; j++)
                     var temp = await task;
                 return temp.result;
             });
-            return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutable(), cache, cache.Hash);
+            return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutable(), cache, cache.Hash
+
+<#
+for (int j = 1; j <= i; j++)
+{
+var postFix= j>1 ? j.ToString() : string.Empty;
+#>
+                ,result<#= j #>.Cache
+<#
+}
+#>            
+            
+            );
             }
         }
     }
@@ -276,14 +303,42 @@ for (int j = 1; j <= i; j++)
 #pragma warning disable CA1819 // Properties should not return arrays
 #pragma warning disable CA2227 // Collection properties should be read only
 
-    public class ConcatStageManyCache<<#=baseGenerics#>>
-    {
+    public class ConcatStageManyCache<<#=baseGenerics#>> : IHavePreviousCache<
 <#
 for (int j = 1; j <= i; j++)
 {
 #>
-        public string[] Ids<#= j #> { get; set; }
-        public TCache<#= j #> PreviouseCache<#= j #> { get; set; }
+<#
+if(j>1)
+{
+#>,
+<#
+}
+#>
+
+    TCache<#= j #>
+<#
+}
+#>
+    >
+    <#
+for (int j = 1; j <= i; j++)
+{
+#>
+    where TCache<#= j #> : class
+<#
+}
+#>
+    {
+
+
+<#
+for (int j = 1; j <= i; j++)
+{
+var postFix= j>1 ? j.ToString() : string.Empty;
+#>
+        public string[] Ids<#= postFix #> { get; set; }
+        public TCache<#= j #> PreviousCache<#= postFix #> { get; set; }
 
 <#
 }
@@ -361,3 +416,26 @@ for (int i = 1; i <= numberOfElements; i++)
 #>
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

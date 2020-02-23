@@ -7,20 +7,20 @@ namespace Stasistium.Stages
 {
     public static class StageResult
     {
-        public static StageResult<TResult, TCache> CreateStageResult<TResult, TCache>(this IGeneratorContext context, LazyTask<IDocument<TResult>> perform, bool hasChanges, string documentId, TCache cache, string hash)
+        public static StageResult<TResult, TCache> CreateStageResult<TResult, TCache>(IGeneratorContext context, LazyTask<IDocument<TResult>> perform, bool hasChanges, string documentId, TCache cache, string hash)
         where TCache : class
             => new StageResult<TResult, TCache>(perform, hasChanges, documentId, cache, hash, context);
-        public static StageResult<TResult, TCache> CreateStageResult<TResult, TCache>(this IGeneratorContext context, IDocument<TResult> result, bool hasChanges, string documentId, TCache cache, string hash)
+        public static StageResult<TResult, TCache> CreateStageResult<TResult, TCache>(IGeneratorContext context, IDocument<TResult> result, bool hasChanges, string documentId, TCache cache, string hash)
         where TCache : class
             => new StageResult<TResult, TCache>(LazyTask.Create(() => result), hasChanges, documentId, cache, hash, context);
     }
     public static class StageResultList
     {
-        public static StageResultList<TResult, TResultCache, TCache> CreateStageResultList<TResult, TResultCache, TCache>(this IGeneratorContext context, LazyTask<ImmutableList<StageResult<TResult, TResultCache>>> perform, bool hasChanges, ImmutableList<string> documentId, TCache cache, string hash)
+        public static StageResultList<TResult, TResultCache, TCache> CreateStageResultList<TResult, TResultCache, TCache>(IGeneratorContext context, LazyTask<ImmutableList<StageResult<TResult, TResultCache>>> perform, bool hasChanges, ImmutableList<string> documentId, TCache cache, string hash)
             where TResultCache : class
             where TCache : class
         => new StageResultList<TResult, TResultCache, TCache>(perform, hasChanges, documentId, cache, hash, context);
-        public static StageResultList<TResult, TResultCache, TCache> CreateStageResultList<TResult, TResultCache, TCache>(this IGeneratorContext context, ImmutableList<StageResult<TResult, TResultCache>> result, bool hasChanges, ImmutableList<string> documentId, TCache cache, string hash)
+        public static StageResultList<TResult, TResultCache, TCache> CreateStageResultList<TResult, TResultCache, TCache>(IGeneratorContext context, ImmutableList<StageResult<TResult, TResultCache>> result, bool hasChanges, ImmutableList<string> documentId, TCache cache, string hash)
             where TCache : class
             where TResultCache : class
             => new StageResultList<TResult, TResultCache, TCache>(LazyTask.Create(() => result), hasChanges, documentId, cache, hash, context);
