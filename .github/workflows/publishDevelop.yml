@@ -26,7 +26,7 @@ jobs:
       run: dotnet pack --configuration Debug
     - name: Publish nuget
       run: |
-           for f in ./*/bin/Release/*.nupkg
+           for f in ./*/bin/*/*.nupkg
            do
              curl -vX PUT -u "LokiMidgard:${{ secrets.GITHUB_TOKEN }}" -F package=@$f https://nuget.pkg.github.com/LokiMidgard/
            done
