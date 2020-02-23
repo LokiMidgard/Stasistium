@@ -107,16 +107,22 @@ namespace Stasistium.Stages
     public class GitCache<T>
         where T : class
     {
+        private readonly string createdBy;
         internal Repository? Repo { get; private set; }
 
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         [Obsolete("Only for Deserialisation", true)]
-        public GitCache() { }
+        public GitCache()
+        {
+            this.createdBy = "Serelisation";
+        }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
 
         public GitCache(Repository repo, T previousCache, string previousSource, string workingDir, string hash, string[] ids, Dictionary<string, string> idToHash, IGeneratorContext context)
         {
+            this.createdBy = "Normal";
+
             if (string.IsNullOrEmpty(hash))
                 throw new ArgumentException("message", nameof(hash));
             if (context is null)
