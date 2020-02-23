@@ -39,7 +39,7 @@ namespace Stasistium.Stages
             this.context.DisposeOnDispose(new Disposer(this));
         }
 
-        public async Task UpdateFiles()
+        public async Task UpdateFiles(bool ignoreCache = false)
         {
 
 
@@ -62,7 +62,7 @@ namespace Stasistium.Stages
             }
 
 
-            var result = await this.inputList.DoIt(this.cache, this.generatorOptions.Token).ConfigureAwait(false);
+            var result = await this.inputList.DoIt(ignoreCache ? null : this.cache, this.generatorOptions.Token).ConfigureAwait(false);
             this.context.Logger.Info($"Cache is {(result.HasChanges ? "INVALID" : "valid")}");
             if (result.HasChanges)
             {
