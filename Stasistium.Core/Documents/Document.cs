@@ -36,9 +36,10 @@ namespace Stasistium.Documents
         private readonly Func<T> valueCallback;
         public DocumentLazy(Func<T> valueCallback, string contentHash, string id, MetadataContainer? metadata, IGeneratorContext context) : base(id, metadata, contentHash, context)
         {
-            if (System.Diagnostics.Debugger.IsAttached && valueCallback is Func<System.IO.Stream> testCallback)
+            if (System.Diagnostics.Debugger.IsAttached && typeof(T).IsInstanceOfType(typeof(System.IO.Stream)))
             {
-                using var stream = testCallback();
+                var data = (object)valueCallback();
+                using var stream = (System.IO.Stream)data;
                 if (contentHash != context.GetHashForStream(stream))
                     System.Diagnostics.Debugger.Break();
             }
