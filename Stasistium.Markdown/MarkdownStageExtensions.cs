@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Microsoft.Toolkit.Parsers.Markdown;
+using AdaptMark.Parsers.Markdown;
 using Stasistium.Stages;
 
 namespace Stasistium

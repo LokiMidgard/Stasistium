@@ -7,7 +7,7 @@
   <Import Project="$(SolutionDir)Common.targets" />
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Toolkit.Parsers" Version="6.1.0-build.32.gaea7c9f533" />
+    <PackageReference Include="AdaptMark" Version="0.1.20-g61dc2a6157" />
   </ItemGroup>
 
   <ItemGroup>

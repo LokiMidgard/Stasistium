@@ -1,4 +1,4 @@
-﻿using Microsoft.Toolkit.Parsers.Markdown;
+﻿using AdaptMark.Parsers.Markdown;
 using Stasistium.Documents;
 using System;
 using System.Collections.Generic;

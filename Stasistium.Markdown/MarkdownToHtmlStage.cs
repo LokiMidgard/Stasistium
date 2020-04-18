@@ -1,13 +1,13 @@
 ﻿using Stasistium.Documents;
 using System;
 using System.Threading.Tasks;
-using Microsoft.Toolkit.Parsers.Markdown;
+using AdaptMark.Parsers.Markdown;
 using System.Text;
-using Blocks = Microsoft.Toolkit.Parsers.Markdown.Blocks;
-using Inlines = Microsoft.Toolkit.Parsers.Markdown.Inlines;
+using Blocks = AdaptMark.Parsers.Markdown.Blocks;
+using Inlines = AdaptMark.Parsers.Markdown.Inlines;
 using System.Collections.Generic;
-using Microsoft.Toolkit.Parsers.Markdown.Blocks;
-using Microsoft.Toolkit.Parsers.Markdown.Inlines;
+using AdaptMark.Parsers.Markdown.Blocks;
+using AdaptMark.Parsers.Markdown.Inlines;
 using System.Linq;
 
 namespace Stasistium.Stages

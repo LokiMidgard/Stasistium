@@ -1,4 +1,4 @@
-﻿using Microsoft.Toolkit.Parsers.Markdown;
+﻿using AdaptMark.Parsers.Markdown;
 using Stasistium.Documents;
 using Stasistium.Helper;
 using System;
@@ -24,11 +24,11 @@ namespace Stasistium.Stages
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
             var document = input.Value;
-            var yamlHeader = document.Blocks.OfType<Microsoft.Toolkit.Parsers.Markdown.Blocks.YamlHeaderBlock>();
+            var yamlHeader = document.Blocks.OfType<AdaptMark.Parsers.Markdown.Blocks.YamlHeaderBlock>();
 
             var newMarkdown = new MarkdownDocument
             {
-                Blocks = document.Blocks.Where(x => !(x is Microsoft.Toolkit.Parsers.Markdown.Blocks.YamlHeaderBlock)).ToList()
+                Blocks = document.Blocks.Where(x => !(x is AdaptMark.Parsers.Markdown.Blocks.YamlHeaderBlock)).ToList()
             };
             var newDocument = input.With(newMarkdown, this.Context.GetHashForString(newMarkdown.ToString()));
             var metadata = newDocument.Metadata;
