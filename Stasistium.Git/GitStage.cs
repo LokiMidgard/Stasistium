@@ -77,14 +77,17 @@ namespace Stasistium.Stages
                     .ToArray();
 
                 var hash = this.Context.GetHashForObject(refs.Select(x => x.Hash));
-
-                var newCache = new GitCache<T>(repo, result.Cache, source.Value, workingDir.FullName, hash, refs.Select(x => x.Id).ToArray(), refs.ToDictionary(x => x.Id, x => x.Hash), this.Context);
+                var gitRefHashes = repo.Tags.Select(x => x.Target.Sha).Concat(repo.Branches.Where(x => x.IsRemote).Select(x => x.Tip.Sha)).ToArray();
+                var newCache = new GitCache<T>(repo, result.Cache, source.Value, workingDir.FullName, gitRefHashes, hash, refs.Select(x => x.Id).ToArray(), refs.ToDictionary(x => x.Id, x => x.Hash), this.Context);
 
                 return (result: refs.ToImmutableList(), newCache);
             });
 
             bool hasChanges;
             GitCache<T> newCache;
+
+            // we need to update our git otherwise we don't know if there are changes...
+
 
 
             if (result.HasChanges || cache is null || cache.Repo is null)
@@ -95,8 +98,35 @@ namespace Stasistium.Stages
                     || cache.Hash != newCache.Hash
                     || temp.result.Any(x => x.HasChanges);
             }
+            else if (cache.Repo != null)
+            {
+                var repo = cache.Repo;
+                var workingDir = new DirectoryInfo(cache.WorkingDir);
+                if (options?.RefreshRemoteSources ?? false)
+                {
+                    // The git library is nor thread save, so we should not paralize this!
+                    foreach (var remote in repo.Network.Remotes)
+                        await Task.Run(() => Commands.Fetch(repo, remote.Name, Array.Empty<string>(), new FetchOptions() { }, null)).ConfigureAwait(false);
+                }
+                var gitRefHashes = repo.Tags.Select(x => x.Target.Sha).Concat(repo.Branches.Where(x => x.IsRemote).Select(x => x.Tip.Sha)).ToArray();
+                // check of the hashes of the tips have changed
+                if (!cache.GitRefHahses.SequenceEqual(gitRefHashes))
+                {
+                    var temp = await task;
+                    newCache = temp.newCache;
+                    hasChanges = cache is null
+                        || cache.Hash != newCache.Hash
+                        || temp.result.Any(x => x.HasChanges);
+                }
+                else
+                {
+                    hasChanges = false;
+                    newCache = cache;
+                }
+            }
             else
             {
+
                 hasChanges = false;
                 newCache = cache;
             }
@@ -118,7 +148,7 @@ namespace Stasistium.Stages
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
 
-        public GitCache(Repository repo, T previousCache, string previousSource, string workingDir, string hash, string[] ids, Dictionary<string, string> idToHash, IGeneratorContext context)
+        public GitCache(Repository repo, T previousCache, string previousSource, string workingDir, string[] gitRefHashes, string hash, string[] ids, Dictionary<string, string> idToHash, IGeneratorContext context)
         {
             if (string.IsNullOrEmpty(hash))
                 throw new ArgumentException("message", nameof(hash));
@@ -131,6 +161,7 @@ namespace Stasistium.Stages
             this.Hash = hash;
             this.Ids = ids ?? throw new ArgumentNullException(nameof(ids));
             this.IdToHash = idToHash ?? throw new ArgumentNullException(nameof(idToHash));
+            this.GitRefHahses = gitRefHashes ?? throw new ArgumentNullException(nameof(gitRefHashes));
 
 #pragma warning disable CA2000 // Dispose objects before losing scope
             context.DisposeOnDispose(new Disposer(this));
@@ -159,6 +190,7 @@ namespace Stasistium.Stages
         public T PreviousCache { get; set; }
         public string PreviousSource { get; set; }
         public string WorkingDir { get; set; }
+        public string[] GitRefHahses { get; set; }
         public string Hash { get; set; }
         public string[] Ids { get; set; }
         public Dictionary<string, string> IdToHash { get; set; }
