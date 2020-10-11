@@ -244,7 +244,23 @@ namespace Stasistium.Stages
                 case Inlines.LinkAnchorInline code:
                     break;
 
-                case Inlines.MarkdownLinkInline code:
+                case Inlines.MarkdownLinkInline hyperlink:
+                    if (hyperlink.Url != null)
+                    {
+
+                        builder.Append("<a href=\"");
+                        builder.Append(hyperlink.Url);
+                        builder.Append("\" ");
+                        if (hyperlink.Tooltip != null)
+                        {
+                            builder.Append("alt=\"");
+                            builder.Append(hyperlink.Tooltip);
+                            builder.Append("\" ");
+                        }
+                        builder.Append(" >");
+                        this.Render(builder, hyperlink.Inlines);
+                        builder.Append("</a>");
+                    }
                     break;
 
                 case Inlines.StrikethroughTextInline strike:
