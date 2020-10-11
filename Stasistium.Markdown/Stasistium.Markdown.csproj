@@ -7,7 +7,7 @@
   <Import Project="$(SolutionDir)Common.targets" />
 
   <ItemGroup>
-    <PackageReference Include="AdaptMark" Version="0.1.25-g15f0633d6a" />
+    <PackageReference Include="AdaptMark" Version="0.1.29-g466287bcfd" />
   </ItemGroup>
 
   <ItemGroup>
