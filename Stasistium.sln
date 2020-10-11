@@ -30,7 +30,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{387DA049
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stasistium.Test", "Stasistium.Test\Stasistium.Test.csproj", "{D8B1AD46-9151-42B7-95A0-15727C99EF68}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stasistium.Sass", "Stasistium.Sass\Stasistium.Sass.csproj", "{03A13D38-5622-4BEB-8ED6-21EB2E3599DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stasistium.Sass", "Stasistium.Sass\Stasistium.Sass.csproj", "{03A13D38-5622-4BEB-8ED6-21EB2E3599DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
