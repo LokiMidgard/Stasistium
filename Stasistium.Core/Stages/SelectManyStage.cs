@@ -16,7 +16,7 @@ where TInputCache : class
         where TCache : class
     {
 
-        private readonly System.Collections.Concurrent.ConcurrentDictionary<string, (Start @in, SelectStage<TResult, TItemCache, TCache, TResult, GeneratedHelper.CacheId<string, StartCache<TCache>>> @out)> startLookup = new System.Collections.Concurrent.ConcurrentDictionary<string, (Start @in, SelectStage<TResult, TItemCache, TCache, TResult, GeneratedHelper.CacheId<string, StartCache<TCache>>> @out)>();
+        private readonly System.Collections.Concurrent.ConcurrentDictionary<(string key, Guid generationId), (Start @in, SelectStage<TResult, TItemCache, TCache, TResult, GeneratedHelper.CacheId<string, StartCache<TCache>>> @out)> startLookup = new System.Collections.Concurrent.ConcurrentDictionary<(string key, Guid generationId), (Start @in, SelectStage<TResult, TItemCache, TCache, TResult, GeneratedHelper.CacheId<string, StartCache<TCache>>> @out)>();
 
         private readonly Func<StageBase<TInput, GeneratedHelper.CacheId<string>>, MultiStageBase<TResult, TItemCache, TCache>> createPipline;
 
@@ -27,7 +27,7 @@ where TInputCache : class
             this.input = input ?? throw new ArgumentNullException(nameof(input));
             this.createPipline = createPipline ?? throw new ArgumentNullException(nameof(createPipline));
         }
-        
+
         protected override async Task<StageResultList<TResult, GeneratedHelper.CacheId<string, GeneratedHelper.CacheId<string, StartCache<TCache>>>, SelectManyCache<TInputCache, TItemCache, TCache>>> DoInternal([AllowNull] SelectManyCache<TInputCache, TItemCache, TCache>? cache, OptionToken options)
         {
             var input = await this.input.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
@@ -40,7 +40,7 @@ where TInputCache : class
                 var resultList = (await Task.WhenAll(inputResult.Select(async item =>
                 {
 
-                    var pipe = this.startLookup.GetOrAdd(item.Id, key =>
+                    var pipe = this.startLookup.GetOrAdd((item.Id, options.GenerationId), key =>
                     {
                         var start = new SelectManyStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache>.Start(item, this.Context);
                         var end = this.createPipline(start).Select(x => new End(x, x.Context));
@@ -49,7 +49,7 @@ where TInputCache : class
 
 
                     if (cache == null
-                        || !cache.InputCacheLookup.TryGetValue(item.Id, out SelectCache<TCache, GeneratedHelper.CacheId<string, StartCache<TCache>>>? lastCache)
+                        || !cache.InputCacheLookup.TryGetValue(item.Id, out var lastCache)
                         || !cache.InputItemToResultItemIdLookup.TryGetValue(item.Id, out var resultIds)
                         || !cache.InputItemToResultItemCacheLookup.TryGetValue(item.Id, out var resultOldCaches))
                     {
@@ -142,7 +142,7 @@ where TInputCache : class
                     var temp = await task;
                     return temp.Item1;
                 });
-                
+
                 return this.Context.CreateStageResultList(actualTask, hasChanges, ids.ToImmutableList(), cache, cache.Hash, input.Cache);
             }
 

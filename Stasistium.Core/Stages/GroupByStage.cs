@@ -17,7 +17,7 @@ namespace Stasistium.Stages
     where TInputCache : class
     {
 
-        private readonly System.Collections.Concurrent.ConcurrentDictionary<TKey, (Start @in, MultiStageBase<TResult, TItemCache, TCache> @out)> startLookup = new System.Collections.Concurrent.ConcurrentDictionary<TKey, (Start @in, MultiStageBase<TResult, TItemCache, TCache> @out)>();
+        private readonly System.Collections.Concurrent.ConcurrentDictionary<(TKey key, Guid generationId), (Start @in, MultiStageBase<TResult, TItemCache, TCache> @out)> startLookup = new System.Collections.Concurrent.ConcurrentDictionary<(TKey key, Guid generationId), (Start @in, MultiStageBase<TResult, TItemCache, TCache> @out)>();
 
         private readonly Func<MultiStageBase<TInput, TInputItemCache, StartCache<TInputCache, TKey>>, TKey, MultiStageBase<TResult, TItemCache, TCache>> createPipline;
 
@@ -57,9 +57,9 @@ namespace Stasistium.Stages
 
                 var resultList = await Task.WhenAll(keyValues.GroupBy(x => x.Key).Select(async x =>
                     {
-                        var pipe = this.startLookup.GetOrAdd(x.Key, id =>
+                        var pipe = this.startLookup.GetOrAdd((x.Key, options.GenerationId), id =>
                         {
-                            var start = new Start(this, x.Key, this.Context);
+                            var start = new Start(this, id.key, this.Context);
                             var end = this.createPipline(start, x.Key);
                             return (start, end);
                         });
