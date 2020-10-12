@@ -340,6 +340,14 @@ namespace Stasistium.Documents
         {
             ((ILogger)this.BaseLogger).Info($"{this.Name}: {text}");
         }
+        public void Error(string text)
+        {
+            ((ILogger)this.BaseLogger).Error($"{this.Name}: {text}");
+        }
+        public void Verbose(string text)
+        {
+            ((ILogger)this.BaseLogger).Verbose($"{this.Name}: {text}");
+        }
     }
     internal class Logger : ILogger, IAsyncDisposable
     {
@@ -352,7 +360,15 @@ namespace Stasistium.Documents
 
         public void Info(string text)
         {
-            this.logger.WriteLine(text);
+            this.logger.WriteLine("INFO: " + text);
+        }
+        public void Verbose(string text)
+        {
+            this.logger.WriteLine("VERBOSE: " + text);
+        }
+        public void Error(string text)
+        {
+            this.logger.WriteLine("ERROR: " + text);
         }
 
         public IDisposable Indent()

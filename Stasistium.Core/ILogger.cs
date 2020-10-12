@@ -15,5 +15,8 @@ namespace Stasistium.Documents
 
         IDisposable Indent();
         void Info(string text);
+
+        void Error(string text);
+        void Verbose(string text);
     }
 }
