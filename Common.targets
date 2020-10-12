@@ -37,10 +37,11 @@
 	<!--Additional Packages-->
 
 	<ItemGroup>
-		<PackageReference Include="GitVersionTask" Version="5.1.2">
+		<PackageReference Update="GitVersionTask" Version="5.3.7">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		
 
 		<PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8">
 			<PrivateAssets>all</PrivateAssets>
