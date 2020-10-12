@@ -1,53 +1,58 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <RootNamespace>Stasistium</RootNamespace>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <TransformOnBuild>true</TransformOnBuild>
-  </PropertyGroup>
+	<PropertyGroup>
+		<RootNamespace>Stasistium</RootNamespace>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<TransformOnBuild>true</TransformOnBuild>
 
-  <Import Project="$(SolutionDir)Common.targets" />
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Include="Stages\ConcatStage.tt.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>ConcatStage.tt</DependentUpon>
-    </None>
-  </ItemGroup>
+	<Import Project="$(SolutionDir)Common.targets" />
 
-  <ItemGroup>
-    <PackageReference Include="System.Collections.Immutable" Version="1.7.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="Stages\ConcatStage.tt.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>ConcatStage.tt</DependentUpon>
+		</None>
+	</ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Stages\ConcatStage.tt.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>ConcatStage.tt</DependentUpon>
-    </Compile>
-    <Compile Update="Stages\GeneratedBaseStages.tt.cs">
-      <DependentUpon>GeneratedBaseStages.tt</DependentUpon>
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-    </Compile>
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="GitVersionTask" Version="5.3.7">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="System.Collections.Immutable" Version="1.7.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Update="Stages\ConcatStage.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>ConcatStage.tt.cs</LastGenOutput>
-    </None>
-    <None Update="Stages\GeneratedBaseStages.tt">
-      <LastGenOutput>GeneratedBaseStages.tt.cs</LastGenOutput>
-      <Generator>TextTemplatingFileGenerator</Generator>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Update="Stages\ConcatStage.tt.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>ConcatStage.tt</DependentUpon>
+		</Compile>
+		<Compile Update="Stages\GeneratedBaseStages.tt.cs">
+			<DependentUpon>GeneratedBaseStages.tt</DependentUpon>
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="Stages\ConcatStage.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>ConcatStage.tt.cs</LastGenOutput>
+		</None>
+		<None Update="Stages\GeneratedBaseStages.tt">
+			<LastGenOutput>GeneratedBaseStages.tt.cs</LastGenOutput>
+			<Generator>TextTemplatingFileGenerator</Generator>
+		</None>
+	</ItemGroup>
 
 
-  <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
+	<ItemGroup>
+		<Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+	</ItemGroup>
 
 </Project>

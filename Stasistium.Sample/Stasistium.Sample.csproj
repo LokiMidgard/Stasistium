@@ -1,36 +1,41 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <!--PreserverCompilationContext will be set by Nuget consuming Razor package-->
-    <PreserveCompilationContext>true</PreserveCompilationContext>
-    <Nullable>enable</Nullable>
-    <LangVersion>8.0</LangVersion>
-    <IsPackable>false</IsPackable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<!--PreserverCompilationContext will be set by Nuget consuming Razor package-->
+		<PreserveCompilationContext>true</PreserveCompilationContext>
+		<Nullable>enable</Nullable>
+		<LangVersion>8.0</LangVersion>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Stasistium.Core\Stasistium.Core.csproj" />
-    <ProjectReference Include="..\Stasistium.Git\Stasistium.Git.csproj" />
-    <ProjectReference Include="..\Stasistium.Markdown\Stasistium.Markdown.csproj" />
-    <ProjectReference Include="..\Stasistium.Razor\Stasistium.Razor.csproj" />
-    <ProjectReference Include="..\Stasistium.YAML\Stasistium.YAML.csproj" />
+	<ItemGroup>
+		<ProjectReference Include="..\Stasistium.Core\Stasistium.Core.csproj" />
+		<ProjectReference Include="..\Stasistium.Git\Stasistium.Git.csproj" />
+		<ProjectReference Include="..\Stasistium.Markdown\Stasistium.Markdown.csproj" />
+		<ProjectReference Include="..\Stasistium.Razor\Stasistium.Razor.csproj" />
+		<ProjectReference Include="..\Stasistium.YAML\Stasistium.YAML.csproj" />
 
-    <PackageReference Include="Westwind.AspnetCore.LiveReload" Version="0.1.12" />
+		<PackageReference Include="Westwind.AspnetCore.LiveReload" Version="0.1.12" />
 
-  </ItemGroup>
 
-  <ItemGroup>
-    <None Update="config.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Layout\base.cshtml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Layout\ViewStart.cshtml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+		<PackageReference Include="GitVersionTask" Version="5.3.7">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="config.json">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Layout\base.cshtml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="Layout\ViewStart.cshtml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
 </Project>
