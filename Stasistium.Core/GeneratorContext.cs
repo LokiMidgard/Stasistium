@@ -230,7 +230,7 @@ namespace Stasistium.Documents
                     return obj.ToString();
 
                 var str = new StringBuilder();
-                foreach (var property in type.GetProperties().OrderBy(x => x.Name))
+                foreach (var property in type.GetProperties(System.Reflection.BindingFlags.Instance).OrderBy(x => x.Name))
                 {
                     str.Append("<");
                     str.Append(property.Name);
