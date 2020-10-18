@@ -9,7 +9,7 @@ using System.Text;
 namespace Stasistium.Documents
 {
     [return: MaybeNull]
-    public delegate T MetadataUpdate<T>([AllowNull]T oldValue, T newValue);
+    public delegate T MetadataUpdate<T>([AllowNull] T oldValue, T newValue);
     public delegate object? MetadataUpdate(object? oldValue, object newValue);
 
     public sealed class MetadataContainer
@@ -57,7 +57,10 @@ namespace Stasistium.Documents
         {
             if (this.values.TryGetValue(typeof(T), out var obj))
                 return (T)obj;
-            throw new ArgumentOutOfRangeException($"No entry of Type {typeof(T)}");
+            // Its a Generic parameter
+#pragma warning disable CA2208 // Instantiate argument exceptions correctly
+            throw new ArgumentOutOfRangeException(nameof(T), $"No entry of Type {typeof(T)}");
+#pragma warning restore CA2208 // Instantiate argument exceptions correctly
         }
         public T? TryGetValue<T>()
            where T : class

@@ -56,7 +56,7 @@ namespace Stasistium.Documents
         {
             var absolutePath = this[newPath];
             if (absolutePath is null)
-                throw new ArgumentOutOfRangeException($"Path {newPath} was not found.");
+                throw new ArgumentOutOfRangeException(nameof(newPath), $"Path {newPath} was not found.");
             return new RelativePathResolver(absolutePath, this.lookup.Values.Distinct());
         }
     }
