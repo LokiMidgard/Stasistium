@@ -1,6 +1,8 @@
 ﻿using Stasistium.Documents;
 using Stasistium.Helper;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -49,6 +51,8 @@ namespace Stasistium.Documents
                 return this.hash;
             }
         }
+
+        public IEnumerable<Type> Keys => this.values.Keys;
 
         public IGeneratorContext Context { get; }
 
