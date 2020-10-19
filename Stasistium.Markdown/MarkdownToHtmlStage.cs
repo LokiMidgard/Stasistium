@@ -233,6 +233,9 @@ namespace Stasistium.Stages
                         builder.Append(image.ImageWidth);
                         builder.Append("\"");
                     }
+
+                    builder.Append(" />");
+
                     break;
 
                 case Inlines.ItalicTextInline italic:
