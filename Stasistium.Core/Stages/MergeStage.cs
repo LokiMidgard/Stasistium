@@ -51,14 +51,14 @@ namespace Stasistium.Stages
                     });
                     bool currentItemHashChanges;
 
-                    if (cache == null || cache.InputIdToOutputId.TryGetValue(currentItem.Id, out string? currentId))
+                    if (cache == null || !cache.InputIdToOutputId.TryGetValue(currentItem.Id, out string? currentId))
                         currentId = null;
                     if (currentItem.HasChanges || inputSingle.HasChanges || currentId is null || cache is null)
                     {
                         var (performing, newItemCache) = await currentTask;
                         currentId = performing.Id;
 
-                        if (cache == null || cache.OutputIdToHash.TryGetValue(currentId, out string? oldHash))
+                        if (cache == null || !cache.OutputIdToHash.TryGetValue(currentId, out string? oldHash))
                             oldHash = null;
                         currentItemHashChanges = oldHash != newItemCache;
                         return (result: StageResult.CreateStageResult(this.Context, performing, currentItemHashChanges, currentId, newItemCache, newItemCache), inputId: currentItem.Id);
@@ -112,7 +112,7 @@ namespace Stasistium.Stages
                 if (!inputSingle.HasChanges && cache != null)
                 {
                     hasChanges = perform.Item1.Any(x => x.HasChanges)
-                        || cache.DocumentIds.SequenceEqual(documentIds);
+                        || !cache.DocumentIds.SequenceEqual(documentIds);
                 }
                 return this.Context.CreateStageResultList(perform.Item1, hasChanges, documentIds, perform.newCache, perform.newCache.Hash, inputReadyToPerform.Cache, inputSingle.Cache);
             }

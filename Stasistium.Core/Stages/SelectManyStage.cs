@@ -66,7 +66,7 @@ where TInputCache : class
                         var itemCache = pipeDone.Cache;
                         foreach (var singleResult in itemResult)
                         {
-                            if (cache == null || cache.OutputItemIdToHash.TryGetValue(singleResult.Id, out string? lastItemHash))
+                            if (cache == null || !cache.OutputItemIdToHash.TryGetValue(singleResult.Id, out string? lastItemHash))
                                 lastItemHash = null;
 
                             var performedSingle = await singleResult.Perform;
