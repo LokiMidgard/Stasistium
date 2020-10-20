@@ -186,14 +186,18 @@ namespace Stasistium.Serelizer
             using var jsonReadr = new Newtonsoft.Json.JsonTextReader(textReader);
 
             var array = await JArray.LoadAsync(jsonReadr).ConfigureAwait(false);
-            return (T)Load(array);
+            return Load<T>(array);
         }
 
 
-        internal static object Load(JArray json)
+        internal static T Load<T>(JArray json)
         {
             if (json.Count == 0)
                 throw new ArgumentException("There must be at least on value", nameof(json));
+
+            if (json[0]["type"]?.ToObject<string>() != typeof(T).AssemblyQualifiedName)
+                throw new ArgumentException($"JSON will not deserelize to {typeof(T).AssemblyQualifiedName} but instead to {json[0]["type"]?.ToObject<string>() ?? "<null>"}", nameof(json));
+
 
             var deserelizedObjects = new object[json.Count];
 
@@ -270,7 +274,7 @@ namespace Stasistium.Serelizer
                             var splited = txt.Split('|');
                             var ticks = long.Parse(splited[0], System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture);
                             var kind = (DateTimeKind)Enum.Parse(typeof(DateTimeKind), splited[1]);
-                            
+
                             value = new DateTime(ticks, kind);
                         }
                         else if (targetType == typeof(DateTimeOffset))
@@ -414,7 +418,7 @@ namespace Stasistium.Serelizer
 
             }
 
-            return deserelizedObjects[0];
+            return (T)deserelizedObjects[0];
         }
 
         private enum ValueKind
