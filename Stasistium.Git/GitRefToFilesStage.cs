@@ -40,7 +40,7 @@ namespace Stasistium.Stages
                             if (addGitMetadata)
                             {
                                 var commits = await Task.Run(() => source.Value.GetCommits(entry.Path).Select(x => new Commit(x))).ConfigureAwait(false);
-                                document = document.With(document.Metadata.Add(new GitRefToFilesStage<TPreviousCache>.Metadata(commits.ToImmutableList())));
+                                document = document.With(document.Metadata.Add(new GitMetadata(commits.ToImmutableList())));
                             }
                             return document as object;
 
@@ -63,19 +63,20 @@ namespace Stasistium.Stages
 
             return blobs.ToImmutable();
         }
+    }
 
-        public class Metadata
+    public class GitMetadata
+    {
+        public GitMetadata(ImmutableList<Commit> commits)
         {
-            public Metadata(ImmutableList<Commit> commits)
-            {
-                this.FileCommits = commits;
-            }
-
-            public ImmutableList<Commit> FileCommits { get; }
+            this.FileCommits = commits;
         }
 
-
+        public ImmutableList<Commit> FileCommits { get; }
     }
+
+
+
     public class Commit
     {
         public Commit(string sha, string message, Signature author, Signature committer)
