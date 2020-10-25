@@ -1,5 +1,6 @@
 ﻿using Stasistium.Core;
 using Stasistium.Documents;
+using Stasistium.Stages;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -124,4 +125,34 @@ namespace Stasistium.Stages
 
 
 
+}
+
+namespace Stasistium
+{
+
+
+    public static partial class StageExtensions
+    {
+
+        public static WhereStage<TCheck, TPreviousItemCache, TPreviousCache> Where<TCheck, TPreviousItemCache, TPreviousCache>(this MultiStageBase<TCheck, TPreviousItemCache, TPreviousCache> input, Func<IDocument<TCheck>, Task<bool>> predicate, string? name = null)
+            where TPreviousCache : class
+            where TPreviousItemCache : class
+        {
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            if (predicate is null)
+                throw new ArgumentNullException(nameof(predicate));
+            return new WhereStage<TCheck, TPreviousItemCache, TPreviousCache>(input, predicate, input.Context, name);
+        }
+        public static WhereStage<TCheck, TPreviousItemCache, TPreviousCache> Where<TCheck, TPreviousItemCache, TPreviousCache>(this MultiStageBase<TCheck, TPreviousItemCache, TPreviousCache> input, Func<IDocument<TCheck>, bool> predicate, string? name = null)
+            where TPreviousCache : class
+            where TPreviousItemCache : class
+        {
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            if (predicate is null)
+                throw new ArgumentNullException(nameof(predicate));
+            return new WhereStage<TCheck, TPreviousItemCache, TPreviousCache>(input, x => Task.FromResult(predicate(x)), input.Context, name);
+        }
+    }
 }

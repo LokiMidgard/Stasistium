@@ -2,6 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using System.IO;
+using Stasistium.Stages;
 
 namespace Stasistium.Stages
 {
@@ -19,6 +20,26 @@ namespace Stasistium.Stages
             var output = input.With(() => new MemoryStream(System.Text.Encoding.UTF8.GetBytes(input.Value)), this.Context.GetHashForString(input.Value));
             return Task.FromResult<IDocument<Stream>>(output);
         }
+    }
+
+}
+
+namespace Stasistium
+{
+
+
+    public static partial class StageExtensions
+    {
+
+
+        public static TextToStreamStage<T> TextToStream<T>(this StageBase<string, T> input, string? name = null)
+            where T : class
+        {
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            return new TextToStreamStage<T>(input, input.Context, name);
+        }
+
     }
 
 }

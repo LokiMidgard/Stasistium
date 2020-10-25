@@ -1,4 +1,5 @@
 ﻿using Stasistium.Documents;
+using Stasistium.Stages;
 using System;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
@@ -25,4 +26,21 @@ namespace Stasistium.Stages
     }
 
 
+}
+namespace Stasistium
+{
+
+
+    public static partial class StageExtensions
+    {
+
+        public static SingleStage<TCheck, TPreviousItemCache, TPreviousCache> SingleEntry<TCheck, TPreviousItemCache, TPreviousCache>(this MultiStageBase<TCheck, TPreviousItemCache, TPreviousCache> input, string? name = null)
+            where TPreviousCache : class
+            where TPreviousItemCache : class
+        {
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            return new SingleStage<TCheck, TPreviousItemCache, TPreviousCache>(input, input.Context, name);
+        }
+    }
 }

@@ -1,5 +1,6 @@
 ﻿using Stasistium.Core;
 using Stasistium.Documents;
+using Stasistium.Stages;
 using System;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
@@ -129,4 +130,53 @@ namespace Stasistium.Stages
 
 
 
+}
+
+namespace Stasistium
+{
+
+
+    public static partial class StageExtensions
+    {
+        public static TransformStage<TIn, TInITemCache, TInCache, TOut> Transform<TIn, TInITemCache, TInCache, TOut>(this MultiStageBase<TIn, TInITemCache, TInCache> input, Func<IDocument<TIn>, Task<IDocument<TOut>>> predicate, string? name = null)
+            where TInCache : class
+            where TInITemCache : class
+        {
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            if (predicate is null)
+                throw new ArgumentNullException(nameof(predicate));
+            return new TransformStage<TIn, TInITemCache, TInCache, TOut>(input, predicate, input.Context, name);
+        }
+        public static TransformStage<TIn, TInITemCache, TInCache, TOut> Transform<TIn, TInITemCache, TInCache, TOut>(this MultiStageBase<TIn, TInITemCache, TInCache> input, Func<IDocument<TIn>, IDocument<TOut>> predicate, string? name = null)
+            where TInCache : class
+            where TInITemCache : class
+        {
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            if (predicate is null)
+                throw new ArgumentNullException(nameof(predicate));
+            return new TransformStage<TIn, TInITemCache, TInCache, TOut>(input, x => Task.FromResult(predicate(x)), input.Context, name);
+        }
+
+        public static TransformStage<TIn, TInCache, TOut> Transform<TIn, TInCache, TOut>(this StageBase<TIn, TInCache> input, Func<IDocument<TIn>, Task<IDocument<TOut>>> predicate, string? name = null)
+    where TInCache : class
+        {
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            if (predicate is null)
+                throw new ArgumentNullException(nameof(predicate));
+            return new TransformStage<TIn, TInCache, TOut>(input, predicate, input.Context, name);
+        }
+
+        public static TransformStage<TIn, TInCache, TOut> Transform<TIn, TInCache, TOut>(this StageBase<TIn, TInCache> input, Func<IDocument<TIn>, IDocument<TOut>> predicate, string? name = null)
+            where TInCache : class
+        {
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            if (predicate is null)
+                throw new ArgumentNullException(nameof(predicate));
+            return new TransformStage<TIn, TInCache, TOut>(input, x => Task.FromResult(predicate(x)), input.Context, name);
+        }
+    }
 }

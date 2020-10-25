@@ -1,5 +1,6 @@
 ﻿using Stasistium.Core;
 using Stasistium.Documents;
+using Stasistium.Stages;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -87,4 +88,17 @@ namespace Stasistium.Stages
         public string LastHash { get; set; }
     }
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+}
+namespace Stasistium
+{
+    public static partial class StageExtensions
+    {
+        public static FileStage<T> File<T>(this StageBase<string, T> input, string? name = null)
+            where T : class
+        {
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            return new FileStage<T>(input, input.Context, name);
+        }
+    }
 }

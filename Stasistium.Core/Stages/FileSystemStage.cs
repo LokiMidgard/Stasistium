@@ -1,5 +1,6 @@
 ﻿using Stasistium.Core;
 using Stasistium.Documents;
+using Stasistium.Stages;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -171,6 +172,24 @@ namespace Stasistium.Stages
             return this.WithId(id);
         }
     }
+}
 
 
+namespace Stasistium
+{
+
+
+    public static partial class StageExtensions
+    {
+
+
+
+        public static FileSystemStage<T> FileSystem<T>(this StageBase<string, T> input, string? name = null)
+            where T : class
+        {
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            return new FileSystemStage<T>(input, input.Context, name);
+        }
+    }
 }

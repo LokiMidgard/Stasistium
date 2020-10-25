@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Stasistium.Serelizer;
+using Stasistium.Stages;
 
 namespace Stasistium.Stages
 {
@@ -147,4 +148,27 @@ namespace Stasistium.Stages
     }
 
 
+}
+
+namespace Stasistium
+{
+
+
+    public static partial class StageExtensions
+    {
+
+
+        public static PersistStage<TItemCache, TCache> Persist<TItemCache, TCache>(this MultiStageBase<Stream, TItemCache, TCache> stage, DirectoryInfo output, GenerationOptions generatorOptions, string? name = null)
+            where TCache : class
+            where TItemCache : class
+        {
+            if (stage is null)
+                throw new ArgumentNullException(nameof(stage));
+            if (output is null)
+                throw new ArgumentNullException(nameof(output));
+            if (generatorOptions is null)
+                throw new ArgumentNullException(nameof(generatorOptions));
+            return new PersistStage<TItemCache, TCache>(stage, output, generatorOptions, stage.Context, name);
+        }
+    }
 }

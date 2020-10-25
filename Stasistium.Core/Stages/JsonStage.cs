@@ -1,4 +1,5 @@
 ﻿using Stasistium.Documents;
+using Stasistium.Stages;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -34,4 +35,40 @@ namespace Stasistium.Stages
     }
 
 
+}
+namespace Stasistium
+{
+
+
+    public static partial class StageExtensions
+    {
+
+
+
+
+        public class JsonHelper<TInCache>
+            where TInCache : class
+        {
+            private readonly StageBase<Stream, TInCache> input;
+            private readonly string? name;
+
+            internal JsonHelper(StageBase<Stream, TInCache> input, string? name)
+            {
+                this.input = input;
+                this.name = name;
+            }
+
+            public JsonStage<TInCache, TOut> For<TOut>()
+            {
+                return new JsonStage<TInCache, TOut>(this.input, this.input.Context, this.name);
+            }
+        }
+        public static JsonHelper<TInCache> Json<TInCache>(this StageBase<Stream, TInCache> input, string? name = null)
+            where TInCache : class
+        {
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            return new JsonHelper<TInCache>(input, name);
+        }
+    }
 }

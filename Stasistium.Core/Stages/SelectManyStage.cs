@@ -6,6 +6,7 @@ using System.Collections.Immutable;
 using System.Collections.Generic;
 using System.Linq;
 using Stasistium.Core;
+using Stasistium.Stages;
 
 namespace Stasistium.Stages
 {
@@ -200,4 +201,25 @@ where TInputCache : class
 
 
 
+}
+
+namespace Stasistium
+{
+
+
+    public static partial class StageExtensions
+    {
+
+
+        public static SelectManyStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache> SelectMany<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache>(this MultiStageBase<TInput, TInputItemCache, TInputCache> input, Func<StageBase<TInput, Stages.GeneratedHelper.CacheId<string>>, MultiStageBase<TResult, TItemCache, TCache>> createPipline, string? name = null)
+            where TCache : class
+            where TInputCache : class
+            where TInputItemCache : class
+            where TItemCache : class
+        {
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            return new SelectManyStage<TInput, TInputItemCache, TInputCache, TResult, TItemCache, TCache>(input, createPipline, input.Context, name);
+        }
+    }
 }
