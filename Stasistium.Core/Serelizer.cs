@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Stasistium.Helper;
 using System;
 using System.Collections.Generic;
@@ -13,11 +14,21 @@ namespace Stasistium.Serelizer
     {
         public static async Task Write(object baseCache, System.IO.Stream stream, bool indented = false)
         {
-            var array = Write(baseCache);
+
+
+            //var array = Write(baseCache);
 
             using var textWriter = new System.IO.StreamWriter(stream);
             using var jsonWriter = new Newtonsoft.Json.JsonTextWriter(textWriter) { Formatting = indented ? Newtonsoft.Json.Formatting.Indented : Newtonsoft.Json.Formatting.None };
-            await array.WriteToAsync(jsonWriter).ConfigureAwait(false);
+            var ser = new JsonSerializer();
+
+            var type = baseCache.GetType();
+            var typeName = type.AssemblyQualifiedName;
+
+            ser.Serialize(jsonWriter, (typeName, baseCache));
+
+
+            //await array.WriteToAsync(jsonWriter).ConfigureAwait(false);
         }
 
         private static JArray Write(object baseCache)
@@ -185,8 +196,24 @@ namespace Stasistium.Serelizer
             using var textReader = new System.IO.StreamReader(stream);
             using var jsonReadr = new Newtonsoft.Json.JsonTextReader(textReader);
 
-            var array = await JArray.LoadAsync(jsonReadr).ConfigureAwait(false);
-            return Load<T>(array);
+            //var array = await JArray.LoadAsync(jsonReadr).ConfigureAwait(false);
+
+            var ser = new JsonSerializer();
+            var (typeName, obj) = await Task.Run(() => ser.Deserialize<(string type, T obj)>(jsonReadr)).ConfigureAwait(false);
+
+            if (typeName is null)
+                throw new ArgumentException($"type unknown does not have a type!");
+
+            var type = Type.GetType(typeName);
+            if (type is null)
+                throw new ArgumentException($"Can't find Type {typeName}");
+
+            if (type != typeof(T))
+                throw new ArgumentException($"Wrong type {typeName}");
+
+            return obj;
+
+            //return Load<T>(array);
         }
 
 
