@@ -32,6 +32,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stasistium.Test", "Stasisti
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stasistium.Sass", "Stasistium.Sass\Stasistium.Sass.csproj", "{03A13D38-5622-4BEB-8ED6-21EB2E3599DB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stasistium.Generator", "Stasistium.Generator\Stasistium.Generator.csproj", "{B299B147-6048-48E0-A483-E98AE336B699}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -78,6 +80,10 @@ Global
 		{03A13D38-5622-4BEB-8ED6-21EB2E3599DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03A13D38-5622-4BEB-8ED6-21EB2E3599DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{03A13D38-5622-4BEB-8ED6-21EB2E3599DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B299B147-6048-48E0-A483-E98AE336B699}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B299B147-6048-48E0-A483-E98AE336B699}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B299B147-6048-48E0-A483-E98AE336B699}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B299B147-6048-48E0-A483-E98AE336B699}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

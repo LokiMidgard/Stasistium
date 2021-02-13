@@ -11,12 +11,9 @@ using System.Threading.Tasks;
 
 namespace Stasistium.Stages
 {
-    public class FileStage : StageBaseSimple< string, Stream>
+    public class FileStage : StageBaseSimple<string, Stream>
     {
-        public FileStage(IGeneratorContext context, string? name) : base(context, name)
-        {
-        }
-
+        public FileStage(IGeneratorContext context, string? name) : base(context, name) { }
         protected override Task<IDocument<Stream>> Work(IDocument<string> input, OptionToken options)
         {
             if (input is null)
@@ -33,5 +30,4 @@ namespace Stasistium.Stages
             return Task.FromResult(document);
         }
     }
-
 }

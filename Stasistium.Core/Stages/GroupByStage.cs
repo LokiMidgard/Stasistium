@@ -19,7 +19,7 @@ namespace Stasistium.Stages
         public GroupByStage(Func<IStageBaseOutput<TInput>, TKey, IStageBaseOutput<TResult>> createPipline, Func<IDocument<TInput>, TKey> keySelector, IGeneratorContext context, string? name) : base(context, name)
         {
             this.createPipline = createPipline;
-            this.keySelector = keySelector;
+            this.keySelector = keySelector; 
         }
 
         protected async override Task<ImmutableList<IDocument<TResult>>> Work(ImmutableList<IDocument<TInput>> input, OptionToken options)
@@ -28,7 +28,7 @@ namespace Stasistium.Stages
 
             var results = await Task.WhenAll(groups.Select(group =>
             {
-                var currentStartStage = SubPiplineHelper.Create((IStageBaseOutput<TInput> start) => this.createPipline(start, group.Key));
+                var currentStartStage = SubPipeline.Create((IStageBaseOutput<TInput> start) => this.createPipline(start, group.Key), this.Context);
                 return currentStartStage.Invoke(group.ToImmutableList(), options);
             })).ConfigureAwait(false);
 
@@ -36,15 +36,7 @@ namespace Stasistium.Stages
         }
 
     }
-
-    public static class SubPiplineHelper
-    {
-        public static SubPiplineHelper<TInput, TResult> Create<TInput, TResult>(Func<IStageBaseOutput<TInput>, IStageBaseOutput<TResult>> createPipeline)
-        {
-            return SubPiplineHelper<TInput, TResult>.Create(createPipeline);
-        }
-    }
-    public class SubPiplineHelper<TInput, TResult> : IStageBaseOutput<TInput>
+    public class SubPiplineHelper<TInput, TResult> : StageBase, IStageBaseOutput<TInput>
     {
         public event StagePerform<TInput>? PostStages;
 
@@ -52,17 +44,19 @@ namespace Stasistium.Stages
 
         public Task<ImmutableList<IDocument<TResult>>> Result => this.completionSource.Task;
 
-        private SubPiplineHelper()
+
+
+        private SubPiplineHelper(IGeneratorContext context) : base(context, null)
         {
         }
 
         // It also exists in the non generic variant which delegates to this. We need access to private members...
 #pragma warning disable CA1000 // Do not declare static members on generic types
-        public static SubPiplineHelper<TInput, TResult> Create(Func<IStageBaseOutput<TInput>, IStageBaseOutput<TResult>> createPipeline)
+        public static SubPiplineHelper<TInput, TResult> Create(Func<IStageBaseOutput<TInput>, IStageBaseOutput<TResult>> createPipeline, IGeneratorContext context)
         {
             if (createPipeline is null)
                 throw new ArgumentNullException(nameof(createPipeline));
-            var start = new SubPiplineHelper<TInput, TResult>();
+            var start = new SubPiplineHelper<TInput, TResult>(context);
             var pipline = createPipeline(start);
             pipline.PostStages += (result, options) =>
             {

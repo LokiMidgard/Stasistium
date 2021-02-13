@@ -30,7 +30,6 @@ namespace Stasistium.Documents
 
         }
     }
-
     public class DocumentLazy<T> : DocumentBase, IDocument<T>
     {
         private readonly Func<T> valueCallback;
@@ -40,7 +39,7 @@ namespace Stasistium.Documents
             {
                 var data = (object)valueCallback();
                 using var stream = (System.IO.Stream)data;
-                if (contentHash != context.GetHashForStream(stream))
+                if (contentHash != context.GetHashForStream(stream) && System.Diagnostics.Debugger.IsAttached)
                     System.Diagnostics.Debugger.Break();
             }
 

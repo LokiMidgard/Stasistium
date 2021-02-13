@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Stasistium.Stages
 {
-    public class StageBase
+    public class StageBase : IStageBase
     {
         internal StageBase(IGeneratorContext context, string? name)
         {
