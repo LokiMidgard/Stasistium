@@ -88,7 +88,7 @@ namespace Stasistium.Razor
                 var htmlEncoder = this._serviceProvider.GetRequiredService<HtmlEncoder>();
                 var diagnosticSource = this._serviceProvider.GetRequiredService<DiagnosticListener>();
 
-                IReadOnlyList<IRazorPage>? viewStart = null;
+                ImmutableList<IRazorPage>? viewStart = null;
 
                 if (this.configuration.ViewStartId != null)
                 {

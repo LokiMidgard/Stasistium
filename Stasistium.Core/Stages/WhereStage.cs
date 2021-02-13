@@ -1,5 +1,4 @@
-﻿using Stasistium.Core;
-using Stasistium.Documents;
+﻿using Stasistium.Documents;
 using Stasistium.Stages;
 using System;
 using System.Collections.Generic;
@@ -11,148 +10,39 @@ using System.Threading.Tasks;
 namespace Stasistium.Stages
 {
 
-    public class WhereStage<TOut, TInItemCache, TInCache> : MultiStageBase<TOut, TInItemCache, WhereStageCache<TInCache>>// : OutputMultiInputSingle0List1StageBase<TCheck, TPreviousItemCache, TPreviousCache, TCheck, TPreviousItemCache, ImmutableList<string>>
-        where TInCache : class
-        where TInItemCache : class
+    public class WhereStage<T> : StageBase<T, T>
     {
-        private readonly MultiStageBase<TOut, TInItemCache, TInCache> input;
-        private readonly Func<IDocument<TOut>, Task<bool>> predicate;
+        private readonly Func<IDocument<T>, bool> predicate;
 
-        public WhereStage(MultiStageBase<TOut, TInItemCache, TInCache> input, Func<IDocument<TOut>, Task<bool>> predicate, IGeneratorContext context, string? name = null) : base(context, name)
+        public WhereStage(Func<IDocument<T>, bool> predicate, IGeneratorContext context, string? name = null) : base(context, name)
         {
-            this.input = input;
             this.predicate = predicate;
         }
 
-        protected override async Task<StageResultList<TOut, TInItemCache, WhereStageCache<TInCache>>> DoInternal([AllowNull] WhereStageCache<TInCache>? cache, OptionToken options)
+
+        protected override Task<ImmutableList<IDocument<T>>> Work(ImmutableList<IDocument<T>> input, OptionToken options)
         {
-
-
-            var input = await this.input.DoIt(cache?.PreviousCache , options).ConfigureAwait(false);
-
-            var task = LazyTask.Create(async () =>
-            {
-
-                var inputList = await input.Perform;
-
-
-                var list = (await Task.WhenAll(inputList.Select(async subInput =>
-                {
-                    bool pass;
-
-                    if (subInput.HasChanges)
-                    {
-                        var result = await subInput.Perform;
-                        var itemCache = subInput.Cache;
-                        pass = await this.predicate(result).ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        if (cache is null)
-                            throw new InvalidOperationException("This shoudl not happen. if item has no changes, ther must be a child cache.");
-                        // since HasChanges if false, it was present in the last invocation
-                        // if it is passed this it was added to thec cache otherwise not.
-                        pass = cache.OutputIdOrder.Contains(subInput.Id);
-                    }
-
-                    if (pass)
-                        return subInput;
-                    else
-                        return null;
-
-
-                })).ConfigureAwait(false)).Where(x => x != null);
-
-                var newCache = new WhereStageCache<TInCache>()
-                {
-                    OutputIdOrder = list.Select(x => x.Id).ToArray(),
-                    PreviousCache  = input.Cache,
-                    Hash = this.Context.GetHashForObject(list.Select(x => x.Hash))
-                };
-                return (result: list.ToImmutableList(), cache: newCache);
-            });
-
-            bool hasChanges = input.HasChanges;
-            if (input.HasChanges || cache == null)
-            {
-
-                var (list, c) = await task;
-
-                hasChanges = false;
-                if (!hasChanges && list.Count != cache?.OutputIdOrder.Length)
-                    hasChanges = true;
-
-                if (!hasChanges && cache != null)
-                {
-                    for (int i = 0; i < cache.OutputIdOrder.Length && !hasChanges; i++)
-                    {
-                        if (list[i].Id != cache.OutputIdOrder[i])
-                            hasChanges = true;
-                        if (list[i].HasChanges)
-                            hasChanges = true;
-                    }
-                }
-                return this.Context.CreateStageResultList(list, hasChanges, c.OutputIdOrder.ToImmutableList(), c, this.Context.GetHashForObject(list.Select(x => x.Hash)), input.Cache);
-
-            }
-            var actualTask = LazyTask.Create(async () =>
-            {
-                var temp = await task;
-                return temp.result;
-            });
-            return this.Context.CreateStageResultList(actualTask, hasChanges, cache.OutputIdOrder.ToImmutableList(), cache, cache.Hash, input.Cache);
+            return Task.FromResult(input.Where(predicate).ToImmutableList());
         }
 
 
     }
-
-#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-#pragma warning disable CA1819 // Properties should not return arrays
-#pragma warning disable CA2227 // Collection properties should be read only
-    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
-    public class WhereStageCache<TInCache> : IHavePreviousCache<TInCache>
-        where TInCache : class
+    public class WhereAsyncStage<T> : StageBase<T, T>
     {
-        public TInCache PreviousCache  { get; set; }
+        private readonly Func<IDocument<T>, Task<bool>> predicate;
 
-        public string[] OutputIdOrder { get; set; }
-        public string Hash { get; set; }
-    }
-#pragma warning restore CA1819 // Properties should not return arrays
-#pragma warning restore CA2227 // Collection properties should be read only
-#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-
-
-
-
-}
-
-namespace Stasistium
-{
-
-
-    public static partial class StageExtensions
-    {
-
-        public static WhereStage<TCheck, TPreviousItemCache, TPreviousCache> Where<TCheck, TPreviousItemCache, TPreviousCache>(this MultiStageBase<TCheck, TPreviousItemCache, TPreviousCache> input, Func<IDocument<TCheck>, Task<bool>> predicate, string? name = null)
-            where TPreviousCache : class
-            where TPreviousItemCache : class
+        public WhereAsyncStage(Func<IDocument<T>, Task<bool>> predicate, IGeneratorContext context, string? name = null) : base(context, name)
         {
-            if (input is null)
-                throw new ArgumentNullException(nameof(input));
-            if (predicate is null)
-                throw new ArgumentNullException(nameof(predicate));
-            return new WhereStage<TCheck, TPreviousItemCache, TPreviousCache>(input, predicate, input.Context, name);
+            this.predicate = predicate;
         }
-        public static WhereStage<TCheck, TPreviousItemCache, TPreviousCache> Where<TCheck, TPreviousItemCache, TPreviousCache>(this MultiStageBase<TCheck, TPreviousItemCache, TPreviousCache> input, Func<IDocument<TCheck>, bool> predicate, string? name = null)
-            where TPreviousCache : class
-            where TPreviousItemCache : class
+
+
+        protected override async Task<ImmutableList<IDocument<T>>> Work(ImmutableList<IDocument<T>> input, OptionToken options)
         {
-            if (input is null)
-                throw new ArgumentNullException(nameof(input));
-            if (predicate is null)
-                throw new ArgumentNullException(nameof(predicate));
-            return new WhereStage<TCheck, TPreviousItemCache, TPreviousCache>(input, x => Task.FromResult(predicate(x)), input.Context, name);
+            var evaluatedFilter = await Task.WhenAll(input.Select(async x => (value: x, filter: await predicate(x))));
+            return evaluatedFilter.Where(x => x.filter).Select(x => x.value).ToImmutableList();
         }
+
+
     }
 }

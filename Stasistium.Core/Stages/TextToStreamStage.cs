@@ -6,10 +6,9 @@ using Stasistium.Stages;
 
 namespace Stasistium.Stages
 {
-    public class TextToStreamStage<TInputCache> : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple1List0StageBase<string, TInputCache, Stream>
-        where TInputCache : class
+    public class TextToStreamStage : StageBaseSimple<string, Stream>
     {
-        public TextToStreamStage(StageBase<string, TInputCache> inputSingle0, IGeneratorContext context, string? name = null) : base(inputSingle0, context, name)
+        public TextToStreamStage(IGeneratorContext context, string? name = null) : base(context, name)
         {
         }
 
@@ -20,26 +19,6 @@ namespace Stasistium.Stages
             var output = input.With(() => new MemoryStream(System.Text.Encoding.UTF8.GetBytes(input.Value)), this.Context.GetHashForString(input.Value));
             return Task.FromResult<IDocument<Stream>>(output);
         }
-    }
-
-}
-
-namespace Stasistium
-{
-
-
-    public static partial class StageExtensions
-    {
-
-
-        public static TextToStreamStage<T> TextToStream<T>(this StageBase<string, T> input, string? name = null)
-            where T : class
-        {
-            if (input is null)
-                throw new ArgumentNullException(nameof(input));
-            return new TextToStreamStage<T>(input, input.Context, name);
-        }
-
     }
 
 }

@@ -1,4 +1,4 @@
-﻿using Stasistium.Core;
+﻿
 using Stasistium.Documents;
 using Stasistium.Stages;
 using System;
@@ -12,31 +12,28 @@ using System.Threading.Tasks;
 namespace Stasistium.Stages
 {
 
-    public class FileSystemStage<T> : MultiStageBase<Stream, string, FileSystemCache<T>>
-        where T : class
+    public class FileSystemStage<T> : StageBase<string, Stream>
     {
-        private readonly StageBase<string, T> input;
-
-        public FileSystemStage(StageBase<string, T> input, IGeneratorContext context, string? name) : base(context, name)
+        public FileSystemStage(IGeneratorContext context, string? name) : base(context, name)
         {
-            this.input = input;
         }
 
-        protected override async Task<StageResultList<Stream, string, FileSystemCache<T>>> DoInternal([AllowNull] FileSystemCache<T>? cache, OptionToken options)
+        protected override Task<ImmutableList<IDocument<Stream>>> Work(ImmutableList<IDocument<string>> input, OptionToken options)
         {
-            var result = await this.input.DoIt(cache?.PreviousCache, options).ConfigureAwait(false);
+            if (input is null)
+                throw new ArgumentNullException(nameof(input));
+            if (options is null)
+                throw new ArgumentNullException(nameof(options));
+            var builder = ImmutableList.CreateBuilder<IDocument<Stream>>();
 
-            var task = LazyTask.Create(async () =>
+
+            foreach (var pathDocument in input)
             {
-
-                var performed = await result.Perform;
-
-                var newPreviousCache = result.Cache;
-                var path = performed.Value;
+                var path = pathDocument.Value;
                 var root = new DirectoryInfo(path);
 
                 if (!root.Exists)
-                    throw this.Context.Exception("Folder does not exists.");
+                    throw this.Context.Exception($"Folder {path} does not exists.");
 
                 var queue = new Queue<DirectoryInfo>();
                 queue.Enqueue(root);
@@ -45,7 +42,7 @@ namespace Stasistium.Stages
 
                 while (queue.TryDequeue(out var directory))
                 {
-                    list.AddRange(directory.GetFiles());
+                    builder.AddRange(directory.GetFiles().Select(ToDocuments));
 
                     foreach (var subDirectory in directory.GetDirectories())
                     {
@@ -53,74 +50,18 @@ namespace Stasistium.Stages
                     }
                 }
 
-
-                var callculated = list.Select(file =>
+                IDocument<Stream> ToDocuments(FileInfo file)
                 {
-                    var id = Path.GetRelativePath(root.FullName, file.FullName).Replace('\\', '/');
-                    var writeTime = file.LastWriteTimeUtc;
+                    var document = new FileDocument(file, root, pathDocument.Metadata, this.Context);
+                    return document;
+                }
+            }
 
-                    if (cache is null || !cache.PathToWriteTime.TryGetValue(id, out var lastWriteTime))
-                        lastWriteTime = default;
-                    var hasChanges = lastWriteTime != writeTime;
-
-                    if (hasChanges || cache is null)
-                    {
-                        // check if we actually have changes.
-                        var document = new FileDocument(file, root, performed.Metadata, this.Context);
-                        if (cache is null || !cache.PathToHash.TryGetValue(id, out string? lastHash))
-                            lastHash = null;
-
-                        hasChanges = document.Hash != lastHash;
-
-                        return (result: StageResult.CreateStageResult(this.Context, document as IDocument<Stream>, hasChanges, document.Id, document.Hash, document.Hash), writeTime, hash: document.Hash, id);
-                    }
-                    else
-                    {
-                        if (cache is null || !cache.PathToHash.TryGetValue(id, out string? lastHash))
-                            throw this.Context.Exception("Should not happpen");
-
-                        var subTask = LazyTask.Create(() =>
-                        {
-                            var document = new FileDocument(file, root, performed.Metadata, this.Context);
-                            return document as IDocument<Stream>;
-                        });
-
-                        return (result: StageResult.CreateStageResult(this.Context, subTask, hasChanges, id, lastHash, lastHash), writeTime, hash: lastHash, id);
-                    }
-                }).ToArray();
-
-
-                var newCache = new FileSystemCache<T>()
-                {
-                    PreviousCache = newPreviousCache,
-                    PathToHash = callculated.ToDictionary(x => x.id, x => x.hash),
-                    PathToWriteTime = callculated.ToDictionary(x => x.id, x => x.writeTime),
-                    IdOrder = callculated.Select(x => x.id).ToArray(),
-                    Hash = this.Context.GetHashForObject(callculated.Select(x => x.hash)),
-                };
-                var resultList = callculated.Select(X => X.result).ToImmutableList();
-                return (result: resultList, newCache);
-            });
-
-            var r = await task;
-            var hasChanges = r.result.Any(x => x.HasChanges)
-                                || cache is null
-                                || !cache.IdOrder.SequenceEqual(r.newCache.IdOrder);
-            var ids = r.newCache.IdOrder.ToImmutableList();
-
-            return this.Context.CreateStageResultList(r.result, hasChanges, ids, r.newCache, r.newCache.Hash, result.Cache);
+            return Task.FromResult(builder.ToImmutable());
         }
     }
 
-    public class FileSystemCache<T> : IHavePreviousCache<T>
-        where T : class
-    {
-        public T PreviousCache { get; set; }
-        public Dictionary<string, DateTime> PathToWriteTime { get; set; }
-        public Dictionary<string, string> PathToHash { get; set; }
-        public string[] IdOrder { get; set; }
-        public string Hash { get; set; }
-    }
+
 
 
     internal class FileDocument : DocumentBase, IDocument<Stream>
@@ -174,22 +115,3 @@ namespace Stasistium.Stages
     }
 }
 
-
-namespace Stasistium
-{
-
-
-    public static partial class StageExtensions
-    {
-
-
-
-        public static FileSystemStage<T> FileSystem<T>(this StageBase<string, T> input, string? name = null)
-            where T : class
-        {
-            if (input is null)
-                throw new ArgumentNullException(nameof(input));
-            return new FileSystemStage<T>(input, input.Context, name);
-        }
-    }
-}

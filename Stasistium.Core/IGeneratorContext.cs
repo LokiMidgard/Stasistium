@@ -1,4 +1,4 @@
-﻿using Stasistium.Core;
+﻿
 using Stasistium.Stages;
 using System;
 using System.Collections.Immutable;
@@ -21,7 +21,7 @@ namespace Stasistium.Documents
         string GetHashForObject(object? value);
         string GetHashForStream(Stream toHash);
         string GetHashForString(string toHash);
-        StaticStage<TResult> StageFromResult<TResult>(string id, TResult result, Func<TResult, string> hashFunction);
+        IStageBaseOutput<TResult> StageFromResult<TResult>(string id, TResult result, Func<TResult, string> hashFunction);
         DirectoryInfo TempDir();
         void Warning(string message, Exception? e = null);
                 

@@ -9,34 +9,22 @@ using System.Threading.Tasks;
 
 namespace Stasistium.Stages
 {
-    public class OrderByStage<T, TItemCache, TPreviousCache, TKey> : GeneratedHelper.Multiple.Simple.OutputMultiSimpleInputSingle0List1StageBase<T, TItemCache, TPreviousCache, T>
-        where TItemCache : class
-        where TPreviousCache : class
+    public class OrderByStage<T> : StageBase<T, T>
     {
-        private readonly Func<IDocument<T>, TKey> keySelector;
+        private readonly Comparison<IDocument<T>> comparision;
 
-        public OrderByStage(MultiStageBase<T, TItemCache, TPreviousCache> inputList0, Func<IDocument<T>, TKey> keySelector, IGeneratorContext context, string? name) : base(inputList0, context, name)
+        public OrderByStage(Comparison<IDocument<T>> comparision, IGeneratorContext context, string? name) : base(context, name)
         {
-            this.keySelector = keySelector;
+            this.comparision = comparision;
         }
 
-        protected override Task<ImmutableList<IDocument<T>>> Work(ImmutableList<IDocument<T>> input, OptionToken options) => Task.FromResult(input.OrderBy(this.keySelector).ToImmutableList());
-    }
-}
-
-namespace Stasistium
-{
-    public static partial class StageExtensions
-    {
-        public static OrderByStage<T, TItemCache, TPreviousCache, TKey> OrderBy<T, TItemCache, TPreviousCache, TKey>(this MultiStageBase<T, TItemCache, TPreviousCache> input, Func<IDocument<T>, TKey> keySelector, string? name = null)
-        where TItemCache : class
-        where TPreviousCache : class
+        protected override Task<ImmutableList<IDocument<T>>> Work(ImmutableList<IDocument<T>> input, OptionToken options)
         {
             if (input is null)
                 throw new ArgumentNullException(nameof(input));
-            if (keySelector is null)
-                throw new ArgumentNullException(nameof(keySelector));
-            return new OrderByStage<T, TItemCache, TPreviousCache, TKey>(input, keySelector, input.Context, name);
+            if (options is null)
+                throw new ArgumentNullException(nameof(options));
+            return Task.FromResult(input.Sort(comparision));
         }
     }
 }

@@ -64,7 +64,7 @@ namespace Stasistium.Documents
             return this.BaseContext.GetHashForString(toHash);
         }
 
-        public StaticStage<TResult> StageFromResult<TResult>(string id, TResult result, Func<TResult, string> hashFunction)
+        public IStageBaseOutput<TResult> StageFromResult<TResult>(string id, TResult result, Func<TResult, string> hashFunction)
         {
             return this.BaseContext.StageFromResult(id, result, hashFunction);
         }
@@ -163,8 +163,14 @@ namespace Stasistium.Documents
             return sb.ToString();
         }
 
-        public Stages.StaticStage<TResult> StageFromResult<TResult>(string id, TResult result, Func<TResult, string> hashFunction)
-    => new Stages.StaticStage<TResult>(id, result, hashFunction, this);
+        private readonly List<Stages.StaticStage> staticStages = new List<Stages.StaticStage>();
+
+        public IStageBaseOutput<TResult> StageFromResult<TResult>(string id, TResult result, Func<TResult, string> hashFunction)
+        {
+            return new Stages.StaticStage<TResult>(id, result, hashFunction, this);
+        }
+
+        public Task Run(OptionToken option) => Task.WhenAll(this.staticStages.Select(stage => stage.Invoke(option)));
 
 
 

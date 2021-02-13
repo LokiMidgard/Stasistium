@@ -1,6 +1,9 @@
 ﻿using Stasistium.Documents;
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Stasistium.Stages
@@ -25,7 +28,7 @@ namespace Stasistium.Stages
 
             baseName = type.Name;
 
-            while (type.IsNested)
+            while (type.IsNested && type.DeclaringType is not null)
             {
                 type = type.DeclaringType;
                 if (type.IsGenericType)
@@ -36,21 +39,38 @@ namespace Stasistium.Stages
 
             return $"{baseName}-{Guid.NewGuid()}";
         }
+
+        public virtual Task Reset() => Task.CompletedTask;
     }
-    public abstract class StageBase<TResult, TCache> : StageBase
-        where TCache : class
+
+    public delegate Task StagePerform<T>(ImmutableList<IDocument<T>> cache, OptionToken options);
+
+
+    public abstract class StageBaseSimple<TIn, TResult> : StageBase<TIn, TResult>, IStageBaseInput<TIn>, IStageBaseOutput<TResult>
     {
-        private readonly System.Threading.SemaphoreSlim semaphore = new System.Threading.SemaphoreSlim(1, 1);
-        private (Guid lastId, Task<StageResult<TResult, TCache>> result) lastRun;
+        protected StageBaseSimple(IGeneratorContext context, string? name) : base(context, name)
+        {
+        }
+
+        protected abstract Task<IDocument<TResult>> Work(IDocument<TIn> input, OptionToken options);
+        protected override sealed async Task<ImmutableList<IDocument<TResult>>> Work(ImmutableList<IDocument<TIn>> input, OptionToken options)
+        {
+            var result = await Task.WhenAll(input.Select(x => this.Work(x, options))).ConfigureAwait(false);
+            return result.ToImmutableList();
+        }
+    }
+    public abstract class StageBase<TIn, TResult> : StageBase, IStageBaseInput<TIn>, IStageBaseOutput<TResult>
+    {
+        public event StagePerform<TResult>? PostStages;
 
         protected StageBase(IGeneratorContext context, string? name) : base(context, name)
         {
-            context.DisposeOnDispose(this.semaphore);
         }
 
-        protected abstract Task<StageResult<TResult, TCache>> DoInternal([AllowNull]TCache? cache, OptionToken options);
 
-        public async Task<StageResult<TResult, TCache>> DoIt([AllowNull]TCache? cache, OptionToken options)
+        protected abstract Task<ImmutableList<IDocument<TResult>>> Work(ImmutableList<IDocument<TIn>> input, OptionToken options);
+
+        async Task IStageBaseInput<TIn>.DoIt(ImmutableList<IDocument<TIn>> input, OptionToken options)
         {
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
@@ -58,79 +78,87 @@ namespace Stasistium.Stages
             this.Context.Logger.Info($"BEGIN");
             var stopWatch = System.Diagnostics.Stopwatch.StartNew();
 
-            Task<StageResult<TResult, TCache>> result;
-            try
-            {
-                await this.semaphore.WaitAsync().ConfigureAwait(false);
-                var lastRun = this.lastRun;
-                if (lastRun.lastId == options.GenerationId)
-                    result = lastRun.result;
-                else
-                {
-                    result = this.DoInternal(cache, options);
-                    this.lastRun = (options.GenerationId, result);
-                }
+            var result = await this.Work(input, options).ConfigureAwait(false);
+            stopWatch.Stop();
+            this.Context.Logger.Info($"END Took {stopWatch.Elapsed}");
 
-            }
-            finally
-            {
-                 this.semaphore.Release();
-                stopWatch.Stop();
-                this.Context.Logger.Info($"END Took {stopWatch.Elapsed}");
-            }
-            return await result.ConfigureAwait(false);
+            await Task
+               .WhenAll(this.PostStages?.GetInvocationList()
+                    .Cast<StagePerform<TResult>>()
+                    .Select(s => s(result, options)) ?? Array.Empty<Task>()
+               ).ConfigureAwait(false);
         }
-
-
     }
 
-    public abstract class MultiStageBase<TResult, TCacheResult, TCache> : StageBase
-     where TCache : class
-     where TCacheResult : class
+
+
+    public abstract class StageBaseSink<TIn> : StageBase, IStageBaseInput<TIn>
     {
 
-        private (Guid lastId, Task<StageResultList<TResult, TCacheResult, TCache>> result) lastRun;
-        private readonly System.Threading.SemaphoreSlim semaphore = new System.Threading.SemaphoreSlim(1, 1);
-
-        protected MultiStageBase(IGeneratorContext context, string? name = null) : base(context, name)
+        protected StageBaseSink(IGeneratorContext context, string? name) : base(context, name)
         {
-            context.DisposeOnDispose(this.semaphore);
         }
 
 
+        protected abstract Task Work(ImmutableList<IDocument<TIn>> input, OptionToken options);
 
-        protected abstract Task<StageResultList<TResult, TCacheResult, TCache>> DoInternal([AllowNull]TCache? cache, OptionToken options);
-
-        public async Task<StageResultList<TResult, TCacheResult, TCache>> DoIt([AllowNull]TCache? cache, OptionToken options)
+        async Task IStageBaseInput<TIn>.DoIt(ImmutableList<IDocument<TIn>> input, OptionToken options)
         {
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
             using var indent = this.Context.Logger.Indent();
             this.Context.Logger.Info($"BEGIN");
             var stopWatch = System.Diagnostics.Stopwatch.StartNew();
-            Task<StageResultList<TResult, TCacheResult, TCache>> result;
-            try
-            {
-                await this.semaphore.WaitAsync().ConfigureAwait(false);
-                var lastRun = this.lastRun;
-                if (lastRun.lastId == options.GenerationId)
-                    result = lastRun.result;
-                else
-                {
-                    result = this.DoInternal(cache, options);
-                    this.lastRun = (options.GenerationId, result);
-                }
-            }
-            finally
-            {
-                this.semaphore.Release();
-                stopWatch.Stop();
-                this.Context.Logger.Info($"END Took {stopWatch.Elapsed}");
-            }
-            return await result.ConfigureAwait(false);
+
+            await this.Work(input, options).ConfigureAwait(false);
+            stopWatch.Stop();
+            this.Context.Logger.Info($"END Took {stopWatch.Elapsed}");
+        }
+    }
+
+    public abstract class StageBase< TIn1, TIn2, TResult> : StageBase, IStageBaseInput<TIn1, TIn2>, IStageBaseOutput<TResult>
+    {
+        public event StagePerform<TResult>? PostStages;
+
+        private TaskCompletionSource<(ImmutableList<IDocument<TIn2>>, OptionToken)> seccondArgument = new TaskCompletionSource<(ImmutableList<IDocument<TIn2>>, OptionToken)>();
+
+        protected StageBase(IGeneratorContext context, string? name) : base(context, name)
+        {
         }
 
+
+        protected abstract Task<ImmutableList<IDocument<TResult>>> Work(ImmutableList<IDocument<TIn1>> input1, ImmutableList<IDocument<TIn2>> input2, OptionToken options);
+
+        async Task IStageBaseInput<TIn1, TIn2>.DoIt1(ImmutableList<IDocument<TIn1>> in1, OptionToken options)
+        {
+            var (in2, otherToken) = await this.seccondArgument.Task.ConfigureAwait(false);
+
+            if (otherToken != options)
+                throw new ArgumentException("OptionToken does not match.");
+
+            var result = await this.Work(in1, in2, options).ConfigureAwait(false);
+
+            await Task
+               .WhenAll(this.PostStages?.GetInvocationList()
+                    .Cast<StagePerform<TResult>>()
+                    .Select(s => s(result, options)) ?? Array.Empty<Task>()
+               ).ConfigureAwait(false);
+
+        }
+
+        Task IStageBaseInput<TIn1, TIn2>.DoIt2(ImmutableList<IDocument<TIn2>> in2, OptionToken options)
+        {
+            this.seccondArgument.SetResult((in2, options));
+            return Task.CompletedTask;
+        }
+
+        public override Task Reset()
+        {
+            this.seccondArgument = new TaskCompletionSource<(ImmutableList<IDocument<TIn2>>, OptionToken)>();
+            return base.Reset();
+        }
     }
+
 
     public class OptionToken : IEquatable<OptionToken>
     {

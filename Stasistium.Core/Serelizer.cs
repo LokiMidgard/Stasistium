@@ -198,7 +198,10 @@ namespace Stasistium.Serelizer
 
             //var array = await JArray.LoadAsync(jsonReadr).ConfigureAwait(false);
 
-            var ser = new JsonSerializer();
+            var ser = new JsonSerializer() {
+            
+
+            };
             var (typeName, obj) = await Task.Run(() => ser.Deserialize<(string type, T obj)>(jsonReadr)).ConfigureAwait(false);
 
             if (typeName is null)
