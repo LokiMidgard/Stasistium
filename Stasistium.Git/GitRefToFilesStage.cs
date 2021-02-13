@@ -9,58 +9,59 @@ using System.Threading.Tasks;
 
 namespace Stasistium.Stages
 {
-    public class GitRefToFilesStage<TPreviousCache> : GeneratedHelper.Multiple.Simple.OutputMultiSimpleInputSingle1List0StageBase<GitRefStage, TPreviousCache, Stream>
-        where TPreviousCache : class
+    public class GitRefToFilesStage : StageBase<GitRefStage, Stream>
     {
         private readonly bool addGitMetadata;
 
-        public GitRefToFilesStage(StageBase<GitRefStage, TPreviousCache> input, bool addGitMetadata, IGeneratorContext context, string? name) : base(input, context, name)
+        public GitRefToFilesStage(bool addGitMetadata, IGeneratorContext context, string? name) : base(context, name)
         {
             this.addGitMetadata = addGitMetadata;
         }
 
-        protected override async Task<ImmutableList<IDocument<Stream>>> Work(IDocument<GitRefStage> source, OptionToken options)
+        protected override async Task<ImmutableList<IDocument<Stream>>> Work(ImmutableList<IDocument<GitRefStage>> sources, OptionToken options)
         {
-            if (source is null)
-                throw new ArgumentNullException(nameof(source));
-
-            var queue = new Queue<Tree>();
-            queue.Enqueue(source.Value.Tip.Tree);
+            if (sources is null)
+                throw new ArgumentNullException(nameof(sources));
 
             var blobs = ImmutableList<IDocument<Stream>>.Empty.ToBuilder();
-
-            while (queue.TryDequeue(out var tree))
+            foreach (var source in sources)
             {
-                var all = await Task.WhenAll(tree.Select(async entry =>
+                var queue = new Queue<Tree>();
+                queue.Enqueue(source.Value.Tip.Tree);
+
+                while (queue.TryDequeue(out var tree))
                 {
-                    switch (entry.Target)
+                    var all = await Task.WhenAll(tree.Select(async entry =>
                     {
-                        case Blob blob:
-                            var document = new GitFileDocument(entry.Path, blob, this.Context, null).With(source.Metadata);
-                            if (addGitMetadata)
-                            {
-                                var commits = await Task.Run(() => source.Value.GetCommits(entry.Path).Select(x => new Commit(x))).ConfigureAwait(false);
-                                document = document.With(document.Metadata.Add(new GitMetadata(commits.ToImmutableList())));
-                            }
-                            return document as object;
+                        switch (entry.Target)
+                        {
+                            case Blob blob:
+                                var document = new GitFileDocument(entry.Path, blob, this.Context, null).With(source.Metadata);
+                                if (this.addGitMetadata)
+                                {
+                                    var commits = await Task.Run(() => source.Value.GetCommits(entry.Path).Select(x => new Commit(x))).ConfigureAwait(false);
+                                    document = document.With(document.Metadata.Add(new GitMetadata(commits.ToImmutableList())));
+                                }
+                                return document as object;
 
-                        case Tree subTree:
-                            return subTree as object;
+                            case Tree subTree:
+                                return subTree as object;
 
-                        case GitLink link:
-                            throw new NotSupportedException("Git link is not supported at the momtent");
+                            case GitLink link:
+                                throw new NotSupportedException("Git link is not supported at the momtent");
 
-                        default:
-                            throw new NotSupportedException($"The type {entry.Target?.GetType().FullName ?? "<NULL>"} is not supported as target");
-                    }
-                })).ConfigureAwait(false);
+                            default:
+                                throw new NotSupportedException($"The type {entry.Target?.GetType().FullName ?? "<NULL>"} is not supported as target");
+                        }
+                    })).ConfigureAwait(false);
 
-                foreach (var subTree in all.OfType<Tree>())
-                    queue.Enqueue(subTree);
+                    foreach (var subTree in all.OfType<Tree>())
+                        queue.Enqueue(subTree);
 
-                blobs.AddRange(all.OfType<IDocument<Stream>>());
+                    blobs.AddRange(all.OfType<IDocument<Stream>>());
+                }
+
             }
-
             return blobs.ToImmutable();
         }
     }

@@ -13,16 +13,18 @@ namespace Stasistium.Sample
 
             var configFile = context.StageFromResult("config ", "config.json", x => x)
                 .File()
-                .Json()
-                .For<Config>();
+                .Json<Config>();
 
-            var contentRepo = configFile.Transform(x => x.With(x.Value.ContentRepo, x.Value.ContentRepo))
+            var contentRepo = configFile.Select(x => x.With(x.Value.ContentRepo, x.Value.ContentRepo))
                 .GitClone();
 
-            var schemaRepo = configFile.Transform(x => x.With(x.Value.SchemaRepo, x.Value.SchemaRepo).With(x.Metadata.Add(new HostMetadata() { Host = x.Value.Host })))
+            var schemaRepo = configFile.Select(x => x.With(x.Value.SchemaRepo, x.Value.SchemaRepo).With(x.Metadata.Add(new HostMetadata() { Host = x.Value.Host })))
                 .GitClone();
 
-            var layoutProvider = configFile.Transform(x => x.With(x.Value.Layouts, x.Value.Layouts)).FileSystem().FileProvider("Layout");
+            var layoutProvider = configFile
+                .Select(x => x.With(x.Value.Layouts, x.Value.Layouts))
+                .FileSystem()
+                .FileProvider("Layout");
 
             var generatorOptions = new GenerationOptions()
             {
@@ -32,37 +34,33 @@ namespace Stasistium.Sample
             var s = System.Diagnostics.Stopwatch.StartNew();
             var files = contentRepo
                 .Where(x => true)
-                .SelectMany(input =>
-                    input
-                    .Transform(x => x.With(x.Metadata.Add(new GitMetadata() { Name = x.Value.FrindlyName, Type = x.Value.Type })))
-                    .GitRefToFiles()
-                    .Sidecar()
-                        .For<BookMetadata>(".metadata")
-                    .Where(x => System.IO.Path.GetExtension(x.Id) == ".md")
-                    .Select(x => x.Markdown().MarkdownToHtml().TextToStream())
-                    .Transform(x => x.WithId(Path.Combine(Enum.GetName(typeof(GitRefType), x.Metadata.GetValue<GitMetadata>()!.Type)!, x.Metadata.GetValue<GitMetadata>()!.Name, x.Id)))
-                );
+                .Select(x => x.With(x.Metadata.Add(new GitMetadata() { Name = x.Value.FrindlyName, Type = x.Value.Type })))
+                .GitRefToFiles(true)
+
+                .SidecarMetadata<BookMetadata>(".metadata")
+                   .Where(x => System.IO.Path.GetExtension(x.Id) == ".md")
+                   .MarkdownFromStream()
+                   .MarkdownToHtml()
+                   .TextToStream()
+                    .Select(x => x.WithId(Path.Combine(Enum.GetName(typeof(GitRefType), x.Metadata.GetValue<GitMetadata>()!.Type)!, x.Metadata.GetValue<GitMetadata>()!.Name, x.Id)));
             //.Where(x => x.Id == "origin/master")
             //.SingleEntry()
 
             var razorProvider = files
                 .FileProvider("Content")
                 .Concat(layoutProvider)
-                .RazorProvider("Content", "Layout/ViewStart.cshtml");
+                .RazorProvider("Content", viewStartId: "Layout/ViewStart.cshtml");
 
-            var rendered = files.Select(x => x.Razor(razorProvider).TextToStream());
+            var rendered = files.Razor(razorProvider).TextToStream();
             var hostReplacementRegex = new System.Text.RegularExpressions.Regex(@"(?<host>http://nota\.org)/schema/", System.Text.RegularExpressions.RegexOptions.Compiled);
 
             var schemaFiles = schemaRepo
-
-                .SelectMany(input =>
-                 input
-                 .Transform(x => x.With(x.Metadata.Add(new GitMetadata() { Name = x.Value.FrindlyName, Type = x.Value.Type })))
-                 .GitRefToFiles()
+                .Select(x => x.With(x.Metadata.Add(new GitMetadata() { Name = x.Value.FrindlyName, Type = x.Value.Type })))
+                 .GitRefToFiles(true)
                  .Where(x => System.IO.Path.GetExtension(x.Id) != ".md")
-                 .Select(x =>
-                    x.ToText()
-                    .Transform(y =>
+
+                    .StreamToText()
+                    .Select(y =>
                     {
                         var gitData = y.Metadata.GetValue<GitMetadata>()!;
                         string version;
@@ -82,8 +80,8 @@ namespace Stasistium.Sample
                         return y.With(newText, y.Context.GetHashForString(newText));
                     })
                     .TextToStream()
-                 )
-                 .Transform(x =>
+
+                 .Select(x =>
                  {
                      var gitData = x.Metadata.GetValue<GitMetadata>()!;
                      string version;
@@ -99,15 +97,18 @@ namespace Stasistium.Sample
                      return x.WithId($"schema/{version}/{x.Id.TrimStart('/')}");
                  })
 
-                        );
-
-            var g = rendered
-                .Transform(x => x.WithId(Path.ChangeExtension(x.Id, ".html")))
-                .Concat(schemaFiles)
-                .Persist(new DirectoryInfo("out"), generatorOptions)
                 ;
 
-            await g.UpdateFiles().ConfigureAwait(false);
+
+            rendered
+                .Select(x => x.WithId(Path.ChangeExtension(x.Id, ".html")))
+                .Concat(schemaFiles)
+                .Persist(new DirectoryInfo("out"))
+
+                ;
+
+            await context.Run(generatorOptions);
+            //await g.UpdateFiles().ConfigureAwait(false);
 
         }
 

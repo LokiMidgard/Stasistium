@@ -13,12 +13,11 @@ namespace Stasistium.Stages
 {
 
 
-    public class MarkdownStreamStage<TPreviousCache> : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple1List0StageBase<Stream, TPreviousCache, MarkdownDocument>
-        where TPreviousCache : class
+    public class MarkdownFromStream : StageBaseSimple<Stream, MarkdownDocument>
     {
         private readonly Func<MarkdownDocument>? generateDocuement;
 
-        public MarkdownStreamStage(StageBase<Stream, TPreviousCache> input, Func<MarkdownDocument>? generateDocuement, IGeneratorContext context, string? name) : base(input, context, name)
+        public MarkdownFromStream(IGeneratorContext context, Func<MarkdownDocument>? generateDocuement = null, string? name = null) : base(context, name)
         {
             this.generateDocuement = generateDocuement;
         }

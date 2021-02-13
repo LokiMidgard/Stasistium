@@ -9,8 +9,7 @@ using Stasistium.Stages;
 
 namespace Stasistium.Stages
 {
-    public class ExcelToMarkdownTextStage<TInCache> : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple1List0StageBase<Stream, TInCache, string>
-    where TInCache : class
+    public class ExcelToMarkdownTextStage: StageBaseSimple<Stream, string>
     {
 
         private enum TableAlignment
@@ -23,7 +22,7 @@ namespace Stasistium.Stages
 
 
         private readonly bool hasHeader;
-        public ExcelToMarkdownTextStage(StageBase<Stream, TInCache> inputSingle0, bool hasHeader, IGeneratorContext context, string? name) : base(inputSingle0, context, name)
+        public ExcelToMarkdownTextStage(bool hasHeader, IGeneratorContext context, string? name) : base(context, name)
         {
             this.hasHeader = hasHeader;
         }
@@ -152,20 +151,6 @@ namespace Stasistium.Stages
                 var result = builder.ToString();
                 return Task.FromResult(input.With(result, input.Context.GetHashForString(result)));
             }
-        }
-    }
-}
-
-namespace Stasistium
-{
-    public static class OfficeStageExtension
-    {
-        public static ExcelToMarkdownTextStage<T> ExcelToMarkdownText<T>(this StageBase<Stream, T> input, bool hasHeader = true, string? name = null)
-        where T : class
-        {
-            if (input is null)
-                throw new ArgumentNullException(nameof(input));
-            return new ExcelToMarkdownTextStage<T>(input, hasHeader, input.Context, name);
         }
     }
 }

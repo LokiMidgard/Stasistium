@@ -88,7 +88,7 @@ namespace Stasistium.Razor
                 var htmlEncoder = this._serviceProvider.GetRequiredService<HtmlEncoder>();
                 var diagnosticSource = this._serviceProvider.GetRequiredService<DiagnosticListener>();
 
-                ImmutableList<IRazorPage>? viewStart = null;
+                IReadOnlyList<IRazorPage>? viewStart = null;
 
                 if (this.configuration.ViewStartId != null)
                 {
@@ -134,7 +134,7 @@ namespace Stasistium.Razor
 
             var environment2 = new WebHostEnvironment()
             {
-                ApplicationName = Assembly.GetEntryAssembly()!.GetName().Name,
+                ApplicationName = Assembly.GetEntryAssembly()!.GetName().Name!,
             };
 
             

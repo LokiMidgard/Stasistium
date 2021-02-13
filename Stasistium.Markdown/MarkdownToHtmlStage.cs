@@ -12,12 +12,11 @@ using System.Linq;
 
 namespace Stasistium.Stages
 {
-    public class MarkdownToHtmlStage<TInputCache> : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple1List0StageBase<MarkdownDocument, TInputCache, string>
-        where TInputCache : class
+    public class MarkdownToHtmlStage : StageBaseSimple<MarkdownDocument, string>
     {
         public MarkdownRenderer Renderer { get; }
 
-        public MarkdownToHtmlStage(StageBase<MarkdownDocument, TInputCache> inputSingle0, MarkdownRenderer? renderer, IGeneratorContext context, string? name) : base(inputSingle0, context, name)
+        public MarkdownToHtmlStage(IGeneratorContext context, MarkdownRenderer? renderer = null, string? name = null) : base(context, name)
         {
             this.Renderer = renderer ?? new MarkdownRenderer();
         }

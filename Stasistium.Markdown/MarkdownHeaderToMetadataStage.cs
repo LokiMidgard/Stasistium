@@ -8,13 +8,12 @@ using System.Threading.Tasks;
 
 namespace Stasistium.Stages
 {
-    public class MarkdownHeaderToMetadataStage<TMetadata, TPreviousCache> : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple1List0StageBase<MarkdownDocument, TPreviousCache, MarkdownDocument>
+    public class MarkdownHeaderToMetadataStage<TMetadata> : StageBaseSimple<MarkdownDocument, MarkdownDocument>
         where TMetadata : class, new()
-        where TPreviousCache : class
     {
         private readonly MetadataUpdate<TMetadata>? update;
 
-        public MarkdownHeaderToMetadataStage(StageBase<MarkdownDocument, TPreviousCache> input, MetadataUpdate<TMetadata>? update, IGeneratorContext context, string? name) : base(input, context,name)
+        public MarkdownHeaderToMetadataStage(MetadataUpdate<TMetadata>? update, IGeneratorContext context, string? name) : base(context, name)
         {
             this.update = update;
         }

@@ -6,36 +6,27 @@ using System.Threading.Tasks;
 
 namespace Stasistium.Stages
 {
-    public class GitCommitsStage<T> : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple1List0StageBase<GitRefStage, T, GitReposetoryMetadata>
-        where T : class
+    public class GitCommitsStage : StageBase<GitRefStage, GitReposetoryMetadata>
     {
-        public GitCommitsStage(StageBase<GitRefStage, T> inputSingle0, IGeneratorContext context, string? name) : base(inputSingle0, context, name)
+        public GitCommitsStage(IGeneratorContext context, string? name) : base(context, name)
         {
+             
         }
 
-        protected override async Task<IDocument<GitReposetoryMetadata>> Work(IDocument<GitRefStage> input, OptionToken options)
+        protected override async Task<ImmutableList<IDocument<GitReposetoryMetadata>>> Work(ImmutableList<IDocument<GitRefStage>> input, OptionToken options)
         {
             if (input is null)
                 throw new System.ArgumentNullException(nameof(input));
-            var x = input.Value;
-            var gitReposetoryMetadata = await Task.Run(() => new GitReposetoryMetadata(x.GetCommits().Select(y => new Commit(y)).ToImmutableList())).ConfigureAwait(false);
-            return input.With(gitReposetoryMetadata, gitReposetoryMetadata.Commits.First().Sha);
+            
+            var documents = await Task.WhenAll(input.Select(async refDocument =>
+                       {
+                           var x = refDocument.Value;
+                           var gitReposetoryMetadata = await Task.Run(() => new GitReposetoryMetadata(x.GetCommits().Select(y => new Commit(y)).ToImmutableList())).ConfigureAwait(false);
+                           return refDocument.With(gitReposetoryMetadata, gitReposetoryMetadata.Commits.First().Sha);
+                       })).ConfigureAwait(false);
+
+            return documents.ToImmutableList();
         }
+
     }
 }
-
-namespace Stasistium
-{
-    public static partial class GitStageExtension
-    {
-        public static GitCommitsStage<T> GitCommits<T>(this StageBase<GitRefStage, T> input, string? name = null)
-            where T : class
-        {
-            if (input is null)
-                throw new System.ArgumentNullException(nameof(input));
-            return new GitCommitsStage<T>(input, input.Context, name);
-        }
-    }
-}
-
-

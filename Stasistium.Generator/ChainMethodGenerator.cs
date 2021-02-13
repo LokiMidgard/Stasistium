@@ -50,28 +50,30 @@ namespace Stasistium.Generator
                 var baseinput1 = classSymbol.AllInterfaces.FirstOrDefault(x => x.IsGenericType && x.ContainingNamespace.ToDisplayString() == "Stasistium.Stages" && x.MetadataName == "IStageBaseInput`1");
                 var baseinput2 = classSymbol.AllInterfaces.FirstOrDefault(x => x.IsGenericType && x.ContainingNamespace.ToDisplayString() == "Stasistium.Stages" && x.MetadataName == "IStageBaseInput`2");
 
-                if (baseinput1 is not null && baseOutput is not null)
+                if (baseinput1 is not null)
                 {
                     var input = baseinput1.TypeArguments.Single();
-                    var output = baseOutput.TypeArguments.Single();
+                    var output = baseOutput?.TypeArguments.Single();
                     var classSource = this.ProcessClass(classSymbol, input, output, context);
-                    context.AddSource($"{classSymbol.Name}_Generate1Parameter.cs", SourceText.From(classSource, Encoding.UTF8));
+                    context.AddSource($"{classSymbol.Name}{classSymbol.TypeArguments.Length}_Generate1Parameter.cs", SourceText.From(classSource, Encoding.UTF8));
                 }
-                if (baseinput2 is not null && baseOutput is not null)
+                if (baseinput2 is not null)
                 {
                     var input1 = baseinput2.TypeArguments.First();
                     var input2 = baseinput2.TypeArguments.Skip(1).Single();
-                    var output = baseOutput.TypeArguments.Single();
+                    var output = baseOutput?.TypeArguments.Single();
                     var classSource = this.ProcessClass(classSymbol, input1, input2, output, context);
-                    context.AddSource($"{classSymbol.Name}_Generate2Parameter.cs", SourceText.From(classSource, Encoding.UTF8));
+                    context.AddSource($"{classSymbol.Name}{classSymbol.TypeArguments.Length}_Generate2Parameter.cs", SourceText.From(classSource, Encoding.UTF8));
                 }
 
             }
         }
 
-        private string ProcessClass(INamedTypeSymbol classSymbol, ITypeSymbol inputSymbol, ITypeSymbol outputSymbol, GeneratorExecutionContext context)
+        private string ProcessClass(INamedTypeSymbol classSymbol, ITypeSymbol inputSymbol, ITypeSymbol? outputSymbol, GeneratorExecutionContext context)
         {
-            var outputName = outputSymbol.ToDisplayString();
+            var outputType = outputSymbol is null
+                ? "void"
+                : $"Stasistium.Stages.IStageBaseOutput<{outputSymbol.ToDisplayString()}>";
             var inputName = inputSymbol.ToDisplayString();
 
             var constructors = classSymbol.Constructors.Where(x => !x.IsStatic);
@@ -95,11 +97,11 @@ namespace Stasistium.Generator
                     //throw new Exception("Fails");
 
 
-                    if (typeName == "IGeneratorContext")
+                    if (typeName == "Stasistium.Documents.IGeneratorContext")
                     {
                         constructorParameterList.Add("input.Context");
                     }
-                    else if (typeName == "string" && parameterName == "name")
+                    else if ((typeName == "string?" || typeName == "System.String?") && parameterName == "name")
                     {
                         hasName = true;
                         constructorParameterList.Add("name");
@@ -125,7 +127,7 @@ namespace Stasistium.Generator
                     var defaultParameter = defaultName is null
                         ? "null"
                         : $"\"{defaultName}\"";
-                    parameterList.Add($"string? name = {defaultParameter})");
+                    parameterList.Add($"string? name = {defaultParameter}");
                 }
 
                 string generic = "";
@@ -140,20 +142,24 @@ namespace Stasistium.Generator
                         typeConstraints += part.ToString();
 
                 }
+
+                var methodName = classSymbol.Name;
+                if (methodName.EndsWith("Stage", comparisonType: StringComparison.OrdinalIgnoreCase))
+                    methodName = methodName.Substring(0, methodName.Length - "Stage".Length);
                 source.AppendLine($@"
 namespace Stasistium
 {{
 
      public static partial class {classSymbol.Name}Extension
      {{
-         public static Stasistium.Stages.IStageBaseOutput<{outputName}> {classSymbol.Name}{generic}({string.Join(", ", parameterList)})
+         public static {outputType} {methodName}{generic}({string.Join(", ", parameterList)})
             {typeConstraints}
          {{
              if (input is null)
                  throw new System.ArgumentNullException(nameof(input));
              var stage = new {classSymbol.ToDisplayString()}({string.Join(", ", constructorParameterList)});
              input.PostStages += (stage as Stasistium.Stages.IStageBaseInput<{inputName}>).DoIt;
-             return stage;
+            {(outputSymbol is null ? "" : "return stage;")}
          }}
      }}
 }}
@@ -163,9 +169,11 @@ namespace Stasistium
             return source.ToString();
         }
 
-        private string ProcessClass(INamedTypeSymbol classSymbol, ITypeSymbol inputSymbol1, ITypeSymbol inputSymbol2, ITypeSymbol outputSymbol, GeneratorExecutionContext context)
+        private string ProcessClass(INamedTypeSymbol classSymbol, ITypeSymbol inputSymbol1, ITypeSymbol inputSymbol2, ITypeSymbol? outputSymbol, GeneratorExecutionContext context)
         {
-            var outputName = outputSymbol.ToDisplayString();
+            var outputType = outputSymbol is null
+     ? "void"
+     : $"Stasistium.Stages.IStageBaseOutput<{outputSymbol.ToDisplayString()}>";
             var input1Name = inputSymbol1.ToDisplayString();
             var input2Name = inputSymbol2.ToDisplayString();
 
@@ -191,11 +199,11 @@ namespace Stasistium
                     //throw new Exception("Fails");
 
 
-                    if (typeName == "IGeneratorContext")
+                    if (typeName == "Stasistium.Documents.IGeneratorContext")
                     {
                         constructorParameterList.Add("input1.Context");
                     }
-                    else if (typeName == "string" && parameterName == "name")
+                    else if ((typeName == "string?" || typeName == "System.String?") && parameterName == "name")
                     {
                         hasName = true;
                         constructorParameterList.Add("name");
@@ -221,7 +229,7 @@ namespace Stasistium
                     var defaultParameter = defaultName is null
                         ? "null"
                         : $"\"{defaultName}\"";
-                    parameterList.Add($"string? name = {defaultParameter})");
+                    parameterList.Add($"string? name = {defaultParameter}");
                 }
 
                 string generic = "";
@@ -236,13 +244,17 @@ namespace Stasistium
                         typeConstraints += part.ToString();
 
                 }
+
+                var methodName = classSymbol.Name;
+                if (methodName.EndsWith("Stage", comparisonType: StringComparison.OrdinalIgnoreCase))
+                    methodName = methodName.Substring(0, methodName.Length - "Stage".Length);
                 source.AppendLine($@"
 namespace Stasistium
 {{
 
      public static partial class {classSymbol.Name}Extension
      {{
-         public static Stasistium.Stages.IStageBaseOutput<{outputName}> {classSymbol.Name}{generic}({string.Join(", ", parameterList)})
+         public static {outputType} {methodName}{generic}({string.Join(", ", parameterList)})
             {typeConstraints}
          {{
              if (input1 is null)
@@ -252,7 +264,7 @@ namespace Stasistium
              var stage = new {classSymbol.ToDisplayString()}({string.Join(", ", constructorParameterList)});
              input1.PostStages += (stage as Stasistium.Stages.IStageBaseInput<{input1Name}, {input2Name}>).DoIt1;
              input2.PostStages += (stage as Stasistium.Stages.IStageBaseInput<{input1Name}, {input2Name}>).DoIt2;
-             return stage;
+             {(outputSymbol is null ? "" : "return stage;")}
          }}
      }}
 }}

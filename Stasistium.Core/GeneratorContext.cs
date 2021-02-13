@@ -170,7 +170,7 @@ namespace Stasistium.Documents
             return new Stages.StaticStage<TResult>(id, result, hashFunction, this);
         }
 
-        public Task Run(OptionToken option) => Task.WhenAll(this.staticStages.Select(stage => stage.Invoke(option)));
+        public Task Run(GenerationOptions option) => Task.WhenAll(this.staticStages.Select(stage => stage.Invoke(option.Token)));
 
 
 

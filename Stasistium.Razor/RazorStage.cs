@@ -10,14 +10,12 @@ using System.Threading.Tasks;
 
 namespace Stasistium.Stages
 {
-    public class RazorProviderStage<TInputItemCache, TInputCache> : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple0List1StageBase<IFileProvider, TInputItemCache, TInputCache, RazorProvider>
-    where TInputItemCache : class
-        where TInputCache : class
+    public class RazorProviderStage : StageBase<IFileProvider, RazorProvider>
     {
         private readonly string id;
         private readonly string? viewStartId;
 
-        public RazorProviderStage(MultiStageBase<IFileProvider, TInputItemCache, TInputCache> inputList0, string contentId, string? id, string? viewStartId, IGeneratorContext context, string? name) : base(inputList0, context, name)
+        public RazorProviderStage(string contentId, IGeneratorContext context, string? id = null, string? viewStartId = null, string? name = null) : base(context, name)
         {
             this.ContentId = contentId;
             this.id = id ?? Guid.NewGuid().ToString();
@@ -26,74 +24,84 @@ namespace Stasistium.Stages
 
         public string ContentId { get; }
 
-        protected override Task<IDocument<RazorProvider>> Work(ImmutableList<IDocument<IFileProvider>> inputList0, OptionToken options)
+        protected override Task<ImmutableList<IDocument<RazorProvider>>> Work(ImmutableList<IDocument<IFileProvider>> input, OptionToken options)
         {
             var renderConfiguration = new RenderConfiguration(this.ContentId) { ViewStartId = this.viewStartId };
-            var fileProviders = inputList0.Select(x => x.Value);
+            var fileProviders = input.Select(x => x.Value);
             var renderer = RazorViewToStringRenderer.GetRenderer(fileProviders, renderConfiguration);
             var render = new RazorProvider(renderer);
-            var hash = this.Context.GetHashForString(string.Join(",", inputList0.Select(x => x.Hash)));
-
-            return Task.FromResult(this.Context.CreateDocument(render, hash, this.id));
+            var hash = this.Context.GetHashForString(string.Join(",", input.Select(x => x.Hash)));
+            return Task.FromResult(ImmutableList.Create(this.Context.CreateDocument(render, hash, this.id)));
         }
     }
 
 
-    public class RazorStage<T, TDocumentCache, TRendererCache> : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple2List0StageBase<T, TDocumentCache, RazorProvider, TRendererCache, string>
-        where TDocumentCache : class
-        where TRendererCache : class
-    {
-        private readonly StageBase<T, TDocumentCache> inputDocument;
-        private readonly StageBase<RazorProvider, TRendererCache> inputRazor;
-
-        public RazorStage(StageBase<T, TDocumentCache> inputDocument, StageBase<RazorProvider, TRendererCache> inputRazor, IGeneratorContext context, string? name) : base(inputDocument, inputRazor, context, name)
-        {
-            this.inputDocument = inputDocument;
-            this.inputRazor = inputRazor;
-        }
-
-
-        protected override async Task<IDocument<string>> Work(IDocument<T> input, IDocument<RazorProvider> rendererDocument, OptionToken options)
-        {
-            if (input is null)
-                throw new ArgumentNullException(nameof(input));
-            if (rendererDocument is null)
-                throw new ArgumentNullException(nameof(rendererDocument));
-
-            var renderer = rendererDocument.Value.Renderer;
-            var result = await renderer.RenderViewToStringAsync(input.Id, input).ConfigureAwait(false);
-            var output = input.With(result, this.Context.GetHashForString(result));
-            return output;
-        }
-
-        public RazorStage<T, TModel, TDocumentCache, TRendererCache> WithModel<TModel>(Func<IDocument<T>, TModel> selector, string? name = null)
-            where TModel : class
-            => new RazorStage<T, TModel, TDocumentCache, TRendererCache>(this.inputDocument, this.inputRazor, selector, this.Context, name);
-    }
-    public class RazorStage<T, TModel, TDocumentCache, TRendererCache> : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple2List0StageBase<T, TDocumentCache, RazorProvider, TRendererCache, string>
-        where TDocumentCache : class
-        where TRendererCache : class
+    public class RazorStage<T, TModel> : StageBase<T, RazorProvider, string>
         where TModel : class
     {
         private readonly Func<IDocument<T>, TModel> selector;
 
-        public RazorStage(StageBase<T, TDocumentCache> inputDocument, StageBase<RazorProvider, TRendererCache> inputRazor, Func<IDocument<T>, TModel> selector, IGeneratorContext context, string? name) : base(inputDocument, inputRazor, context, name)
+        public RazorStage(Func<IDocument<T>, TModel> selector, IGeneratorContext context, string? name) : base(context, name)
         {
             this.selector = selector;
         }
 
 
-        protected override async Task<IDocument<string>> Work(IDocument<T> input, IDocument<RazorProvider> rendererDocument, OptionToken options)
+        protected override async Task<ImmutableList<IDocument<string>>> Work(ImmutableList<IDocument<T>> inputDocument, ImmutableList<IDocument<RazorProvider>> inputrendererList, OptionToken options)
         {
-            if (input is null)
-                throw new ArgumentNullException(nameof(input));
-            if (rendererDocument is null)
-                throw new ArgumentNullException(nameof(rendererDocument));
+            if (inputDocument is null)
+                throw new ArgumentNullException(nameof(inputDocument));
+            if (inputrendererList is null)
+                throw new ArgumentNullException(nameof(inputrendererList));
+            if (options is null)
+                throw new ArgumentNullException(nameof(options));
 
-            var renderer = rendererDocument.Value.Renderer;
-            var result = await renderer.RenderViewToStringAsync(input.Id, this.selector(input)).ConfigureAwait(false);
-            var output = input.With(result, this.Context.GetHashForString(result));
-            return output;
+            var inputRenderer = inputrendererList.Single();
+
+            var inputs = await Task.WhenAll(inputDocument.Select(async doc =>
+            {
+                var renderer = inputRenderer.Value.Renderer;
+                var result = await renderer.RenderViewToStringAsync(doc.Id, this.selector(doc)).ConfigureAwait(false);
+                var output = doc.With(result, this.Context.GetHashForString(result));
+                return output;
+            })).ConfigureAwait(false);
+
+            return inputs.ToImmutableList();
         }
+
+
+    }
+
+    public class RazorStage<T> : StageBase<T, RazorProvider, string>
+    {
+
+        public RazorStage(IGeneratorContext context, string? name) : base(context, name)
+        {
+        }
+
+
+        protected override async Task<ImmutableList<IDocument<string>>> Work(ImmutableList<IDocument<T>> inputDocument, ImmutableList<IDocument<RazorProvider>> inputrendererList, OptionToken options)
+        {
+            if (inputDocument is null)
+                throw new ArgumentNullException(nameof(inputDocument));
+            if (inputrendererList is null)
+                throw new ArgumentNullException(nameof(inputrendererList));
+            if (options is null)
+                throw new ArgumentNullException(nameof(options));
+
+            var inputRenderer = inputrendererList.Single();
+
+            var inputs = await Task.WhenAll(inputDocument.Select(async doc =>
+            {
+                var renderer = inputRenderer.Value.Renderer;
+                var result = await renderer.RenderViewToStringAsync(doc.Id, doc).ConfigureAwait(false);
+                var output = doc.With(result, this.Context.GetHashForString(result));
+                return output;
+            })).ConfigureAwait(false);
+
+            return inputs.ToImmutableList();
+        }
+
+
     }
 }

@@ -8,12 +8,11 @@ using System.Threading.Tasks;
 
 namespace Stasistium.Stages
 {
-    public class MarkdownStringStage<TPreviousCache> : GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple1List0StageBase<string, TPreviousCache, MarkdownDocument>
-        where TPreviousCache : class
+    public class MarkdownStringStage : StageBaseSimple<string, MarkdownDocument>
     {
         private readonly Func<MarkdownDocument>? generateDocuement;
 
-        public MarkdownStringStage(StageBase<string, TPreviousCache> input, Func<MarkdownDocument>? generateDocuement, IGeneratorContext context, string? name) : base(input, context, name)
+        public MarkdownStringStage(Func<MarkdownDocument>? generateDocuement, IGeneratorContext context, string? name) : base(context, name)
         {
             this.generateDocuement = generateDocuement;
         }

@@ -14,24 +14,24 @@ using Stasistium;
 namespace Stasistium.Razor
 {
 
-    public class FileProviderStage<TInputItemCache, TInputCache> : Stages.GeneratedHelper.Single.Simple.OutputSingleInputSingleSimple0List1StageBase<Stream, TInputItemCache, TInputCache, IFileProvider>
-        where TInputCache : class
-        where TInputItemCache : class
+    public class FileProviderStage : StageBase<Stream, IFileProvider>
     {
-        public FileProviderStage(string providerId, MultiStageBase<Stream, TInputItemCache, TInputCache> inputList0, IGeneratorContext context, string? name) : base(inputList0, context,name)
+        public FileProviderStage(string providerId, IGeneratorContext context, string? name) : base(context, name)
         {
-            this.ProviderId = providerId;
+            this.ProviderId = providerId; 
         }
 
         public string ProviderId { get; }
 
-        protected override Task<IDocument<IFileProvider>> Work(ImmutableList<IDocument<Stream>> inputList0, OptionToken options)
-        {
-            var provider = new FileProvider(inputList0, this.ProviderId);
 
-            var hash = this.Context.GetHashForString(string.Join(",", inputList0.Select(x => x.Hash)));
+
+        protected override Task<ImmutableList<IDocument<IFileProvider>>> Work(ImmutableList<IDocument<Stream>> input, OptionToken options)
+        {
+            var provider = new FileProvider(input, this.ProviderId);
+
+            var hash = this.Context.GetHashForString(string.Join(",", input.Select(x => x.Hash)));
             IDocument<IFileProvider> document = this.Context.CreateDocument(provider, hash, this.ProviderId);
-            return Task.FromResult(document);
+            return Task.FromResult(ImmutableList.Create(document));
 
         }
 

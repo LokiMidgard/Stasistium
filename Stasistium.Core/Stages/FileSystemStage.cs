@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace Stasistium.Stages
 {
 
-    public class FileSystemStage<T> : StageBase<string, Stream>
+    public class FileSystemStage : StageBase<string, Stream>
     {
         public FileSystemStage(IGeneratorContext context, string? name) : base(context, name)
         {
