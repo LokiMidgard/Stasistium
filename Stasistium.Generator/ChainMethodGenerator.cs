@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.CodeAnalysis;
@@ -24,49 +25,70 @@ namespace Stasistium.Generator
         public void Execute(GeneratorExecutionContext context)
         {
 
-
-            // retreive the populated receiver 
-            if (context.SyntaxReceiver is not SyntaxReceiver receiver)
-                return;
-
-            // we're going to create a new compilation that contains the attribute.
-            // TODO: we should allow source generators to provide source during initialize, so that this step isn't required.
-            var options = (CSharpParseOptions)((CSharpCompilation)context.Compilation).SyntaxTrees[0].Options;
-            var compilation = context.Compilation;
-
-            // loop over the candidate classes, and keep the ones that are actually annotated
-            foreach (var @class in receiver.CandidateClasses)
+            try
             {
 
-                var model = compilation.GetSemanticModel(@class.SyntaxTree);
-                if (model is null)
-                    continue;
+                // retreive the populated receiver 
+                if (context.SyntaxReceiver is not SyntaxReceiver receiver)
+                    return;
 
-                var classSymbol = model.GetDeclaredSymbol(@class);
-                if (classSymbol is null)
-                    continue;
+                // we're going to create a new compilation that contains the attribute.
+                // TODO: we should allow source generators to provide source during initialize, so that this step isn't required.
+                var options = (CSharpParseOptions)((CSharpCompilation)context.Compilation).SyntaxTrees[0].Options;
+                var compilation = context.Compilation;
 
-                var baseOutput = classSymbol.AllInterfaces.FirstOrDefault(x => x.IsGenericType && x.ContainingNamespace.ToDisplayString() == "Stasistium.Stages" && x.MetadataName == "IStageBaseOutput`1");
-                var baseinput1 = classSymbol.AllInterfaces.FirstOrDefault(x => x.IsGenericType && x.ContainingNamespace.ToDisplayString() == "Stasistium.Stages" && x.MetadataName == "IStageBaseInput`1");
-                var baseinput2 = classSymbol.AllInterfaces.FirstOrDefault(x => x.IsGenericType && x.ContainingNamespace.ToDisplayString() == "Stasistium.Stages" && x.MetadataName == "IStageBaseInput`2");
-
-                if (baseinput1 is not null)
+                // loop over the candidate classes, and keep the ones that are actually annotated
+                foreach (var @class in receiver.CandidateClasses)
                 {
-                    var input = baseinput1.TypeArguments.Single();
-                    var output = baseOutput?.TypeArguments.Single();
-                    var classSource = this.ProcessClass(classSymbol, input, output, context);
-                    context.AddSource($"{classSymbol.Name}{classSymbol.TypeArguments.Length}_Generate1Parameter.cs", SourceText.From(classSource, Encoding.UTF8));
-                }
-                if (baseinput2 is not null)
-                {
-                    var input1 = baseinput2.TypeArguments.First();
-                    var input2 = baseinput2.TypeArguments.Skip(1).Single();
-                    var output = baseOutput?.TypeArguments.Single();
-                    var classSource = this.ProcessClass(classSymbol, input1, input2, output, context);
-                    context.AddSource($"{classSymbol.Name}{classSymbol.TypeArguments.Length}_Generate2Parameter.cs", SourceText.From(classSource, Encoding.UTF8));
-                }
 
+                    var model = compilation.GetSemanticModel(@class.SyntaxTree);
+                    if (model is null)
+                        continue;
+
+                    var classSymbol = model.GetDeclaredSymbol(@class);
+                    if (classSymbol is null)
+                        continue;
+
+                    var baseOutput = classSymbol.AllInterfaces.FirstOrDefault(x => x.IsGenericType && x.ContainingNamespace.ToDisplayString() == "Stasistium.Stages" && x.MetadataName == "IStageBaseOutput`1");
+                    var baseinput1 = classSymbol.AllInterfaces.FirstOrDefault(x => x.IsGenericType && x.ContainingNamespace.ToDisplayString() == "Stasistium.Stages" && x.MetadataName == "IStageBaseInput`1");
+                    var baseinput2 = classSymbol.AllInterfaces.FirstOrDefault(x => x.IsGenericType && x.ContainingNamespace.ToDisplayString() == "Stasistium.Stages" && x.MetadataName == "IStageBaseInput`2");
+
+                    if (baseinput1 is not null)
+                    {
+                        var input = baseinput1.TypeArguments.Single();
+                        var output = baseOutput?.TypeArguments.Single();
+                        var classSource = this.ProcessClass(classSymbol, input, output, context);
+                        context.AddSource($"{classSymbol.Name}{classSymbol.TypeArguments.Length}_Generate1Parameter.cs", SourceText.From(classSource, Encoding.UTF8));
+                    }
+                    if (baseinput2 is not null)
+                    {
+                        var input1 = baseinput2.TypeArguments.First();
+                        var input2 = baseinput2.TypeArguments.Skip(1).Single();
+                        var output = baseOutput?.TypeArguments.Single();
+                        var classSource = this.ProcessClass(classSymbol, input1, input2, output, context);
+                        context.AddSource($"{classSymbol.Name}{classSymbol.TypeArguments.Length}_Generate2Parameter.cs", SourceText.From(classSource, Encoding.UTF8));
+                    }
+
+                }
             }
+            catch (Exception e)
+            {
+                var str = this.PrependError(e.ToString());
+                context.AddSource($"errors_Generate2Parameter.cs", SourceText.From(str, Encoding.UTF8));
+            }
+        }
+
+        private string PrependError(string orinal)
+        {
+            using var reader = new StringReader(orinal);
+            var builder = new StringBuilder();
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                builder.Append("#error ");
+                builder.AppendLine(line);
+            }
+            return builder.ToString();
         }
 
         private string ProcessClass(INamedTypeSymbol classSymbol, ITypeSymbol inputSymbol, ITypeSymbol? outputSymbol, GeneratorExecutionContext context)
