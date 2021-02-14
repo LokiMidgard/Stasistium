@@ -2,12 +2,27 @@
 
 	<PropertyGroup>
 		<TargetFramework>netstandard2.0</TargetFramework>
-
-		<IncludeBuildOutput>false</IncludeBuildOutput>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<NoPackageAnalysis>true</NoPackageAnalysis>
 	</PropertyGroup>
+
 	<Import Project="$(SolutionDir)Common.targets" />
+
+	<PropertyGroup>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+		<SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<EnableNETAnalyzers>True</EnableNETAnalyzers>
+		<AnalysisMode>AllEnabledByDefault</AnalysisMode>
+		<AnalysisLevel>latest</AnalysisLevel>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<DevelopmentDependency>true</DevelopmentDependency>
+	</PropertyGroup>
+
 
 	<ItemGroup>
 
@@ -17,6 +32,7 @@
 
 	<ItemGroup>
 		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+		<None Update="tools\*" Pack="true" PackagePath="" />
 	</ItemGroup>
 
 </Project>
