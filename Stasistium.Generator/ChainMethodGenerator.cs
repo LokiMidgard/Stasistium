@@ -37,6 +37,12 @@ namespace Stasistium.Generator
                 var options = (CSharpParseOptions)((CSharpCompilation)context.Compilation).SyntaxTrees[0].Options;
                 var compilation = context.Compilation;
 
+                
+
+                if (!System.Diagnostics.Debugger.IsAttached)
+                    System.Diagnostics.Debugger.Launch();
+
+
                 // loop over the candidate classes, and keep the ones that are actually annotated
                 foreach (var @class in receiver.CandidateClasses)
                 {
@@ -49,8 +55,6 @@ namespace Stasistium.Generator
                     if (classSymbol is null)
                         continue;
 
-                    //if (!System.Diagnostics.Debugger.IsAttached)
-                    //    System.Diagnostics.Debugger.Launch();
 
                     var baseOutput = classSymbol.AllInterfaces.FirstOrDefault(x => x.IsGenericType && x.ConstructUnboundGenericType().ToDisplayString() == "Stasistium.Stages.IStageBaseOutput<>");
                     var baseinput1 = classSymbol.AllInterfaces.FirstOrDefault(x => x.IsGenericType && x.ConstructUnboundGenericType().ToDisplayString() == "Stasistium.Stages.IStageBaseInput<>");
