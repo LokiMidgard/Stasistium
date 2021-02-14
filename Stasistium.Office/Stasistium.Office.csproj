@@ -8,10 +8,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="EPPlus" Version="4.5.3.2" />
-		<PackageReference Include="GitVersionTask" Version="5.3.7">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -20,7 +16,7 @@
 
 
 	<ItemGroup>
-		<ProjectReference Include="..\Stasistium.Generator\Stasistium.Generator.csproj"  OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\Stasistium.Generator\Stasistium.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 
 </Project>

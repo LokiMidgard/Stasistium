@@ -13,17 +13,13 @@
 
 	<ItemGroup>
 		<PackageReference Include="SharpScss" Version="1.4.0" />
-		<PackageReference Include="GitVersionTask" Version="5.3.7">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
 	</ItemGroup>
 
 
 
 
 	<ItemGroup>
-		<ProjectReference Include="..\Stasistium.Generator\Stasistium.Generator.csproj"  OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\Stasistium.Generator\Stasistium.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 	
 </Project>

@@ -8,10 +8,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="AdaptMark" Version="0.1.34-g5658af5a89" />
-		<PackageReference Include="GitVersionTask" Version="5.3.7">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -19,7 +15,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Stasistium.Generator\Stasistium.Generator.csproj"  OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+		<ProjectReference Include="..\Stasistium.Generator\Stasistium.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
 
 </Project>
