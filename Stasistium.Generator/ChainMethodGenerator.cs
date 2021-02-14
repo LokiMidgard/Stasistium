@@ -49,9 +49,12 @@ namespace Stasistium.Generator
                     if (classSymbol is null)
                         continue;
 
-                    var baseOutput = classSymbol.AllInterfaces.FirstOrDefault(x => x.IsGenericType && x.ContainingNamespace.ToDisplayString() == "Stasistium.Stages" && x.MetadataName == "IStageBaseOutput`1");
-                    var baseinput1 = classSymbol.AllInterfaces.FirstOrDefault(x => x.IsGenericType && x.ContainingNamespace.ToDisplayString() == "Stasistium.Stages" && x.MetadataName == "IStageBaseInput`1");
-                    var baseinput2 = classSymbol.AllInterfaces.FirstOrDefault(x => x.IsGenericType && x.ContainingNamespace.ToDisplayString() == "Stasistium.Stages" && x.MetadataName == "IStageBaseInput`2");
+                    //if (!System.Diagnostics.Debugger.IsAttached)
+                    //    System.Diagnostics.Debugger.Launch();
+
+                    var baseOutput = classSymbol.AllInterfaces.FirstOrDefault(x => x.IsGenericType && x.ConstructUnboundGenericType().ToDisplayString() == "Stasistium.Stages.IStageBaseOutput<>");
+                    var baseinput1 = classSymbol.AllInterfaces.FirstOrDefault(x => x.IsGenericType && x.ConstructUnboundGenericType().ToDisplayString() == "Stasistium.Stages.IStageBaseInput<>");
+                    var baseinput2 = classSymbol.AllInterfaces.FirstOrDefault(x => x.IsGenericType && x.ConstructUnboundGenericType().ToDisplayString() == "Stasistium.Stages.IStageBaseInput<,>");
 
                     if (baseinput1 is not null)
                     {
