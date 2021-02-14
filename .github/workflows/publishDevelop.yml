@@ -23,6 +23,7 @@ jobs:
         dotnet tool install --global GitVersion.Tool --version 5.6.4
         dotnet gitversion /output buildserver
     - name: Disable GitVersionTask on builds
+      shell: pwsh
       run: |
         set-content -Path Directory.build.props -Value '<?xml version="1.0" encoding="utf-8"?>
         <Project>
