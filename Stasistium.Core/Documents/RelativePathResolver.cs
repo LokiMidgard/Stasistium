@@ -9,7 +9,7 @@ namespace Stasistium.Documents
     public class RelativePathResolver
     {
         private readonly string relativeTo;
-        public readonly Dictionary<string, string> lookup;
+        private readonly Dictionary<string, string> lookup;
 
         public string? this[string index]
         {

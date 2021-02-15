@@ -12,7 +12,7 @@ namespace Stasistium.Serelizer
 {
     internal class JsonSerelizer
     {
-        public static async Task Write(object baseCache, System.IO.Stream stream, bool indented = false)
+        public static Task Write(object baseCache, System.IO.Stream stream, bool indented = false)
         {
 
 
@@ -26,9 +26,9 @@ namespace Stasistium.Serelizer
             var typeName = type.AssemblyQualifiedName;
 
             ser.Serialize(jsonWriter, (typeName, baseCache));
-
-
             //await array.WriteToAsync(jsonWriter).ConfigureAwait(false);
+
+            return Task.CompletedTask;
         }
 
         private static JArray Write(object baseCache)
@@ -97,6 +97,9 @@ namespace Stasistium.Serelizer
 
                         var keyProperty = keyValuePairType.GetProperty(nameof(KeyValuePair<object, object>.Key));
                         var ValueProperty = keyValuePairType.GetProperty(nameof(KeyValuePair<object, object>.Value));
+
+                        if (keyProperty is null || ValueProperty is null)
+                            continue;
 
                         var key = keyProperty.GetValue(item);
                         var value = ValueProperty.GetValue(item);
@@ -198,8 +201,9 @@ namespace Stasistium.Serelizer
 
             //var array = await JArray.LoadAsync(jsonReadr).ConfigureAwait(false);
 
-            var ser = new JsonSerializer() {
-            
+            var ser = new JsonSerializer()
+            {
+
 
             };
             var (typeName, obj) = await Task.Run(() => ser.Deserialize<(string type, T obj)>(jsonReadr)).ConfigureAwait(false);

@@ -35,15 +35,29 @@ namespace Stasistium.Documents
         private readonly Func<T> valueCallback;
         public DocumentLazy(Func<T> valueCallback, string contentHash, string id, MetadataContainer? metadata, IGeneratorContext context) : base(id, metadata, contentHash, context)
         {
+            if (string.IsNullOrEmpty(contentHash))
+                throw new ArgumentException($"'{nameof(contentHash)}' cannot be null or empty", nameof(contentHash));
+            if (string.IsNullOrEmpty(id))
+                throw new ArgumentException($"'{nameof(id)}' cannot be null or empty", nameof(id));
+            if (context is null)
+                throw new ArgumentNullException(nameof(context));
+            this.valueCallback = valueCallback ?? throw new ArgumentNullException(nameof(valueCallback));
+
             if (System.Diagnostics.Debugger.IsAttached && typeof(T).IsInstanceOfType(typeof(System.IO.Stream)))
             {
-                var data = (object)valueCallback();
-                using var stream = (System.IO.Stream)data;
-                if (contentHash != context.GetHashForStream(stream) && System.Diagnostics.Debugger.IsAttached)
+                var data = (object?)valueCallback();
+                if (data is not null)
+                {
+                    using var stream = (System.IO.Stream)data;
+                    if (contentHash != context.GetHashForStream(stream) && System.Diagnostics.Debugger.IsAttached)
+                        System.Diagnostics.Debugger.Break();
+                }
+                else 
+                {
                     System.Diagnostics.Debugger.Break();
+                }
             }
 
-            this.valueCallback = valueCallback;
         }
 
         public T Value => this.valueCallback();

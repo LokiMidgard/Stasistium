@@ -22,7 +22,7 @@ namespace Stasistium.Stages
 
         protected override Task<ImmutableList<IDocument<T>>> Work(ImmutableList<IDocument<T>> input, OptionToken options)
         {
-            return Task.FromResult(input.Where(predicate).ToImmutableList());
+            return Task.FromResult(input.Where(this.predicate).ToImmutableList());
         }
 
 
@@ -39,7 +39,7 @@ namespace Stasistium.Stages
 
         protected override async Task<ImmutableList<IDocument<T>>> Work(ImmutableList<IDocument<T>> input, OptionToken options)
         {
-            var evaluatedFilter = await Task.WhenAll(input.Select(async x => (value: x, filter: await predicate(x))));
+            var evaluatedFilter = await Task.WhenAll(input.Select(async x => (value: x, filter: await this.predicate(x).ConfigureAwait(false)))).ConfigureAwait(false);
             return evaluatedFilter.Where(x => x.filter).Select(x => x.value).ToImmutableList();
         }
 

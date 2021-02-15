@@ -99,7 +99,7 @@ namespace Stasistium.Documents
             return this.BaseContext.DisposeAsync();
         }
 
-        public bool Equals(IGeneratorContext other)
+        public bool Equals(IGeneratorContext? other)
         {
             return this.BaseContext.Equals(other);
         }
@@ -233,7 +233,7 @@ namespace Stasistium.Documents
             {
                 var type = obj.GetType();
                 if (type.IsEnum)
-                    return obj.ToString();
+                    return obj.ToString() ?? string.Empty;
 
                 var str = new StringBuilder();
                 foreach (var property in type.GetProperties(System.Reflection.BindingFlags.Instance).OrderBy(x => x.Name))
@@ -310,13 +310,13 @@ namespace Stasistium.Documents
             return base.GetHashCode();
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is IGeneratorContext other)
                 return this.Equals(other);
             return false;
         }
-        public bool Equals(IGeneratorContext other)
+        public bool Equals(IGeneratorContext? other)
         {
             if (other is GeneratorContextWrapper wrapper)
                 return this.Equals(wrapper.BaseContext);
@@ -355,9 +355,12 @@ namespace Stasistium.Documents
             ((ILogger)this.BaseLogger).Verbose($"{this.Name}: {text}");
         }
     }
+    // the logger is not owned, it can e.g. be the Console...
+#pragma warning disable CA1001 // Types that own disposable fields should be disposable
     internal class Logger : ILogger, IAsyncDisposable
     {
         private readonly System.CodeDom.Compiler.IndentedTextWriter logger;
+#pragma warning restore CA1001 // Types that own disposable fields should be disposable
 
         internal Logger(TextWriter writer)
         {

@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 
-
+[assembly: CLSCompliant(false)]
 namespace Stasistium.Generator
 {
     [Generator]
@@ -37,7 +37,7 @@ namespace Stasistium.Generator
                 var options = (CSharpParseOptions)((CSharpCompilation)context.Compilation).SyntaxTrees[0].Options;
                 var compilation = context.Compilation;
 
-                
+
 
                 //if (!System.Diagnostics.Debugger.IsAttached)
                 //    System.Diagnostics.Debugger.Launch();
@@ -64,7 +64,7 @@ namespace Stasistium.Generator
                     {
                         var input = baseinput1.TypeArguments.Single();
                         var output = baseOutput?.TypeArguments.Single();
-                        var classSource = this.ProcessClass(classSymbol, input, output, context);
+                        var classSource = ProcessClass(classSymbol, input, output);
                         context.AddSource($"{classSymbol.Name}{classSymbol.TypeArguments.Length}_Generate1Parameter.cs", SourceText.From(classSource, Encoding.UTF8));
                     }
                     if (baseinput2 is not null)
@@ -72,7 +72,7 @@ namespace Stasistium.Generator
                         var input1 = baseinput2.TypeArguments.First();
                         var input2 = baseinput2.TypeArguments.Skip(1).Single();
                         var output = baseOutput?.TypeArguments.Single();
-                        var classSource = this.ProcessClass(classSymbol, input1, input2, output, context);
+                        var classSource = ProcessClass(classSymbol, input1, input2, output);
                         context.AddSource($"{classSymbol.Name}{classSymbol.TypeArguments.Length}_Generate2Parameter.cs", SourceText.From(classSource, Encoding.UTF8));
                     }
 
@@ -80,17 +80,17 @@ namespace Stasistium.Generator
             }
             catch (Exception e)
             {
-                var str = this.PrependError(e.ToString());
+                var str = PrependError(e.ToString());
                 context.AddSource($"errors_Generate2Parameter.cs", SourceText.From(str, Encoding.UTF8));
             }
         }
 
-        private string PrependError(string orinal)
+        private static string PrependError(string orinal)
         {
             using var reader = new StringReader(orinal);
             var builder = new StringBuilder();
-            string line;
-            while ((line = reader.ReadLine()) != null)
+
+            for (string line = reader.ReadLine(); line is not null; line = reader.ReadLine())
             {
                 builder.Append("#error ");
                 builder.AppendLine(line);
@@ -98,7 +98,7 @@ namespace Stasistium.Generator
             return builder.ToString();
         }
 
-        private string ProcessClass(INamedTypeSymbol classSymbol, ITypeSymbol inputSymbol, ITypeSymbol? outputSymbol, GeneratorExecutionContext context)
+        private static string ProcessClass(INamedTypeSymbol classSymbol, ITypeSymbol inputSymbol, ITypeSymbol? outputSymbol)
         {
             var outputType = outputSymbol is null
                 ? "void"
@@ -198,7 +198,7 @@ namespace Stasistium
             return source.ToString();
         }
 
-        private string ProcessClass(INamedTypeSymbol classSymbol, ITypeSymbol inputSymbol1, ITypeSymbol inputSymbol2, ITypeSymbol? outputSymbol, GeneratorExecutionContext context)
+        private static string ProcessClass(INamedTypeSymbol classSymbol, ITypeSymbol inputSymbol1, ITypeSymbol inputSymbol2, ITypeSymbol? outputSymbol)
         {
             var outputType = outputSymbol is null
      ? "void"
