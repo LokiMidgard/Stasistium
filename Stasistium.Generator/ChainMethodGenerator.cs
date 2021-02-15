@@ -39,8 +39,8 @@ namespace Stasistium.Generator
 
                 
 
-                if (!System.Diagnostics.Debugger.IsAttached)
-                    System.Diagnostics.Debugger.Launch();
+                //if (!System.Diagnostics.Debugger.IsAttached)
+                //    System.Diagnostics.Debugger.Launch();
 
 
                 // loop over the candidate classes, and keep the ones that are actually annotated
