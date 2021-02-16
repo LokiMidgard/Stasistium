@@ -16,10 +16,10 @@ namespace Stasistium.Stages
         private readonly Func<IDocument<TInput>, TKey> keySelector;
 
 
-        public GroupByStage(Func<IStageBaseOutput<TInput>, TKey, IStageBaseOutput<TResult>> createPipline, Func<IDocument<TInput>, TKey> keySelector, IGeneratorContext context, string? name) : base(context, name)
+        public GroupByStage(Func<IDocument<TInput>, TKey> keySelector, Func<IStageBaseOutput<TInput>, TKey, IStageBaseOutput<TResult>> createPipline, IGeneratorContext context, string? name) : base(context, name)
         {
             this.createPipline = createPipline;
-            this.keySelector = keySelector; 
+            this.keySelector = keySelector;
         }
 
         protected async override Task<ImmutableList<IDocument<TResult>>> Work(ImmutableList<IDocument<TInput>> input, OptionToken options)
@@ -36,5 +36,5 @@ namespace Stasistium.Stages
         }
 
     }
-   
+
 }
