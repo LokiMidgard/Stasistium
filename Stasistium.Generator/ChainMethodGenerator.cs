@@ -15,7 +15,7 @@ namespace Stasistium.Generator
     [Generator]
     public class ChainMethodGenerator : ISourceGenerator
     {
-        
+
 
         private const string ATTRIBUTES = @"
 namespace Stasistium
@@ -193,12 +193,7 @@ namespace Stasistium
 
                 }
 
-                string methodName;
-                var nameAttribute = classSymbol.GetAttributes().FirstOrDefault(x => x.AttributeClass?.ToDisplayString() == "Stasistium.StageNameAttribute");
-                if (nameAttribute is not null && nameAttribute.ConstructorArguments.First().Value is string name)
-                    methodName = name;
-                else
-                    methodName = classSymbol.Name;
+                string methodName = GetNameFromAttribute(constructor) ?? classSymbol.Name;
 
                 if (methodName.EndsWith("Stage", comparisonType: StringComparison.OrdinalIgnoreCase))
                     methodName = methodName.Substring(0, methodName.Length - "Stage".Length);
@@ -223,6 +218,12 @@ namespace Stasistium
             }
 
             return source.ToString();
+        }
+
+        private static string? GetNameFromAttribute(IMethodSymbol classSymbol)
+        {
+            var attributeData = classSymbol.GetAttributes().FirstOrDefault(x => x.AttributeClass?.ToDisplayString() == "Stasistium.StageNameAttribute");
+            return attributeData?.ConstructorArguments.First().Value as string;
         }
 
         private static string ProcessClass(INamedTypeSymbol classSymbol, ITypeSymbol inputSymbol1, ITypeSymbol inputSymbol2, ITypeSymbol? outputSymbol)
@@ -301,12 +302,8 @@ namespace Stasistium
 
                 }
 
-                string methodName;
-                var nameAttribute = classSymbol.GetAttributes().FirstOrDefault(x => x.AttributeClass?.ToDisplayString() == "Stasistium.StageNameAttribute");
-                if (nameAttribute is not null && nameAttribute.ConstructorArguments.First().Value is string name)
-                    methodName = name;
-                else
-                    methodName = classSymbol.Name;
+                string methodName = GetNameFromAttribute(constructor) ?? classSymbol.Name;
+
 
                 if (methodName.EndsWith("Stage", comparisonType: StringComparison.OrdinalIgnoreCase))
                     methodName = methodName.Substring(0, methodName.Length - "Stage".Length);
@@ -336,6 +333,7 @@ namespace Stasistium
 
             return source.ToString();
         }
+
 
 
 
