@@ -35,12 +35,11 @@ namespace Stasistium.Sample
             var files = contentRepo
                 .Where(x => true)
                 .Select(x => x.With(x.Metadata.Add(new GitMetadata() { Name = x.Value.FrindlyName, Type = x.Value.Type })))
-                .GitRefToFiles(true)
-
-                .SidecarMetadata<BookMetadata>(".metadata")
+                .Files(true)
+                .Sidecar<BookMetadata>(".metadata")
                    .Where(x => System.IO.Path.GetExtension(x.Id) == ".md")
-                   .MarkdownFromStream()
-                   .MarkdownToHtml()
+                   .Markdown()
+                   .Html()
                    .TextToStream()
                     .Select(x => x.WithId(Path.Combine(Enum.GetName(typeof(GitRefType), x.Metadata.GetValue<GitMetadata>()!.Type)!, x.Metadata.GetValue<GitMetadata>()!.Name, x.Id)));
             //.Where(x => x.Id == "origin/master")
@@ -56,7 +55,7 @@ namespace Stasistium.Sample
 
             var schemaFiles = schemaRepo
                 .Select(x => x.With(x.Metadata.Add(new GitMetadata() { Name = x.Value.FrindlyName, Type = x.Value.Type })))
-                 .GitRefToFiles(true)
+                 .Files(true)
                  .Where(x => System.IO.Path.GetExtension(x.Id) != ".md")
 
                     .StreamToText()
