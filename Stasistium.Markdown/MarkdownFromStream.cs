@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 namespace Stasistium.Stages
 {
 
-
     public class MarkdownFromStream : StageBaseSimple<Stream, MarkdownDocument>
     {
         private readonly Func<MarkdownDocument>? generateDocuement;
 
+        [StageName("Markdown")]
         public MarkdownFromStream(IGeneratorContext context, Func<MarkdownDocument>? generateDocuement = null, string? name = null) : base(context, name)
         {
             this.generateDocuement = generateDocuement;

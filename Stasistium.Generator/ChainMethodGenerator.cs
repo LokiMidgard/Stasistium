@@ -11,10 +11,28 @@ using Microsoft.CodeAnalysis.Text;
 [assembly: CLSCompliant(false)]
 namespace Stasistium.Generator
 {
+
     [Generator]
     public class ChainMethodGenerator : ISourceGenerator
     {
+        
 
+        private const string ATTRIBUTES = @"
+namespace Stasistium
+{
+
+    [System.AttributeUsage(System.AttributeTargets.Constructor, Inherited = false, AllowMultiple = false)]
+    sealed class StageNameAttribute : System.Attribute
+    {
+
+        public StageNameAttribute(string name)
+        {
+            this.Name = name;
+        }
+
+        public string Name { get; }
+    }
+}";
 
         public void Initialize(GeneratorInitializationContext context)
         {
@@ -35,7 +53,10 @@ namespace Stasistium.Generator
                 // we're going to create a new compilation that contains the attribute.
                 // TODO: we should allow source generators to provide source during initialize, so that this step isn't required.
                 var options = (CSharpParseOptions)((CSharpCompilation)context.Compilation).SyntaxTrees[0].Options;
-                var compilation = context.Compilation;
+
+
+                context.AddSource("Attributes.cs", ATTRIBUTES);
+                var compilation = context.Compilation.AddSyntaxTrees(CSharpSyntaxTree.ParseText(ATTRIBUTES, options));
 
 
 
@@ -172,7 +193,13 @@ namespace Stasistium.Generator
 
                 }
 
-                var methodName = classSymbol.Name;
+                string methodName;
+                var nameAttribute = classSymbol.GetAttributes().FirstOrDefault(x => x.AttributeClass?.ToDisplayString() == "Stasistium.StageNameAttribute");
+                if (nameAttribute is not null && nameAttribute.ConstructorArguments.First().Value is string name)
+                    methodName = name;
+                else
+                    methodName = classSymbol.Name;
+
                 if (methodName.EndsWith("Stage", comparisonType: StringComparison.OrdinalIgnoreCase))
                     methodName = methodName.Substring(0, methodName.Length - "Stage".Length);
                 source.AppendLine($@"
@@ -274,9 +301,16 @@ namespace Stasistium
 
                 }
 
-                var methodName = classSymbol.Name;
+                string methodName;
+                var nameAttribute = classSymbol.GetAttributes().FirstOrDefault(x => x.AttributeClass?.ToDisplayString() == "Stasistium.StageNameAttribute");
+                if (nameAttribute is not null && nameAttribute.ConstructorArguments.First().Value is string name)
+                    methodName = name;
+                else
+                    methodName = classSymbol.Name;
+
                 if (methodName.EndsWith("Stage", comparisonType: StringComparison.OrdinalIgnoreCase))
                     methodName = methodName.Substring(0, methodName.Length - "Stage".Length);
+
                 source.AppendLine($@"
 namespace Stasistium
 {{

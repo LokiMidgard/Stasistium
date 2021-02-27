@@ -13,6 +13,7 @@ namespace Stasistium.Stages
     {
         private readonly bool addGitMetadata;
 
+        [StageName("Files")]
         public GitRefToFilesStage(bool addGitMetadata, IGeneratorContext context, string? name) : base(context, name)
         {
             this.addGitMetadata = addGitMetadata;

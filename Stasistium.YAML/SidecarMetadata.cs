@@ -12,6 +12,7 @@ namespace Stasistium.Stages
     {
         private readonly MetadataUpdate<TMetadata>? update;
 
+        [StageName("Sidecar")]
         public SidecarMetadata(string sidecarExtension, IGeneratorContext context, MetadataUpdate<TMetadata>? update = null, string? name = null) : base(context, name)
         {
             if (sidecarExtension is null)
