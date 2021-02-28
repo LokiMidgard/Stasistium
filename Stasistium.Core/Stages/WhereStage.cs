@@ -15,7 +15,7 @@ namespace Stasistium.Stages
     {
         private readonly Func<IDocument<T>, bool> predicate;
 
-        public WhereStage(Expression<Func<IDocument<T>, bool>> predicate, IGeneratorContext context, string? name = null) : base(context, name ?? predicate?.ToString())
+        public WhereStage(Expression<Func<IDocument<T>, bool>> predicate, IGeneratorContext context, string? name = null) : base(context, name ?? $"Where {predicate}")
         {
             if (predicate is null)
                 throw new ArgumentNullException(nameof(predicate));
@@ -34,7 +34,7 @@ namespace Stasistium.Stages
     {
         private readonly Func<IDocument<T>, Task<bool>> predicate;
 
-        public WhereAsyncStage(Expression<Func<IDocument<T>, Task<bool>>> predicate, IGeneratorContext context, string? name = null) : base(context, name ?? predicate?.ToString())
+        public WhereAsyncStage(Expression<Func<IDocument<T>, Task<bool>>> predicate, IGeneratorContext context, string? name = null) : base(context, name ?? $"Where {predicate}")
         {
             if (predicate is null)
                 throw new ArgumentNullException(nameof(predicate));
