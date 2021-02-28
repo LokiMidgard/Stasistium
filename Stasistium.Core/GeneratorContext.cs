@@ -167,7 +167,9 @@ namespace Stasistium.Documents
 
         public IStageBaseOutput<TResult> StageFromResult<TResult>(string id, TResult result, Func<TResult, string> hashFunction)
         {
-            return new Stages.StaticStage<TResult>(id, result, hashFunction, this);
+            var stage = new Stages.StaticStage<TResult>(id, result, hashFunction, this);
+            this.staticStages.Add(stage);
+            return stage;
         }
 
         public Task Run(GenerationOptions option) => Task.WhenAll(this.staticStages.Select(stage => stage.Invoke(option.Token)));
