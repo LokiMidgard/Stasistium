@@ -41,6 +41,11 @@ namespace Stasistium.Stages
         }
 
         public virtual Task Reset() => Task.CompletedTask;
+
+        public override string ToString()
+        {
+            return this.Name;
+        }
     }
 
     public delegate Task StagePerform<T>(ImmutableList<IDocument<T>> cache, OptionToken options);
@@ -116,7 +121,7 @@ namespace Stasistium.Stages
         }
     }
 
-    public abstract class StageBase< TIn1, TIn2, TResult> : StageBase, IStageBaseInput<TIn1, TIn2>, IStageBaseOutput<TResult>
+    public abstract class StageBase<TIn1, TIn2, TResult> : StageBase, IStageBaseInput<TIn1, TIn2>, IStageBaseOutput<TResult>
     {
         public event StagePerform<TResult>? PostStages;
 

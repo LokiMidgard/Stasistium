@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Stasistium.Stages
@@ -14,9 +15,11 @@ namespace Stasistium.Stages
     {
         private readonly Func<IDocument<T>, bool> predicate;
 
-        public WhereStage(Func<IDocument<T>, bool> predicate, IGeneratorContext context, string? name = null) : base(context, name)
+        public WhereStage(Expression<Func<IDocument<T>, bool>> predicate, IGeneratorContext context, string? name = null) : base(context, name ?? predicate?.ToString())
         {
-            this.predicate = predicate;
+            if (predicate is null)
+                throw new ArgumentNullException(nameof(predicate));
+            this.predicate = predicate.Compile();
         }
 
 
@@ -31,9 +34,11 @@ namespace Stasistium.Stages
     {
         private readonly Func<IDocument<T>, Task<bool>> predicate;
 
-        public WhereAsyncStage(Func<IDocument<T>, Task<bool>> predicate, IGeneratorContext context, string? name = null) : base(context, name)
+        public WhereAsyncStage(Expression<Func<IDocument<T>, Task<bool>>> predicate, IGeneratorContext context, string? name = null) : base(context, name ?? predicate?.ToString())
         {
-            this.predicate = predicate;
+            if (predicate is null)
+                throw new ArgumentNullException(nameof(predicate));
+            this.predicate = predicate.Compile();
         }
 
 
