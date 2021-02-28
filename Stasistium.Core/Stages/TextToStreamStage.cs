@@ -8,6 +8,7 @@ namespace Stasistium.Stages
 {
     public class TextToStreamStage : StageBaseSimple<string, Stream>
     {
+        [Stasistium.StageName("ToStream")]
         public TextToStreamStage(IGeneratorContext context, string? name = null) : base(context, name)
         {
         }

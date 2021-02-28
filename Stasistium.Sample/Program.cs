@@ -39,8 +39,8 @@ namespace Stasistium.Sample
                 .Sidecar<BookMetadata>(".metadata")
                    .Where(x => System.IO.Path.GetExtension(x.Id) == ".md")
                    .Markdown()
-                   .Html()
-                   .TextToStream()
+                   .ToHtml()
+                   .ToStream()
                     .Select(x => x.WithId(Path.Combine(Enum.GetName(typeof(GitRefType), x.Metadata.GetValue<GitMetadata>()!.Type)!, x.Metadata.GetValue<GitMetadata>()!.Name, x.Id)));
             //.Where(x => x.Id == "origin/master")
             //.SingleEntry()
@@ -50,7 +50,7 @@ namespace Stasistium.Sample
                 .Concat(layoutProvider)
                 .RazorProvider("Content", viewStartId: "Layout/ViewStart.cshtml");
 
-            var rendered = files.Razor(razorProvider).TextToStream();
+            var rendered = files.Razor(razorProvider).ToStream();
             var hostReplacementRegex = new System.Text.RegularExpressions.Regex(@"(?<host>http://nota\.org)/schema/", System.Text.RegularExpressions.RegexOptions.Compiled);
 
             var schemaFiles = schemaRepo
@@ -58,7 +58,7 @@ namespace Stasistium.Sample
                  .Files(true)
                  .Where(x => System.IO.Path.GetExtension(x.Id) != ".md")
 
-                    .StreamToText()
+                    .ToText()
                     .Select(y =>
                     {
                         var gitData = y.Metadata.GetValue<GitMetadata>()!;
@@ -78,7 +78,7 @@ namespace Stasistium.Sample
 
                         return y.With(newText, y.Context.GetHashForString(newText));
                     })
-                    .TextToStream()
+                    .ToStream()
 
                  .Select(x =>
                  {

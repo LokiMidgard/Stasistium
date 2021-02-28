@@ -10,6 +10,7 @@ namespace Stasistium.Stages
 {
     public class StreamToText : StageBaseSimple<Stream, string>
     {
+        [Stasistium.StageName("ToText")]
         public StreamToText(IGeneratorContext context, Encoding? encoding = null, string? name = null) : base(context, name)
         {
             this.Encoding = encoding ?? Encoding.UTF8;
