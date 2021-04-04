@@ -11,22 +11,7 @@ using Stasistium.Stages;
 namespace Stasistium.Stages
 {
 
-    public class StageList
-    {
-        public static StageList<T> Create<T>(IStageBaseOutput<T> item1)
-        {
-            return new StageList<T>(item1);
-        }
-    }
-    public class StageList<T> : StageList
-    {
-        public IStageBaseOutput<T> Item1 { get; }
-
-        public StageList(IStageBaseOutput<T> item1)
-        {
-            this.Item1 = item1;
-        }
-    }
+    
 
     public delegate IStageBaseOutput<TResult> GroupPipeline<TResult, TKey, TInput>(IStageBaseOutput<TKey> keyStage, IStageBaseOutput<TInput> inputStage);
     public class GroupByStage<TInput, TResult, TKey> : StageBase<TInput, TResult>
@@ -97,7 +82,7 @@ namespace Stasistium.Stages
         private readonly Func<IDocument<TInput>, TKey> keySelector;
 
 
-        public GroupByStage(Func<IDocument<TInput>, TKey> keySelector, GroupPipeline<TResult, TKey, TInput, TAdditionalInput> createPipline, TAdditionalInput additionalInput, IGeneratorContext context, string? name) : base(context, name)
+        public GroupByStage(Func<IDocument<TInput>, TKey> keySelector, GroupPipeline<TResult, TKey, TInput, TAdditionalInput> createPipline, IGeneratorContext context, string? name) : base(context, name)
         {
             if (createPipline is null)
                 throw new ArgumentNullException(nameof(createPipline));
