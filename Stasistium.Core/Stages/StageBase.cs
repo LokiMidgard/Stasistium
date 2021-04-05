@@ -151,15 +151,15 @@ namespace Stasistium.Stages
                     .Select(s => s(result, options)) ?? Array.Empty<Task>()
                ).ConfigureAwait(false);
             finishSource.SetResult(null);
-            this.argumentCompletion.TryRemove(options, out _);
         }
 
-        Task IStageBaseInput<TIn1, TIn2>.DoIt2(ImmutableList<IDocument<TIn2>> in2, OptionToken options)
+        async Task IStageBaseInput<TIn1, TIn2>.DoIt2(ImmutableList<IDocument<TIn2>> in2, OptionToken options)
         {
             var seccondArgument = this.argumentCompletion.GetOrAdd(options, (opt) => new TaskCompletionSource<(ImmutableList<IDocument<TIn2>> input, OptionToken otherOption, TaskCompletionSource<object?> completed)>());
             var finish = new TaskCompletionSource<object?>();
             seccondArgument.SetResult((in2, options, finish));
-            return finish.Task;
+            await finish.Task.ConfigureAwait(false);
+            this.argumentCompletion.TryRemove(options, out _);
         }
 
     }
