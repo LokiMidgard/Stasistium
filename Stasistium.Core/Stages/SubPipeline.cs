@@ -12,6 +12,10 @@ namespace Stasistium.Stages
         {
             return SubPipline<TInput, TResult>.Create(createPipeline, context);
         }
+        public static SubPipline<T, T> Create<T>(IGeneratorContext context)
+        {
+            return SubPipline<T, T>.Create(x => x, context).input;
+        }
     }
 
     public class SubPipline<TInput, TResult> : StageBase, IStageBaseOutput<TInput>
@@ -43,5 +47,6 @@ namespace Stasistium.Stages
             ).ConfigureAwait(false);
         }
     }
+
 
 }

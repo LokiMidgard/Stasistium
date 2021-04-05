@@ -86,9 +86,9 @@ namespace Stasistium.Stages
         {
             if (createPipline is null)
                 throw new ArgumentNullException(nameof(createPipline));
-            (this.inputStage,_) = SubPipeline.Create((IStageBaseOutput<TInput> start) => start, context);
-            (this.additional,_) = SubPipeline.Create((IStageBaseOutput<TAdditionalInput> start) => start, context);
-            (this.keyStage  ,_) = SubPipeline.Create((IStageBaseOutput<TKey> start) => start, context);
+            this.inputStage = SubPipeline.Create<TInput>(context);
+            this.additional = SubPipeline.Create<TAdditionalInput>(context);
+            this.keyStage = SubPipeline.Create<TKey>(context);
 
             this.createPipline = createPipline(this.keyStage, this.inputStage, this.additional);
             this.keySelector = keySelector ?? throw new ArgumentNullException(nameof(keySelector));
