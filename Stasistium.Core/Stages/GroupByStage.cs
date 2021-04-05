@@ -11,7 +11,7 @@ using Stasistium.Stages;
 namespace Stasistium.Stages
 {
 
-    
+
 
     public delegate IStageBaseOutput<TResult> GroupPipeline<TResult, TKey, TInput>(IStageBaseOutput<TKey> keyStage, IStageBaseOutput<TInput> inputStage);
     public class GroupByStage<TInput, TResult, TKey> : StageBase<TInput, TResult>
@@ -26,8 +26,8 @@ namespace Stasistium.Stages
         {
             if (createPipline is null)
                 throw new ArgumentNullException(nameof(createPipline));
-            this.inputStage = SubPipeline.Create((IStageBaseOutput<TInput> start) => start, context);
-            this.keyStage = SubPipeline.Create((IStageBaseOutput<TKey> start) => start, context);
+            (this.inputStage, _) = SubPipeline.Create((IStageBaseOutput<TInput> start) => start, context);
+            (this.keyStage, _) = SubPipeline.Create((IStageBaseOutput<TKey> start) => start, context);
 
             this.createPipline = createPipline(this.keyStage, this.inputStage);
             this.keySelector = keySelector ?? throw new ArgumentNullException(nameof(keySelector));
@@ -86,9 +86,9 @@ namespace Stasistium.Stages
         {
             if (createPipline is null)
                 throw new ArgumentNullException(nameof(createPipline));
-            this.inputStage = SubPipeline.Create((IStageBaseOutput<TInput> start) => start, context);
-            this.additional = SubPipeline.Create((IStageBaseOutput<TAdditionalInput> start) => start, context);
-            this.keyStage = SubPipeline.Create((IStageBaseOutput<TKey> start) => start, context);
+            (this.inputStage,_) = SubPipeline.Create((IStageBaseOutput<TInput> start) => start, context);
+            (this.additional,_) = SubPipeline.Create((IStageBaseOutput<TAdditionalInput> start) => start, context);
+            (this.keyStage  ,_) = SubPipeline.Create((IStageBaseOutput<TKey> start) => start, context);
 
             this.createPipline = createPipline(this.keyStage, this.inputStage, this.additional);
             this.keySelector = keySelector ?? throw new ArgumentNullException(nameof(keySelector));
