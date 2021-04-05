@@ -29,4 +29,27 @@ namespace Stasistium.Stages
             return Task.FromResult(result.ToImmutableList());
         }
     }
+    public class ListTransform<TInput1, TInput2, TResult> : StageBase<TInput1, TInput2, TResult>
+    {
+        private readonly Func<ImmutableList<IDocument<TInput1>>, ImmutableList<IDocument<TInput2>>, IEnumerable<IDocument<TResult>>> transform;
+
+        public ListTransform(Func<ImmutableList<IDocument<TInput1>>, ImmutableList<IDocument<TInput2>>, IEnumerable<IDocument<TResult>>> transform, IGeneratorContext context, string? name) : base(context, name)
+        {
+            this.transform = transform;
+        }
+
+        public ListTransform(Func<ImmutableList<IDocument<TInput1>>, ImmutableList<IDocument<TInput2>>, IDocument<TResult>> transform, IGeneratorContext context, string? name) : base(context, name)
+        {
+            this.transform = (input1, input2) => ImmutableList.Create(transform(input1, input2));
+        }
+
+        protected override Task<ImmutableList<IDocument<TResult>>> Work(ImmutableList<IDocument<TInput1>> input1, ImmutableList<IDocument<TInput2>> input2, OptionToken options)
+        {
+            var result = this.transform(input1, input2);
+
+            if (result is ImmutableList<IDocument<TResult>> immutable)
+                return Task.FromResult(immutable);
+            return Task.FromResult(result.ToImmutableList());
+        }
+    }
 }
