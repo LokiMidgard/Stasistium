@@ -89,6 +89,21 @@ namespace Stasistium.Stages
             }
             catch (Exception e)
             {
+                if (options.BreakOnError)
+                {
+                    try
+                    {
+                        if (System.Diagnostics.Debugger.IsAttached)
+                            System.Diagnostics.Debugger.Break();
+                        else
+                            System.Diagnostics.Debugger.Launch();
+
+                    }
+                    catch (Exception ex)
+                    {
+                        this.Context.Logger.Error($"Faild to lunch debugger {ex}");
+                    }
+                }
                 this.Context.Logger.Error(e.ToString());
                 result = ImmutableList<IDocument<TResult>>.Empty;
             }
@@ -158,6 +173,21 @@ namespace Stasistium.Stages
             }
             catch (Exception e)
             {
+                if (options.BreakOnError)
+                {
+                    try
+                    {
+                        if (System.Diagnostics.Debugger.IsAttached)
+                            System.Diagnostics.Debugger.Break();
+                        else
+                            System.Diagnostics.Debugger.Launch();
+
+                    }
+                    catch (Exception ex)
+                    {
+                        this.Context.Logger.Error($"Faild to lunch debugger {ex}");
+                    }
+                }
                 this.Context.Logger.Error(e.ToString());
                 result = ImmutableList<IDocument<TResult>>.Empty;
             }
@@ -183,19 +213,23 @@ namespace Stasistium.Stages
 
     public class OptionToken : IEquatable<OptionToken>
     {
-        public bool RefreshRemoteSources { get; }
+        private readonly GenerationOptions root;
+
+        public bool RefreshRemoteSources => this.root.Refresh;
+        public bool BreakOnError => this.root.BreakOnError;
+
         public ImmutableArray<Guid> GenerationId { get; }
 
 
-        internal OptionToken(bool refresh)
+        internal OptionToken(GenerationOptions root)
         {
             this.GenerationId = ImmutableArray.Create(Guid.NewGuid());
-            this.RefreshRemoteSources = refresh;
+            this.root = root;
         }
         private OptionToken(OptionToken parent)
         {
             this.GenerationId = parent.GenerationId.Add(Guid.NewGuid());
-            this.RefreshRemoteSources = parent.RefreshRemoteSources;
+            this.root = parent.root;
         }
         public OptionToken CreateSubToken()
         {
