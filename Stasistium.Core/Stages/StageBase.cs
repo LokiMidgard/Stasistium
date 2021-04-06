@@ -82,7 +82,16 @@ namespace Stasistium.Stages
             this.Context.Logger.Info($"BEGIN");
             var stopWatch = System.Diagnostics.Stopwatch.StartNew();
 
-            var result = await this.Work(input, options).ConfigureAwait(false);
+            ImmutableList<IDocument<TResult>>? result;
+            try
+            {
+                result = await this.Work(input, options).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                this.Context.Logger.Error(e.ToString());
+                result = ImmutableList<IDocument<TResult>>.Empty;
+            }
             stopWatch.Stop();
             this.Context.Logger.Info($"END Took {stopWatch.Elapsed}");
 
@@ -142,9 +151,16 @@ namespace Stasistium.Stages
 
             if (!otherToken.HaveSameRoot(options))
                 throw new ArgumentException("OptionToken does not match.");
-
-            var result = await this.Work(in1, in2, options).ConfigureAwait(false);
-
+            ImmutableList<IDocument<TResult>>? result;
+            try
+            {
+                result = await this.Work(in1, in2, options).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                this.Context.Logger.Error(e.ToString());
+                result = ImmutableList<IDocument<TResult>>.Empty;
+            }
             await Task
                .WhenAll(this.PostStages?.GetInvocationList()
                     .Cast<StagePerform<TResult>>()
