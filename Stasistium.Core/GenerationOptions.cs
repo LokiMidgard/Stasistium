@@ -9,6 +9,7 @@ namespace Stasistium
         public bool BreakOnError { set; get; }
 
         public bool CompressCache { get; set; } = true;
+        public bool CheckUniqueID { get; set; }
         public OptionToken Token
         {
             get
@@ -18,6 +19,7 @@ namespace Stasistium
 
             }
         }
+
     }
 
 }

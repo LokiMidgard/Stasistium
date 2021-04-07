@@ -86,6 +86,18 @@ namespace Stasistium.Stages
             try
             {
                 result = await this.Work(input, options).ConfigureAwait(false);
+                if (options.CheckUniqueID)
+                {
+                    var doubles = result.GroupBy(x => x.Id)
+                        .Select(x => (id: x.Key, count: x.Count()))
+                        .Where(x => x.count > 1)
+                        .Select(x => $"{x.id}: {x.count}");
+                    if (doubles.Any())
+                    {
+                        this.Context.Logger.Error($"Found multiple IDs:\n{string.Join("\n", doubles)}");
+                        options.TryBreak(this.Context);
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -170,6 +182,18 @@ namespace Stasistium.Stages
             try
             {
                 result = await this.Work(in1, in2, options).ConfigureAwait(false);
+                if (options.CheckUniqueID)
+                {
+                    var doubles = result.GroupBy(x => x.Id)
+                        .Select(x => (id: x.Key, count: x.Count()))
+                        .Where(x => x.count > 1)
+                        .Select(x => $"{x.id}: {x.count}");
+                    if (doubles.Any())
+                    {
+                        this.Context.Logger.Error($"Found multiple IDs:\n{string.Join("\n", doubles)}");
+                        options.TryBreak(this.Context);
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -218,8 +242,30 @@ namespace Stasistium.Stages
         public bool RefreshRemoteSources => this.root.Refresh;
         public bool BreakOnError => this.root.BreakOnError;
 
+        public bool CheckUniqueID => this.root.CheckUniqueID;
+
         public ImmutableArray<Guid> GenerationId { get; }
 
+        public void TryBreak(IGeneratorContext context)
+        {
+            if (context is null)
+                throw new ArgumentNullException(nameof(context));
+            if (this.BreakOnError)
+            {
+                try
+                {
+                    if (System.Diagnostics.Debugger.IsAttached)
+                        System.Diagnostics.Debugger.Break();
+                    else
+                        System.Diagnostics.Debugger.Launch();
+
+                }
+                catch (Exception ex)
+                {
+                    context.Logger.Error($"Faild to lunch debugger {ex}");
+                }
+            }
+        }
 
         internal OptionToken(GenerationOptions root)
         {
