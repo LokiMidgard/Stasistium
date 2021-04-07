@@ -69,7 +69,7 @@ namespace Stasistium.Stages
             var inputs = await Task.WhenAll(inputDocument.Select(async doc =>
             {
                 var renderer = inputRenderer.Value.Renderer;
-                var result = await renderer.RenderViewToStringAsync(doc.Id, doc).ConfigureAwait(false);
+                var result = await renderer.RenderViewToStringAsync(inputRenderer.Id, doc).ConfigureAwait(false);
                 var output = doc.With(result, this.Context.GetHashForString(result));
                 return output;
             })).ConfigureAwait(false);
