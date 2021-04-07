@@ -36,7 +36,16 @@ namespace Stasistium.Stages
             var inputs = await Task.WhenAll(inputDocument.Select(async doc =>
             {
                 var renderer = inputRenderer.Value.Renderer;
-                var result = await renderer.RenderViewToStringAsync(inputRenderer.Id, this.selector(doc)).ConfigureAwait(false);
+                string result;
+                try
+                {
+                    result = await renderer.RenderViewToStringAsync(inputRenderer.Id, this.selector(doc)).ConfigureAwait(false);
+                }
+                catch (Exception e)
+                {
+                    result = e.ToString();
+                }
+
                 var output = doc.With(result, this.Context.GetHashForString(result));
                 return output;
             })).ConfigureAwait(false);
@@ -69,7 +78,17 @@ namespace Stasistium.Stages
             var inputs = await Task.WhenAll(inputDocument.Select(async doc =>
             {
                 var renderer = inputRenderer.Value.Renderer;
-                var result = await renderer.RenderViewToStringAsync(inputRenderer.Id, doc).ConfigureAwait(false);
+                string result;
+
+                try
+                {
+                    result = await renderer.RenderViewToStringAsync(inputRenderer.Id, doc).ConfigureAwait(false);
+                }
+                catch (Exception e)
+                {
+                    result = e.ToString();
+                }
+
                 var output = doc.With(result, this.Context.GetHashForString(result));
                 return output;
             })).ConfigureAwait(false);
