@@ -39,11 +39,12 @@ namespace Stasistium.Stages
                 string result;
                 try
                 {
-                    result = await renderer.RenderViewToStringAsync(inputRenderer.Id, this.selector(doc)).ConfigureAwait(false);
+                    result = await renderer.RenderViewToStringAsync(doc.Id, this.selector(doc)).ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {
-                    result = e.ToString();
+                    this.Context.Logger.Error($"Failed to render {doc.Id}:\n{e}");
+                    result = $"<pre>\n{e}\n</pre>";
                 }
 
                 var output = doc.With(result, this.Context.GetHashForString(result));
@@ -82,11 +83,12 @@ namespace Stasistium.Stages
 
                 try
                 {
-                    result = await renderer.RenderViewToStringAsync(inputRenderer.Id, doc).ConfigureAwait(false);
+                    result = await renderer.RenderViewToStringAsync(doc.Id, doc).ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {
-                    result = e.ToString();
+                    this.Context.Logger.Error($"Failed to render {doc.Id}:\n{e}");
+                    result = $"<pre>\n{e}\n</pre>";
                 }
 
                 var output = doc.With(result, this.Context.GetHashForString(result));

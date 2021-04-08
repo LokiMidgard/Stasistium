@@ -14,7 +14,7 @@ namespace Stasistium.Stages
         private readonly string id;
         private readonly string? viewStartId;
 
-        public RazorProviderStage(string contentId, IGeneratorContext context, string? id = null, string? viewStartId = null, string? name = null) : base(context, name)
+        public RazorProviderStage(string contentId, IGeneratorContext context, string? viewStartId = null, string? id = null,  string? name = null) : base(context, name)
         {
             this.ContentId = contentId;
             this.id = id ?? Guid.NewGuid().ToString();
