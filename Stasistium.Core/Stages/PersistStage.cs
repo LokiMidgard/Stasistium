@@ -32,6 +32,7 @@ namespace Stasistium.Stages
                 var subDirectorys = current.GetDirectories();
                 foreach (var subDirectory in subDirectorys)
                 {
+                    this.Context.Logger.Info($"Found subdirectory {current}");
                     directoryQueue.Enqueue(subDirectory);
                 }
             }
