@@ -26,11 +26,14 @@ namespace Stasistium.Stages
                 if (!current.Exists)
                     continue;
 
+                this.Context.Logger.Info($"push {current} to directory stack");
                 directoryStack.Push(current);
 
                 var subDirectorys = current.GetDirectories();
                 foreach (var subDirectory in subDirectorys)
+                {
                     directoryQueue.Enqueue(subDirectory);
+                }
             }
 
             while (directoryStack.TryPop(out var currentDirectory))
@@ -46,7 +49,11 @@ namespace Stasistium.Stages
                     }
 
                 if (currentDirectory.GetFiles().Length == 0 && currentDirectory.GetDirectories().Length == 0)
+                {
+                    this.Context.Logger.Info($"Deleting {currentDirectory}");
+
                     currentDirectory.Delete(false);
+                }
             }
 
             // Get all changed files and persit those
