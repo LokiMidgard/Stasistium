@@ -150,7 +150,15 @@ namespace Stasistium.Stages
             this.Context.Logger.Info($"BEGIN");
             var stopWatch = System.Diagnostics.Stopwatch.StartNew();
 
-            await this.Work(input, options).ConfigureAwait(false);
+            try
+            {
+                await this.Work(input, options).ConfigureAwait(false);
+
+            }
+            catch (Exception e)
+            {
+                this.Context.Logger.Error($"Error {e}");
+            }
             stopWatch.Stop();
             this.Context.Logger.Info($"END Took {stopWatch.Elapsed}");
         }
