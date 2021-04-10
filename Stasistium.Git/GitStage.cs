@@ -64,11 +64,6 @@ namespace Stasistium.Stages
                 repo = await Task.Run(() =>
                 {
                     var repo = new Repository(Repository.Clone(input.Value.Url, workingDir.FullName, new CloneOptions() { IsBare = true }));
-                    if (input.Value.PrimaryBranchName is not null)
-                    {
-                        var branch = repo.Branches[input.Value.PrimaryBranchName];
-                        repo.Reset(ResetMode.Hard, branch.Tip);
-                    }
                     return repo;
                 }).ConfigureAwait(false);
                 this.Context.DisposeOnDispose(repo);
