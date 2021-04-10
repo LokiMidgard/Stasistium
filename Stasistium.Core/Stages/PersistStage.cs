@@ -28,8 +28,16 @@ namespace Stasistium.Stages
 
                 this.Context.Logger.Info($"push {current} to directory stack");
                 directoryStack.Push(current);
-
-                var subDirectorys = current.GetDirectories();
+                DirectoryInfo[] subDirectorys;
+                try
+                {
+                    subDirectorys = current.GetDirectories();
+                }
+                catch (Exception e)
+                {
+                    this.Context.Logger.Error($"Faild to itterate folder {current}\n{e}");
+                    subDirectorys = Array.Empty<DirectoryInfo>();
+                }
                 foreach (var subDirectory in subDirectorys)
                 {
                     this.Context.Logger.Info($"Found subdirectory {current}");
