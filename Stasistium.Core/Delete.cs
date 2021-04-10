@@ -11,9 +11,28 @@ namespace Stasistium.Helper
                 return;
             }
 
-            var files = Directory.GetFiles(directoryPath);
-            var directories = Directory.GetDirectories(directoryPath);
+            string[]? files;
+            try
+            {
+                files = Directory.GetFiles(directoryPath);
 
+            }
+            catch (System.Exception e)
+            {
+                System.Console.Error.WriteLine(e);
+                files = System.Array.Empty<string>();
+            }
+            string[]? directories;
+            try
+            {
+                directories = Directory.GetDirectories(directoryPath);
+
+            }
+            catch (System.Exception e)
+            {
+                System.Console.Error.WriteLine(e);
+                directories = System.Array.Empty<string>();
+            }
             foreach (var file in files)
             {
                 File.SetAttributes(file, FileAttributes.Normal);
