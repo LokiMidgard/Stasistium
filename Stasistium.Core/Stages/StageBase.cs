@@ -122,7 +122,7 @@ namespace Stasistium.Stages
                 }
                 stopWatch.Stop();
             }
-            this.Context.Logger.Info($"END Took {stopWatch.Elapsed}");
+            this.Context.Logger.Info($"END Took\t{stopWatch.Elapsed}");
 
             await Task
                .WhenAll(this.PostStages?.GetInvocationList()

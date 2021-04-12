@@ -346,15 +346,15 @@ namespace Stasistium.Documents
 
         public void Info(string text)
         {
-            ((ILogger)this.BaseLogger).Info($"{this.Name}: {text}");
+            ((ILogger)this.BaseLogger).Info($"{{{this.Name}}}\t{text}");
         }
         public void Error(string text)
         {
-            ((ILogger)this.BaseLogger).Error($"{this.Name}: {text}");
+            ((ILogger)this.BaseLogger).Error($"{{{this.Name}}}\t{text}");
         }
         public void Verbose(string text)
         {
-            ((ILogger)this.BaseLogger).Verbose($"{this.Name}: {text}");
+            ((ILogger)this.BaseLogger).Verbose($"{{{this.Name}}}\t{text}");
         }
     }
     // the logger is not owned, it can e.g. be the Console...
@@ -371,15 +371,15 @@ namespace Stasistium.Documents
 
         public void Info(string text)
         {
-            this.logger.WriteLine("INFO: " + text);
+            this.logger.WriteLine("[INFO]\t" + text);
         }
         public void Verbose(string text)
         {
-            this.logger.WriteLine("VERBOSE: " + text);
+            this.logger.WriteLine("[VERBOSE]\t" + text);
         }
         public void Error(string text)
         {
-            this.logger.WriteLine("ERROR: " + text);
+            this.logger.WriteLine("[ERROR]\t" + text);
         }
 
         public IDisposable Indent()
