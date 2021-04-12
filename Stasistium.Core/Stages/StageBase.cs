@@ -78,48 +78,50 @@ namespace Stasistium.Stages
         {
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
-            using var indent = this.Context.Logger.Indent();
             this.Context.Logger.Info($"BEGIN");
             var stopWatch = System.Diagnostics.Stopwatch.StartNew();
-
             ImmutableList<IDocument<TResult>>? result;
-            try
-            {
-                result = await this.Work(input, options).ConfigureAwait(false);
-                if (options.CheckUniqueID)
-                {
-                    var doubles = result.GroupBy(x => x.Id)
-                        .Select(x => (id: x.Key, count: x.Count()))
-                        .Where(x => x.count > 1)
-                        .Select(x => $"{x.id}: {x.count}");
-                    if (doubles.Any())
-                    {
-                        this.Context.Logger.Error($"Found multiple IDs:\n{string.Join("\n", doubles)}");
-                        options.TryBreak(this.Context);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                if (options.BreakOnError)
-                {
-                    try
-                    {
-                        if (System.Diagnostics.Debugger.IsAttached)
-                            System.Diagnostics.Debugger.Break();
-                        else
-                            System.Diagnostics.Debugger.Launch();
 
-                    }
-                    catch (Exception ex)
+            using (var indent = this.Context.Logger.Indent())
+            {
+                try
+                {
+                    result = await this.Work(input, options).ConfigureAwait(false);
+                    if (options.CheckUniqueID)
                     {
-                        this.Context.Logger.Error($"Faild to lunch debugger {ex}");
+                        var doubles = result.GroupBy(x => x.Id)
+                            .Select(x => (id: x.Key, count: x.Count()))
+                            .Where(x => x.count > 1)
+                            .Select(x => $"{x.id}: {x.count}");
+                        if (doubles.Any())
+                        {
+                            this.Context.Logger.Error($"Found multiple IDs:\n{string.Join("\n", doubles)}");
+                            options.TryBreak(this.Context);
+                        }
                     }
                 }
-                this.Context.Logger.Error(e.ToString());
-                result = ImmutableList<IDocument<TResult>>.Empty;
+                catch (Exception e)
+                {
+                    if (options.BreakOnError)
+                    {
+                        try
+                        {
+                            if (System.Diagnostics.Debugger.IsAttached)
+                                System.Diagnostics.Debugger.Break();
+                            else
+                                System.Diagnostics.Debugger.Launch();
+
+                        }
+                        catch (Exception ex)
+                        {
+                            this.Context.Logger.Error($"Faild to lunch debugger {ex}");
+                        }
+                    }
+                    this.Context.Logger.Error(e.ToString());
+                    result = ImmutableList<IDocument<TResult>>.Empty;
+                }
+                stopWatch.Stop();
             }
-            stopWatch.Stop();
             this.Context.Logger.Info($"END Took {stopWatch.Elapsed}");
 
             await Task
@@ -146,20 +148,23 @@ namespace Stasistium.Stages
         {
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
-            using var indent = this.Context.Logger.Indent();
             this.Context.Logger.Info($"BEGIN");
             var stopWatch = System.Diagnostics.Stopwatch.StartNew();
-
-            try
+            using (var indent = this.Context.Logger.Indent())
             {
-                await this.Work(input, options).ConfigureAwait(false);
 
+
+                try
+                {
+                    await this.Work(input, options).ConfigureAwait(false);
+
+                }
+                catch (Exception e)
+                {
+                    this.Context.Logger.Error($"Error {e}");
+                }
+                stopWatch.Stop();
             }
-            catch (Exception e)
-            {
-                this.Context.Logger.Error($"Error {e}");
-            }
-            stopWatch.Stop();
             this.Context.Logger.Info($"END Took {stopWatch.Elapsed}");
         }
     }
