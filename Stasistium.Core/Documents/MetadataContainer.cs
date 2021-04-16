@@ -14,7 +14,7 @@ namespace Stasistium.Documents
     public delegate T MetadataUpdate<T>([AllowNull] T oldValue, T newValue);
     public delegate object? MetadataUpdate(object? oldValue, object newValue);
 
-    public sealed class MetadataContainer
+    public sealed class MetadataContainer 
     {
         internal static MetadataContainer EmptyFromContext(GeneratorContext context) => new MetadataContainer(ImmutableDictionary<Type, object>.Empty, context);
 
@@ -66,6 +66,7 @@ namespace Stasistium.Documents
             throw new ArgumentOutOfRangeException(nameof(T), $"No entry of Type {typeof(T)}");
 #pragma warning restore CA2208 // Instantiate argument exceptions correctly
         }
+
         public T? TryGetValue<T>()
            where T : class
         {
@@ -73,6 +74,29 @@ namespace Stasistium.Documents
                 return (T)obj;
             return null;
         }
+
+        public object GetValue(Type type)
+        {
+            if (type is null)
+                throw new ArgumentNullException(nameof(type));
+            if (this.values.TryGetValue(type, out var obj))
+                return obj;
+            // Its a Generic parameter
+#pragma warning disable CA2208 // Instantiate argument exceptions correctly
+            throw new ArgumentOutOfRangeException(nameof(type), $"No entry of Type {type}");
+#pragma warning restore CA2208 // Instantiate argument exceptions correctly
+        }
+
+        public object? TryGetValue(Type type)
+        {
+            if (type is null)
+                throw new ArgumentNullException(nameof(type));
+            if (this.values.TryGetValue(type, out var obj))
+                return obj;
+            return null;
+        }
+
+
 
         public MetadataContainer AddOrUpdate<T>(T value)
             where T : class => new MetadataContainer(this.values.SetItem(typeof(T), value), this.Context);
