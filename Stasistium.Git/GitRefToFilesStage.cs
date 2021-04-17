@@ -69,12 +69,16 @@ namespace Stasistium.Stages
 
     public class GitMetadata
     {
+        private GitMetadata()
+        {
+
+        }
         public GitMetadata(ImmutableList<Commit> commits)
         {
             this.FileCommits = commits;
         }
 
-        public ImmutableList<Commit> FileCommits { get; }
+        public ImmutableList<Commit> FileCommits { get; private set; }
     }
 
 
