@@ -109,6 +109,7 @@ namespace Stasistium.Stages
     }
     public class Signature
     {
+        private Signature() { }
         public Signature(string name, string email, DateTimeOffset date)
         {
             this.Name = name ?? throw new ArgumentNullException(nameof(name));
