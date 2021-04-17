@@ -85,6 +85,7 @@ namespace Stasistium.Stages
 
     public class Commit
     {
+        private Commit() { };
         public Commit(string sha, string message, Signature author, Signature committer)
         {
             this.Sha = sha ?? throw new ArgumentNullException(nameof(sha));
