@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<TargetFramework>net6.0</TargetFramework>
 	</PropertyGroup>
 
 	<Import Project="$(SolutionDir)Common.targets" />
 
 	<ItemGroup>
-		<PackageReference Include="EPPlus" Version="4.5.3.2" />
+		<PackageReference Include="EPPlus" Version="4.5.3.3" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -17,6 +17,14 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Stasistium.Generator\Stasistium.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+	  <PackageReference Update="GitVersion.MsBuild" Version="5.9.0">
+	    <PrivateAssets>all</PrivateAssets>
+	    <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+	  </PackageReference>
 	</ItemGroup>
 
 </Project>

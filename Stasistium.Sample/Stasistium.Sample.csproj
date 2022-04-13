@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<TargetFramework>net6.0</TargetFramework>
 		<!--PreserverCompilationContext will be set by Nuget consuming Razor package-->
 		<PreserveCompilationContext>true</PreserveCompilationContext>
 		<Nullable>enable</Nullable>
@@ -16,6 +16,10 @@
 		<ProjectReference Include="..\Stasistium.Markdown\Stasistium.Markdown.csproj" />
 		<ProjectReference Include="..\Stasistium.Razor\Stasistium.Razor.csproj" />
 		<ProjectReference Include="..\Stasistium.YAML\Stasistium.YAML.csproj" />
+		<PackageReference Include="GitVersion.MsBuild" Version="5.9.0">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 
 		<PackageReference Include="Westwind.AspnetCore.LiveReload" Version="0.1.12" />
 	</ItemGroup>
