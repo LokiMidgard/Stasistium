@@ -20,7 +20,7 @@ jobs:
 
     - name: GitVersion
       run: | 
-        dotnet tool install --global GitVersion.Tool --version 5.6.4
+        dotnet tool install --global GitVersion.Tool --version 5.9.0
         dotnet gitversion /output buildserver
     - name: Disable GitVersionTask on builds
       shell: pwsh
