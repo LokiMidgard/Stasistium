@@ -1,4 +1,5 @@
 ﻿using Stasistium.Documents;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -12,19 +13,21 @@ namespace Stasistium.Stages
     {
         internal StageBase(IGeneratorContext context, string? name)
         {
-            this.Name = name ?? this.GenerateName();
-            this.Context = context?.ForName(this.Name) ?? throw new ArgumentNullException(nameof(context));
+            Name = name ?? GenerateName();
+            Context = context?.ForName(Name) ?? throw new ArgumentNullException(nameof(context));
         }
 
         public IGeneratorContext Context { get; }
         public string Name { get; }
         private string GenerateName()
         {
-            var type = this.GetType();
+            Type? type = GetType();
             string baseName;
 
             if (type.IsGenericType)
+            {
                 type = type.GetGenericTypeDefinition();
+            }
 
             baseName = type.Name;
 
@@ -32,7 +35,9 @@ namespace Stasistium.Stages
             {
                 type = type.DeclaringType;
                 if (type.IsGenericType)
+                {
                     type = type.GetGenericTypeDefinition();
+                }
 
                 baseName = $"{type.Name}.{baseName}";
             }
@@ -43,7 +48,7 @@ namespace Stasistium.Stages
 
         public override string ToString()
         {
-            return this.Name;
+            return Name;
         }
     }
 
@@ -57,9 +62,9 @@ namespace Stasistium.Stages
         }
 
         protected abstract Task<IDocument<TResult>> Work(IDocument<TIn> input, OptionToken options);
-        protected override sealed async Task<ImmutableList<IDocument<TResult>>> Work(ImmutableList<IDocument<TIn>> input, OptionToken options)
+        protected sealed override async Task<ImmutableList<IDocument<TResult>>> Work(ImmutableList<IDocument<TIn>> input, OptionToken options)
         {
-            var result = await Task.WhenAll(input.Select(x => this.Work(x, options))).ConfigureAwait(false);
+            IDocument<TResult>[]? result = await Task.WhenAll(input.Select(x => Work(x, options))).ConfigureAwait(false);
             return result.ToImmutableList();
         }
     }
@@ -77,26 +82,29 @@ namespace Stasistium.Stages
         async Task IStageBaseInput<TIn>.DoIt(ImmutableList<IDocument<TIn>> input, OptionToken options)
         {
             if (options is null)
+            {
                 throw new ArgumentNullException(nameof(options));
-            this.Context.Logger.Info($"BEGIN");
-            var stopWatch = System.Diagnostics.Stopwatch.StartNew();
+            }
+
+            Context.Logger.Info($"BEGIN");
+            System.Diagnostics.Stopwatch? stopWatch = System.Diagnostics.Stopwatch.StartNew();
             ImmutableList<IDocument<TResult>>? result;
 
-            using (var indent = this.Context.Logger.Indent())
+            using (IDisposable? indent = Context.Logger.Indent())
             {
                 try
                 {
-                    result = await this.Work(input, options).ConfigureAwait(false);
+                    result = await Work(input, options).ConfigureAwait(false);
                     if (options.CheckUniqueID)
                     {
-                        var doubles = result.GroupBy(x => x.Id)
+                        IEnumerable<string>? doubles = result.GroupBy(x => x.Id)
                             .Select(x => (id: x.Key, count: x.Count()))
                             .Where(x => x.count > 1)
                             .Select(x => $"{x.id}: {x.count}");
                         if (doubles.Any())
                         {
-                            this.Context.Logger.Error($"Found multiple IDs:\n{string.Join("\n", doubles)}");
-                            options.TryBreak(this.Context);
+                            Context.Logger.Error($"Found multiple IDs:\n{string.Join("\n", doubles)}");
+                            options.TryBreak(Context);
                         }
                     }
                 }
@@ -107,25 +115,28 @@ namespace Stasistium.Stages
                         try
                         {
                             if (System.Diagnostics.Debugger.IsAttached)
+                            {
                                 System.Diagnostics.Debugger.Break();
+                            }
                             else
+                            {
                                 System.Diagnostics.Debugger.Launch();
-
+                            }
                         }
                         catch (Exception ex)
                         {
-                            this.Context.Logger.Error($"Faild to lunch debugger {ex}");
+                            Context.Logger.Error($"Faild to lunch debugger {ex}");
                         }
                     }
-                    this.Context.Logger.Error(e.ToString());
+                    Context.Logger.Error(e.ToString());
                     result = ImmutableList<IDocument<TResult>>.Empty;
                 }
                 stopWatch.Stop();
             }
-            this.Context.Logger.Info($"END Took\t{stopWatch.Elapsed}");
+            Context.Logger.Info($"END Took\t{stopWatch.Elapsed}");
 
             await Task
-               .WhenAll(this.PostStages?.GetInvocationList()
+               .WhenAll(PostStages?.GetInvocationList()
                     .Cast<StagePerform<TResult>>()
                     .Select(s => s(result, options)) ?? Array.Empty<Task>()
                ).ConfigureAwait(false);
@@ -147,25 +158,28 @@ namespace Stasistium.Stages
         async Task IStageBaseInput<TIn>.DoIt(ImmutableList<IDocument<TIn>> input, OptionToken options)
         {
             if (options is null)
+            {
                 throw new ArgumentNullException(nameof(options));
-            this.Context.Logger.Info($"BEGIN");
-            var stopWatch = System.Diagnostics.Stopwatch.StartNew();
-            using (var indent = this.Context.Logger.Indent())
+            }
+
+            Context.Logger.Info($"BEGIN");
+            System.Diagnostics.Stopwatch? stopWatch = System.Diagnostics.Stopwatch.StartNew();
+            using (IDisposable? indent = Context.Logger.Indent())
             {
 
 
                 try
                 {
-                    await this.Work(input, options).ConfigureAwait(false);
+                    await Work(input, options).ConfigureAwait(false);
 
                 }
                 catch (Exception e)
                 {
-                    this.Context.Logger.Error($"Error {e}");
+                    Context.Logger.Error($"Error {e}");
                 }
                 stopWatch.Stop();
             }
-            this.Context.Logger.Info($"END Took {stopWatch.Elapsed}");
+            Context.Logger.Info($"END Took {stopWatch.Elapsed}");
         }
     }
 
@@ -173,7 +187,7 @@ namespace Stasistium.Stages
     {
         public event StagePerform<TResult>? PostStages;
 
-        private System.Collections.Concurrent.ConcurrentDictionary<OptionToken, TaskCompletionSource<(ImmutableList<IDocument<TIn2>> input, OptionToken otherOption, TaskCompletionSource<object?> completed)>> argumentCompletion = new System.Collections.Concurrent.ConcurrentDictionary<OptionToken, TaskCompletionSource<(ImmutableList<IDocument<TIn2>> input, OptionToken otherOption, TaskCompletionSource<object?> completed)>>();
+        private System.Collections.Concurrent.ConcurrentDictionary<OptionToken, TaskCompletionSource<(ImmutableList<IDocument<TIn2>> input, OptionToken otherOption, TaskCompletionSource<object?> completed)>> argumentCompletion = new();
 
         protected StageBase(IGeneratorContext context, string? name) : base(context, name)
         {
@@ -185,26 +199,29 @@ namespace Stasistium.Stages
         async Task IStageBaseInput<TIn1, TIn2>.DoIt1(ImmutableList<IDocument<TIn1>> in1, OptionToken options)
         {
 
-            var seccondArgument = this.argumentCompletion.GetOrAdd(options, (opt) => new TaskCompletionSource<(ImmutableList<IDocument<TIn2>> input, OptionToken otherOption, TaskCompletionSource<object?> completed)>());
+            TaskCompletionSource<(ImmutableList<IDocument<TIn2>> input, OptionToken otherOption, TaskCompletionSource<object?> completed)>? seccondArgument = argumentCompletion.GetOrAdd(options, (opt) => new TaskCompletionSource<(ImmutableList<IDocument<TIn2>> input, OptionToken otherOption, TaskCompletionSource<object?> completed)>());
 
-            var (in2, otherToken, finishSource) = await seccondArgument.Task.ConfigureAwait(false);
+            (ImmutableList<IDocument<TIn2>> in2, OptionToken otherToken, TaskCompletionSource<object?> finishSource) = await seccondArgument.Task.ConfigureAwait(false);
 
             if (!otherToken.HaveSameRoot(options))
+            {
                 throw new ArgumentException("OptionToken does not match.");
+            }
+
             ImmutableList<IDocument<TResult>>? result;
             try
             {
-                result = await this.Work(in1, in2, options).ConfigureAwait(false);
+                result = await Work(in1, in2, options).ConfigureAwait(false);
                 if (options.CheckUniqueID)
                 {
-                    var doubles = result.GroupBy(x => x.Id)
+                    IEnumerable<string>? doubles = result.GroupBy(x => x.Id)
                         .Select(x => (id: x.Key, count: x.Count()))
                         .Where(x => x.count > 1)
                         .Select(x => $"{x.id}: {x.count}");
                     if (doubles.Any())
                     {
-                        this.Context.Logger.Error($"Found multiple IDs:\n{string.Join("\n", doubles)}");
-                        options.TryBreak(this.Context);
+                        Context.Logger.Error($"Found multiple IDs:\n{string.Join("\n", doubles)}");
+                        options.TryBreak(Context);
                     }
                 }
             }
@@ -215,21 +232,24 @@ namespace Stasistium.Stages
                     try
                     {
                         if (System.Diagnostics.Debugger.IsAttached)
+                        {
                             System.Diagnostics.Debugger.Break();
+                        }
                         else
+                        {
                             System.Diagnostics.Debugger.Launch();
-
+                        }
                     }
                     catch (Exception ex)
                     {
-                        this.Context.Logger.Error($"Faild to lunch debugger {ex}");
+                        Context.Logger.Error($"Faild to lunch debugger {ex}");
                     }
                 }
-                this.Context.Logger.Error(e.ToString());
+                Context.Logger.Error(e.ToString());
                 result = ImmutableList<IDocument<TResult>>.Empty;
             }
             await Task
-               .WhenAll(this.PostStages?.GetInvocationList()
+               .WhenAll(PostStages?.GetInvocationList()
                     .Cast<StagePerform<TResult>>()
                     .Select(s => s(result, options)) ?? Array.Empty<Task>()
                ).ConfigureAwait(false);
@@ -238,11 +258,11 @@ namespace Stasistium.Stages
 
         async Task IStageBaseInput<TIn1, TIn2>.DoIt2(ImmutableList<IDocument<TIn2>> in2, OptionToken options)
         {
-            var seccondArgument = this.argumentCompletion.GetOrAdd(options, (opt) => new TaskCompletionSource<(ImmutableList<IDocument<TIn2>> input, OptionToken otherOption, TaskCompletionSource<object?> completed)>());
-            var finish = new TaskCompletionSource<object?>();
+            TaskCompletionSource<(ImmutableList<IDocument<TIn2>> input, OptionToken otherOption, TaskCompletionSource<object?> completed)>? seccondArgument = argumentCompletion.GetOrAdd(options, (opt) => new TaskCompletionSource<(ImmutableList<IDocument<TIn2>> input, OptionToken otherOption, TaskCompletionSource<object?> completed)>());
+            TaskCompletionSource<object?>? finish = new();
             seccondArgument.SetResult((in2, options, finish));
             await finish.Task.ConfigureAwait(false);
-            this.argumentCompletion.TryRemove(options, out _);
+            argumentCompletion.TryRemove(options, out _);
         }
 
     }
@@ -252,26 +272,32 @@ namespace Stasistium.Stages
     {
         private readonly GenerationOptions root;
 
-        public bool RefreshRemoteSources => this.root.Refresh;
-        public bool BreakOnError => this.root.BreakOnError;
+        public bool RefreshRemoteSources => root.Refresh;
+        public bool BreakOnError => root.BreakOnError;
 
-        public bool CheckUniqueID => this.root.CheckUniqueID;
+        public bool CheckUniqueID => root.CheckUniqueID;
 
         public ImmutableArray<Guid> GenerationId { get; }
 
         public void TryBreak(IGeneratorContext context)
         {
             if (context is null)
+            {
                 throw new ArgumentNullException(nameof(context));
-            if (this.BreakOnError)
+            }
+
+            if (BreakOnError)
             {
                 try
                 {
                     if (System.Diagnostics.Debugger.IsAttached)
+                    {
                         System.Diagnostics.Debugger.Break();
+                    }
                     else
+                    {
                         System.Diagnostics.Debugger.Launch();
-
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -282,13 +308,13 @@ namespace Stasistium.Stages
 
         internal OptionToken(GenerationOptions root)
         {
-            this.GenerationId = ImmutableArray.Create(Guid.NewGuid());
+            GenerationId = ImmutableArray.Create(Guid.NewGuid());
             this.root = root;
         }
         private OptionToken(OptionToken parent)
         {
-            this.GenerationId = parent.GenerationId.Add(Guid.NewGuid());
-            this.root = parent.root;
+            GenerationId = parent.GenerationId.Add(Guid.NewGuid());
+            root = parent.root;
         }
         public OptionToken CreateSubToken()
         {
@@ -296,32 +322,42 @@ namespace Stasistium.Stages
         }
         public override bool Equals(object? obj)
         {
-            return obj is OptionToken token && this.Equals(token);
+            return obj is OptionToken token && Equals(token);
         }
 
         public bool Equals([AllowNull] OptionToken? other)
         {
             if (other is null)
+            {
                 return false;
+            }
 
-            return this.GenerationId.SequenceEqual(other.GenerationId);
+            return GenerationId.SequenceEqual(other.GenerationId);
         }
         public bool IsSuperTokenOf(OptionToken other)
         {
             if (other is null)
+            {
                 throw new ArgumentNullException(nameof(other));
+            }
+
             return other.IsSubTokenOf(this);
         }
         public bool IsSubTokenOf(OptionToken other)
         {
             if (other is null)
+            {
                 throw new ArgumentNullException(nameof(other));
-            if (this.GenerationId.Length > other.GenerationId.Length)
+            }
+
+            if (GenerationId.Length > other.GenerationId.Length)
             {
                 for (int i = 0; i < other.GenerationId.Length; i++)
                 {
-                    if (other.GenerationId[i] != this.GenerationId[i])
+                    if (other.GenerationId[i] != GenerationId[i])
+                    {
                         return false;
+                    }
                 }
                 return true;
             }
@@ -330,25 +366,37 @@ namespace Stasistium.Stages
 
         public override int GetHashCode()
         {
-            var hash = new HashCode();
-            for (var i = 0; i < this.GenerationId.Length; i++)
-                hash.Add(this.GenerationId[i]);
+            HashCode hash = new();
+            for (int i = 0; i < GenerationId.Length; i++)
+            {
+                hash.Add(GenerationId[i]);
+            }
+
             return hash.ToHashCode();
         }
 
         public bool HaveSameRoot(OptionToken options)
         {
             if (options is null)
+            {
                 throw new ArgumentNullException(nameof(options));
-            return options.GenerationId[0] == this.GenerationId[0];
+            }
+
+            return options.GenerationId[0] == GenerationId[0];
         }
 
         public static bool operator ==(OptionToken? left, OptionToken? right)
         {
             if (left is null && right is null)
+            {
                 return true;
+            }
+
             if (left is null || right is null)
+            {
                 return false;
+            }
+
             return left.Equals(right);
         }
 

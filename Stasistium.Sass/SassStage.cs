@@ -21,7 +21,7 @@ namespace Stasistium.Sass
         {
             return Task.FromResult(all.Select(input =>
             {
-                RelativePathResolver? resolver = new RelativePathResolver(input.Id, all.Select(x => x.Id));
+                RelativePathResolver? resolver = new(input.Id, all.Select(x => x.Id));
                 System.Collections.Generic.Dictionary<string, IDocument<string>>? lookup = all.ToDictionary(x => x.Id, x => x);
                 ScssResult result = Scss.ConvertToCss(input.Value, new ScssOptions()
                 {

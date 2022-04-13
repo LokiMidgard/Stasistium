@@ -37,8 +37,8 @@ namespace Stasistium.Razor
 
         private class FileProvider : IFileProvider
         {
-            private Dictionary<string, StageProviderDirectory> directoryLookup = new Dictionary<string, StageProviderDirectory>();
-            private Dictionary<string, IFileInfo> fileLookup = new Dictionary<string, IFileInfo>();
+            private Dictionary<string, StageProviderDirectory> directoryLookup = new();
+            private Dictionary<string, IFileInfo> fileLookup = new();
 
 
             public FileProvider(IEnumerable<IDocument<Stream>> files, string id)
@@ -82,7 +82,7 @@ namespace Stasistium.Razor
 
             private class ChangeToken : IChangeToken
             {
-                public static readonly ChangeToken Instance = new ChangeToken();
+                public static readonly ChangeToken Instance = new();
                 private ChangeToken()
                 {
 
@@ -98,7 +98,7 @@ namespace Stasistium.Razor
                     {
 
                     }
-                    public static readonly Disposable Instance = new Disposable();
+                    public static readonly Disposable Instance = new();
                     public void Dispose()
                     {
                         throw new NotImplementedException();
@@ -154,7 +154,7 @@ namespace Stasistium.Razor
 
             private class StageProviderDirectory : IDirectoryContents, IFileInfo
             {
-                private readonly List<StageProviderFile> fileList = new List<StageProviderFile>();
+                private readonly List<StageProviderFile> fileList = new();
                 public StageProviderDirectory(string physicalPath)
                 {
                     this.PhysicalPath = physicalPath;

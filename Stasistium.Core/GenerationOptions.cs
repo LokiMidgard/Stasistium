@@ -14,7 +14,7 @@ namespace Stasistium
         {
             get
             {
-                var token = new OptionToken(this);
+                OptionToken? token = new(this);
                 return token;
 
             }

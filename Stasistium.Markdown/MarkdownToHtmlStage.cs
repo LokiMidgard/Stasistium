@@ -108,13 +108,13 @@ namespace Stasistium.Stages
                         builder.Append(id);
                         builder.Append("\" ");
                     }
-                    builder.Append(">");
+                    builder.Append('>');
 
                     foreach (var item in header.Inlines)
                         this.Render(builder, item);
                     builder.Append("</h");
                     builder.Append(header.HeaderLevel.ToString(System.Globalization.CultureInfo.InvariantCulture));
-                    builder.Append(">");
+                    builder.Append('>');
                     break;
 
                 case Blocks.HorizontalRuleBlock hr:
@@ -124,9 +124,9 @@ namespace Stasistium.Stages
                 case Blocks.ListBlock list:
                     var listStyle = list.Style == ListStyle.Bulleted ? "ul" : "ol";
 
-                    builder.Append("<");
+                    builder.Append('<');
                     builder.Append(listStyle);
-                    builder.Append(">");
+                    builder.Append('>');
 
                     foreach (var item in list.Items)
                     {
@@ -137,7 +137,7 @@ namespace Stasistium.Stages
 
                     builder.Append("</");
                     builder.Append(listStyle);
-                    builder.Append(">");
+                    builder.Append('>');
                     break;
 
                 case Blocks.QuoteBlock quote:
@@ -220,18 +220,18 @@ namespace Stasistium.Stages
 
                     builder.Append("<img src=\"");
                     builder.Append(image.Url);
-                    builder.Append("\"");
+                    builder.Append('"');
                     if (image.ImageHeight > 0)
                     {
                         builder.Append("height=\"");
                         builder.Append(image.ImageHeight);
-                        builder.Append("\"");
+                        builder.Append('"');
                     }
                     if (image.ImageWidth > 0)
                     {
                         builder.Append("width=\"");
                         builder.Append(image.ImageWidth);
-                        builder.Append("\"");
+                        builder.Append('"');
                     }
 
                     builder.Append(" />");

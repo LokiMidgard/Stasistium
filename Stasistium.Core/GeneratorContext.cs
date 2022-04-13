@@ -1,4 +1,5 @@
 ﻿using Stasistium.Stages;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,99 +21,106 @@ namespace Stasistium.Documents
         public GeneratorContextWrapper(IGeneratorContext baseContext, string name)
         {
             if (baseContext is GeneratorContextWrapper wrapper)
-                this.BaseContext = wrapper.BaseContext;
+            {
+                BaseContext = wrapper.BaseContext;
+            }
             else if (baseContext is GeneratorContext context)
-                this.BaseContext = context;
+            {
+                BaseContext = context;
+            }
             else if (baseContext is null)
+            {
                 throw new ArgumentNullException(nameof(baseContext));
+            }
             else
+            {
                 throw new NotSupportedException($"Implementation {baseContext.GetType()} is not supported");
+            }
 
-            this.Name = name;
+            Name = name;
         }
 
-        public DirectoryInfo CacheFolder => this.BaseContext.CacheFolder;
+        public DirectoryInfo CacheFolder => BaseContext.CacheFolder;
 
-        public MetadataContainer EmptyMetadata => this.BaseContext.EmptyMetadata;
+        public MetadataContainer EmptyMetadata => BaseContext.EmptyMetadata;
 
-        public ILogger Logger => this.BaseContext.Logger.WithName(this.Name);
+        public ILogger Logger => BaseContext.Logger.WithName(Name);
 
-        public DirectoryInfo TempFolder => this.BaseContext.TempFolder;
+        public DirectoryInfo TempFolder => BaseContext.TempFolder;
 
         public DirectoryInfo ChachDir()
         {
-            return this.BaseContext.ChachDir();
+            return BaseContext.ChachDir();
         }
 
         public IDocument<T> CreateDocument<T>(T value, string contentHash, string id, MetadataContainer? metadata = null)
         {
-            return this.BaseContext.CreateDocument(value, contentHash, id, metadata);
+            return BaseContext.CreateDocument(value, contentHash, id, metadata);
         }
 
         public Exception Exception(string message)
         {
-            return this.BaseContext.Exception(message);
+            return BaseContext.Exception(message);
         }
 
         public string GetHashForStream(Stream toHash)
         {
-            return this.BaseContext.GetHashForStream(toHash);
+            return BaseContext.GetHashForStream(toHash);
         }
 
         public string GetHashForString(string toHash)
         {
-            return this.BaseContext.GetHashForString(toHash);
+            return BaseContext.GetHashForString(toHash);
         }
 
         public IStageBaseOutput<TResult> StageFromResult<TResult>(string id, TResult result, Func<TResult, string> hashFunction)
         {
-            return this.BaseContext.StageFromResult(id, result, hashFunction);
+            return BaseContext.StageFromResult(id, result, hashFunction);
         }
 
         public DirectoryInfo TempDir()
         {
-            return this.BaseContext.TempDir();
+            return BaseContext.TempDir();
         }
 
         public void Warning(string message, Exception? e = null)
         {
-            this.BaseContext.Warning(message, e);
+            BaseContext.Warning(message, e);
         }
 
         public string GetHashForObject(object? value)
         {
-            return this.BaseContext.GetHashForObject(value);
+            return BaseContext.GetHashForObject(value);
         }
 
         public void DisposeOnDispose(IDisposable disposable)
         {
-            this.BaseContext.DisposeOnDispose(disposable);
+            BaseContext.DisposeOnDispose(disposable);
         }
 
         public void DisposeOnDispose(IAsyncDisposable disposable)
         {
-            this.BaseContext.DisposeOnDispose(disposable);
+            BaseContext.DisposeOnDispose(disposable);
         }
 
         public ValueTask DisposeAsync()
         {
-            return this.BaseContext.DisposeAsync();
+            return BaseContext.DisposeAsync();
         }
 
         public bool Equals(IGeneratorContext? other)
         {
-            return this.BaseContext.Equals(other);
+            return BaseContext.Equals(other);
         }
     }
     public sealed class GeneratorContext : IGeneratorContext
     {
-        private readonly HashAlgorithm algorithm = SHA256.Create();
         private readonly Func<object, string?>? objectToStingRepresentation;
 
-        private readonly System.Collections.Concurrent.ConcurrentBag<IDisposable> disposables = new System.Collections.Concurrent.ConcurrentBag<IDisposable>();
-        private readonly System.Collections.Concurrent.ConcurrentBag<IAsyncDisposable> asyncDisposables = new System.Collections.Concurrent.ConcurrentBag<IAsyncDisposable>();
+        private readonly System.Collections.Concurrent.ConcurrentBag<IDisposable> disposables = new();
+        private readonly System.Collections.Concurrent.ConcurrentBag<IAsyncDisposable> asyncDisposables = new();
 
-        public ILogger Logger => this.logger;
+        public ILogger Logger => logger;
         private readonly Logger logger;
         public DirectoryInfo CacheFolder { get; }
         public DirectoryInfo TempFolder { get; }
@@ -121,9 +129,9 @@ namespace Stasistium.Documents
 
         public GeneratorContext(DirectoryInfo? cacheFolder = null, DirectoryInfo? tempFolder = null, Func<object, string?>? objectToStingRepresentation = null, TextWriter? logger = null)
         {
-            this.CacheFolder = cacheFolder ?? new DirectoryInfo("Cache");
-            this.TempFolder = tempFolder ?? new DirectoryInfo("Temp");
-            this.EmptyMetadata = MetadataContainer.EmptyFromContext(this);
+            CacheFolder = cacheFolder ?? new DirectoryInfo("Cache");
+            TempFolder = tempFolder ?? new DirectoryInfo("Temp");
+            EmptyMetadata = MetadataContainer.EmptyFromContext(this);
             this.objectToStingRepresentation = objectToStingRepresentation;
             this.logger = new Logger(logger ?? Console.Out);
         }
@@ -131,56 +139,68 @@ namespace Stasistium.Documents
         public void DisposeOnDispose(IDisposable disposable)
         {
             if (disposable is null)
+            {
                 throw new ArgumentNullException(nameof(disposable));
-            this.disposables.Add(disposable);
+            }
+
+            disposables.Add(disposable);
         }
         public void DisposeOnDispose(IAsyncDisposable disposable)
         {
             if (disposable is null)
+            {
                 throw new ArgumentNullException(nameof(disposable));
-            this.asyncDisposables.Add(disposable);
+            }
+
+            asyncDisposables.Add(disposable);
         }
 
         public string GetHashForString(string toHash)
         {
-            var bytes = this.algorithm.ComputeHash(Encoding.UTF8.GetBytes(toHash));
+            using SHA256? algorithm = SHA256.Create();
+            byte[]? bytes = algorithm.ComputeHash(Encoding.UTF8.GetBytes(toHash ?? string.Empty));
 
-            var sb = new StringBuilder(bytes.Length << 1);
+            StringBuilder? sb = new(bytes.Length << 1);
             foreach (byte b in bytes)
-                sb.Append(b.ToString("X2", System.Globalization.CultureInfo.InvariantCulture));
+            {
+                _ = sb.Append(b.ToString("X2", System.Globalization.CultureInfo.InvariantCulture));
+            }
 
             return sb.ToString();
         }
 
         public string GetHashForStream(Stream toHash)
         {
-            var bytes = this.algorithm.ComputeHash(toHash);
+            using SHA256? algorithm = SHA256.Create();
+            byte[]? bytes = algorithm.ComputeHash(toHash);
 
-            var sb = new StringBuilder(bytes.Length << 1);
+            StringBuilder? sb = new(bytes.Length << 1);
             foreach (byte b in bytes)
-                sb.Append(b.ToString("X2", System.Globalization.CultureInfo.InvariantCulture));
+            {
+                _ = sb.Append(b.ToString("X2", System.Globalization.CultureInfo.InvariantCulture));
+            }
 
             return sb.ToString();
         }
 
-        private readonly List<Stages.StaticStage> staticStages = new List<Stages.StaticStage>();
+        private readonly List<Stages.StaticStage> staticStages = new();
 
         public IStageBaseOutput<TResult> StageFromResult<TResult>(string id, TResult result, Func<TResult, string> hashFunction)
         {
-            var stage = new Stages.StaticStage<TResult>(id, result, hashFunction, this);
-            this.staticStages.Add(stage);
+            StaticStage<TResult>? stage = new(id, result, hashFunction, this);
+            staticStages.Add(stage);
             return stage;
         }
 
-        public Task Run(GenerationOptions option) => Task.WhenAll(this.staticStages.Select(stage => stage.Invoke(option.Token)));
+        public Task Run(GenerationOptions option) => Task.WhenAll(staticStages.Select(stage => stage.Invoke(option.Token)));
 
 
 
         public string GetHashForObject(object? value)
         {
 
-            var c = System.Globalization.CultureInfo.InvariantCulture;
-            return this.GetHashForString(value switch
+            System.Globalization.CultureInfo? c = System.Globalization.CultureInfo.InvariantCulture;
+            return GetHashForString(value switch
             {
                 string s => s,
                 int i => i.ToString(c),
@@ -197,29 +217,29 @@ namespace Stasistium.Documents
                 null => "",
                 System.Runtime.CompilerServices.ITuple tuple => TupleToString(tuple),
                 System.Collections.IEnumerable enumerable => EnumberableToString(enumerable),
-                _ => this.GetStringForObject(value)
-            }); ; ;
+                _ => GetStringForObject(value)
+            });
 
             string TupleToString(System.Runtime.CompilerServices.ITuple tuple)
             {
-                var str = new StringBuilder();
+                StringBuilder? str = new();
                 for (int i = 0; i < tuple.Length; i++)
                 {
-                    str.Append("<");
-                    str.Append(System.Net.WebUtility.HtmlEncode(this.GetHashForObject(tuple[i])));
-                    str.Append(">");
+                    _ = str.Append('<')
+                    .Append(System.Net.WebUtility.HtmlEncode(GetHashForObject(tuple[i])))
+                    .Append('>');
                 }
 
                 return str.ToString();
             }
             string EnumberableToString(System.Collections.IEnumerable enumerable)
             {
-                var str = new StringBuilder();
-                foreach (var item in enumerable)
+                StringBuilder? str = new();
+                foreach (object? item in enumerable)
                 {
-                    str.Append("<");
-                    str.Append(System.Net.WebUtility.HtmlEncode(this.GetHashForObject(item)));
-                    str.Append(">");
+                    _ = str.Append('<')
+                    .Append(System.Net.WebUtility.HtmlEncode(GetHashForObject(item)))
+                    .Append('>');
                 }
 
                 return str.ToString();
@@ -230,21 +250,23 @@ namespace Stasistium.Documents
 
         private string GetStringForObject(object obj)
         {
-            var result = this.objectToStingRepresentation?.Invoke(obj);
+            string? result = objectToStingRepresentation?.Invoke(obj);
             if (result is null)
             {
-                var type = obj.GetType();
+                Type? type = obj.GetType();
                 if (type.IsEnum)
-                    return obj.ToString() ?? string.Empty;
-
-                var str = new StringBuilder();
-                foreach (var property in type.GetProperties(System.Reflection.BindingFlags.Instance).OrderBy(x => x.Name))
                 {
-                    str.Append("<");
-                    str.Append(property.Name);
-                    str.Append("><");
-                    str.Append(this.GetHashForObject(property.GetValue(obj)));
-                    str.Append(">");
+                    return obj.ToString() ?? string.Empty;
+                }
+
+                StringBuilder? str = new();
+                foreach (System.Reflection.PropertyInfo? property in type.GetProperties(System.Reflection.BindingFlags.Instance).OrderBy(x => x.Name))
+                {
+                    _ = str.Append('<')
+                    .Append(property.Name)
+                    .Append("><")
+                    .Append(GetHashForObject(property.GetValue(obj)))
+                    .Append('>');
                 }
                 return str.ToString();
             }
@@ -255,7 +277,9 @@ namespace Stasistium.Documents
         {
             Console.WriteLine(message);
             if (e != null)
+            {
                 Console.WriteLine(e.ToString());
+            }
         }
 
 
@@ -267,14 +291,14 @@ namespace Stasistium.Documents
 
         public System.IO.DirectoryInfo TempDir()
         {
-            var directoryInfo = new DirectoryInfo(Path.Combine(this.TempFolder.FullName, Guid.NewGuid().ToString()));
+            DirectoryInfo? directoryInfo = new(Path.Combine(TempFolder.FullName, Guid.NewGuid().ToString()));
             directoryInfo.Create();
             return directoryInfo;
         }
         public System.IO.DirectoryInfo ChachDir()
         {
-            this.CacheFolder.Create();
-            return this.CacheFolder;
+            CacheFolder.Create();
+            return CacheFolder;
         }
 
         #region IDisposable Support
@@ -282,19 +306,22 @@ namespace Stasistium.Documents
 
         public async ValueTask DisposeAsync()
         {
-            if (!this.disposedValue)
+            if (!disposedValue)
             {
-                while (this.disposables.TryTake(out var disposable))
+                while (disposables.TryTake(out IDisposable? disposable))
+                {
                     disposable.Dispose();
+                }
 
-                while (this.asyncDisposables.TryTake(out var disposable))
+                while (asyncDisposables.TryTake(out IAsyncDisposable? disposable))
+                {
                     await disposable.DisposeAsync();
+                }
 
-                this.algorithm.Dispose();
 
-                Helper.Delete.Readonly(this.TempFolder.FullName);
-                await this.logger.DisposeAsync();
-                this.disposedValue = true;
+                Helper.Delete.Readonly(TempFolder.FullName);
+                await logger.DisposeAsync();
+                disposedValue = true;
             }
 
         }
@@ -315,15 +342,23 @@ namespace Stasistium.Documents
         public override bool Equals(object? obj)
         {
             if (obj is IGeneratorContext other)
-                return this.Equals(other);
+            {
+                return Equals(other);
+            }
+
             return false;
         }
         public bool Equals(IGeneratorContext? other)
         {
             if (other is GeneratorContextWrapper wrapper)
-                return this.Equals(wrapper.BaseContext);
+            {
+                return Equals(wrapper.BaseContext);
+            }
             else if (other is GeneratorContext context)
+            {
                 return ReferenceEquals(this, context);
+            }
+
             return false;
         }
     }
@@ -332,8 +367,8 @@ namespace Stasistium.Documents
     {
         public LoggerWrapper(Logger baseLogger, string name)
         {
-            this.BaseLogger = baseLogger ?? throw new ArgumentNullException(nameof(baseLogger));
-            this.Name = name ?? throw new ArgumentNullException(nameof(name));
+            BaseLogger = baseLogger ?? throw new ArgumentNullException(nameof(baseLogger));
+            Name = name ?? throw new ArgumentNullException(nameof(name));
         }
 
         public Logger BaseLogger { get; }
@@ -341,20 +376,20 @@ namespace Stasistium.Documents
 
         public IDisposable Indent()
         {
-            return ((ILogger)this.BaseLogger).Indent();
+            return ((ILogger)BaseLogger).Indent();
         }
 
         public void Info(string text)
         {
-            ((ILogger)this.BaseLogger).Info($"{{{this.Name}}}\t{text}");
+            ((ILogger)BaseLogger).Info($"{{{Name}}}\t{text}");
         }
         public void Error(string text)
         {
-            ((ILogger)this.BaseLogger).Error($"{{{this.Name}}}\t{text}");
+            ((ILogger)BaseLogger).Error($"{{{Name}}}\t{text}");
         }
         public void Verbose(string text)
         {
-            ((ILogger)this.BaseLogger).Verbose($"{{{this.Name}}}\t{text}");
+            ((ILogger)BaseLogger).Verbose($"{{{Name}}}\t{text}");
         }
     }
     // the logger is not owned, it can e.g. be the Console...
@@ -366,31 +401,31 @@ namespace Stasistium.Documents
 
         internal Logger(TextWriter writer)
         {
-            this.logger = new System.CodeDom.Compiler.IndentedTextWriter(writer);
+            logger = new System.CodeDom.Compiler.IndentedTextWriter(writer);
         }
 
         public void Info(string text)
         {
-            this.logger.WriteLine("[INFO]\t" + text);
+            logger.WriteLine("[INFO]\t" + text);
         }
         public void Verbose(string text)
         {
-            this.logger.WriteLine("[VERBOSE]\t" + text);
+            logger.WriteLine("[VERBOSE]\t" + text);
         }
         public void Error(string text)
         {
-            this.logger.WriteLine("[ERROR]\t" + text);
+            logger.WriteLine("[ERROR]\t" + text);
         }
 
         public IDisposable Indent()
         {
-            this.logger.Indent++;
+            logger.Indent++;
             return new IndentWrapper(this);
         }
 
         public ValueTask DisposeAsync()
         {
-            return this.logger.DisposeAsync();
+            return logger.DisposeAsync();
         }
 
         private sealed class IndentWrapper : IDisposable
@@ -407,10 +442,10 @@ namespace Stasistium.Documents
 
             public void Dispose()
             {
-                if (!this.disposedValue)
+                if (!disposedValue)
                 {
-                    this.logger.logger.Indent--;
-                    this.disposedValue = true;
+                    logger.logger.Indent--;
+                    disposedValue = true;
                 }
             }
             #endregion

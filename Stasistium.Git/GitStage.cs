@@ -21,7 +21,7 @@ namespace Stasistium.Stages
 
     public class GitCloneStage : StageBase<GitRepo, GitRefStage>
     {
-        private readonly Dictionary<GitRepo, (DirectoryInfo workingDirectory, Repository repository)> repoLookup = new Dictionary<GitRepo, (DirectoryInfo workingDirectory, Repository repository)>();
+        private readonly Dictionary<GitRepo, (DirectoryInfo workingDirectory, Repository repository)> repoLookup = new();
 
         public GitCloneStage(IGeneratorContext context, string? name) : base(context, name)
         {
@@ -80,7 +80,7 @@ namespace Stasistium.Stages
 
     public class GitCloneStringStage : StageBase<string, GitRefStage>
     {
-        private readonly Dictionary<string, (DirectoryInfo workingDirectory, Repository repository)> repoLookup = new Dictionary<string, (DirectoryInfo workingDirectory, Repository repository)>();
+        private readonly Dictionary<string, (DirectoryInfo workingDirectory, Repository repository)> repoLookup = new();
         [StageName("GitClone")]
         public GitCloneStringStage(IGeneratorContext context, string? name) : base(context, name)
         {

@@ -16,7 +16,7 @@ namespace Stasistium.Documents
 
     public sealed class MetadataContainer 
     {
-        internal static MetadataContainer EmptyFromContext(GeneratorContext context) => new MetadataContainer(ImmutableDictionary<Type, object>.Empty, context);
+        internal static MetadataContainer EmptyFromContext(GeneratorContext context) => new(ImmutableDictionary<Type, object>.Empty, context);
 
         private readonly ImmutableDictionary<Type, object> values;
 
@@ -31,11 +31,11 @@ namespace Stasistium.Documents
             var hash = new StringBuilder();
             foreach (var (key, value) in values.OrderBy(x => x.Key.FullName).Select(x => (key: x.Key.FullName, value: this.Context.GetHashForObject(x.Value))))
             {
-                hash.Append("<");
+                hash.Append('<');
                 hash.Append(System.Net.WebUtility.HtmlEncode(key));
                 hash.Append("><");
                 hash.Append(System.Net.WebUtility.HtmlEncode(value));
-                hash.Append(">");
+                hash.Append('>');
             }
             return hash.ToString();
         }
@@ -99,7 +99,7 @@ namespace Stasistium.Documents
 
 
         public MetadataContainer AddOrUpdate<T>(T value)
-            where T : class => new MetadataContainer(this.values.SetItem(typeof(T), value), this.Context);
+            where T : class => new(this.values.SetItem(typeof(T), value), this.Context);
 
         public MetadataContainer AddOrUpdate<T>(T value, MetadataUpdate<T> updateCallback)
             where T : class
@@ -134,7 +134,7 @@ namespace Stasistium.Documents
         }
 
         public MetadataContainer Add<T>(T value)
-            where T : class => new MetadataContainer(this.values.Add(typeof(T), value), this.Context);
+            where T : class => new(this.values.Add(typeof(T), value), this.Context);
 
         public MetadataContainer Update<T>(T value, out T? oldValue)
             where T : class

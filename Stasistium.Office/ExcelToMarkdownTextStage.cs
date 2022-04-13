@@ -90,7 +90,7 @@ namespace Stasistium.Stages
                 {
                     foreach (var column in columnSize)
                     {
-                        builder.Append("+");
+                        builder.Append('+');
                         builder.Append(isHeader ? '=' : '-', column + 4);
                     }
                     builder.AppendLine("+");
@@ -100,7 +100,7 @@ namespace Stasistium.Stages
                 WriteLine(builder, columnSize);
                 for (int row = 0; row < rowCount; row++)
                 {
-                    builder.Append("|");
+                    builder.Append('|');
                     for (int column = 0; column < columnSize.Length; column++)
                     {
                         var (value, alignment) = table[column, row];
