@@ -61,6 +61,7 @@ namespace Stasistium.Stages
                     }
                     catch (YamlDotNet.Core.YamlException e) when (e.InnerException is null) // Hope that only happens when it does not match.
                     {
+                        this.Context.Logger.Error($"Faild to parse YAML {e}");
                         newMetadata = null;
                     }
 
