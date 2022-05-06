@@ -30,7 +30,7 @@ namespace Stasistium.Stages
             var inputList = input;
 
             var sidecarLookup = inputList.Where(x => Path.GetExtension(x.Id) == this.SidecarExtension)
-                .ToDictionary(x => Path.Combine(Path.GetDirectoryName(x.Id) ?? string.Empty, Path.GetFileNameWithoutExtension(x.Id)));
+                .ToDictionary(x => Path.Combine(Path.GetDirectoryName(x.Id) ?? string.Empty, Path.GetFileNameWithoutExtension(x.Id)).Replace('\\','/'));
 
             var files = inputList.Where(x => Path.GetExtension(x.Id) != this.SidecarExtension);
 
