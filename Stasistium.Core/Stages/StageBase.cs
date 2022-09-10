@@ -133,7 +133,14 @@ namespace Stasistium.Stages
                 }
                 stopWatch.Stop();
             }
-            Context.Logger.Info($"END Took\t{stopWatch.Elapsed}");
+            if (stopWatch.Elapsed.TotalSeconds > options.WarnLongRunningStageSeconds)
+            {
+                Context.Logger.Warn($"END Took\t{stopWatch.Elapsed}");
+            }
+            else
+            {
+                Context.Logger.Info($"END Took\t{stopWatch.Elapsed}");
+            }
 
             await Task
                .WhenAll(PostStages?.GetInvocationList()
@@ -179,7 +186,14 @@ namespace Stasistium.Stages
                 }
                 stopWatch.Stop();
             }
-            Context.Logger.Info($"END Took {stopWatch.Elapsed}");
+            if (stopWatch.Elapsed.TotalSeconds > options.WarnLongRunningStageSeconds)
+            {
+                Context.Logger.Warn($"END Took\t{stopWatch.Elapsed}");
+            }
+            else
+            {
+                Context.Logger.Info($"END Took\t{stopWatch.Elapsed}");
+            }
         }
     }
 
@@ -276,6 +290,9 @@ namespace Stasistium.Stages
         public bool BreakOnError => root.BreakOnError;
 
         public bool CheckUniqueID => root.CheckUniqueID;
+
+        public double WarnLongRunningStageSeconds => root.WarnLongRunningStageSeconds;
+
 
         public ImmutableArray<Guid> GenerationId { get; }
 

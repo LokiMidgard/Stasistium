@@ -391,6 +391,10 @@ namespace Stasistium.Documents
         {
             ((ILogger)BaseLogger).Verbose($"{{{Name}}}\t{text}");
         }
+        public void Warn(string text)
+        {
+            ((ILogger)BaseLogger).Warn($"{{{Name}}}\t{text}");
+        }
     }
     // the logger is not owned, it can e.g. be the Console...
 #pragma warning disable CA1001 // Types that own disposable fields should be disposable
@@ -415,6 +419,10 @@ namespace Stasistium.Documents
         public void Error(string text)
         {
             logger.WriteLine("[ERROR]\t" + text);
+        }
+        public void Warn(string text)
+        {
+            logger.WriteLine("[WARNING]\t" + text);
         }
 
         public IDisposable Indent()

@@ -10,6 +10,7 @@ namespace Stasistium
 
         public bool CompressCache { get; set; } = true;
         public bool CheckUniqueID { get; set; }
+        public double WarnLongRunningStageSeconds { get; set; } = 20;
         public OptionToken Token
         {
             get
